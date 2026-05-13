@@ -1,0 +1,6153 @@
+[
+  {
+    "file": "工作日报0420KMS_HSM.xlsx",
+    "sheets": [
+      {
+        "sheet": "Sheet1",
+        "max_row": 18,
+        "max_column": 5,
+        "non_empty_rows": 17,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "分类",
+          "与密码/加密相关程度",
+          "为什么相关",
+          "典型服务/配置点"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "Cryptography & PKI",
+            "最高",
+            "这是最直接的密码学分类，包含密钥管理、证书、HSM、PKI 等",
+            "AWS KMS、CloudHSM、AWS Certificate Manager、Private CA；涉及密钥类型、密钥轮换、证书、签名、HSM、TLS 证书等。AWS KMS 明确用于创建和控制加密/签名所用密钥。"
+          ],
+          [
+            "",
+            "Security, Identity, & Compliance",
+            "很高",
+            "安全服务大量依赖加密、密钥、证书、密钥轮换、TLS、审计",
+            "Secrets Manager、IAM、Security Hub、Macie、CloudTrail 等。Secrets Manager 使用 AWS KMS 加密 secret，且可选择默认 KMS key 或 customer managed key。"
+          ],
+          [
+            "",
+            "Storage",
+            "很高",
+            "存储服务普遍涉及静态数据加密、KMS 密钥选择、服务端加密、客户端加密",
+            "S3、EBS、EFS、FSx、Backup。比如 EFS 同时支持传输中加密和静态加密；EBS 加密也使用 KMS。"
+          ],
+          [
+            "",
+            "Database",
+            "很高",
+            "数据库通常涉及静态加密、KMS key、透明加密、字段级/客户端加密",
+            "RDS、Aurora、DynamoDB、Redshift、ElastiCache、DocumentDB 等。DynamoDB 默认加密所有静态客户数据，并使用 KMS；Aurora 也使用 KMS 进行资源加密。"
+          ],
+          [
+            "",
+            "Compute",
+            "中高",
+            "计算服务本身不一定是密码服务，但会涉及磁盘加密、实例通信 TLS、证书部署、Nitro 安全等",
+            "EC2、Lambda、Lightsail、Outposts。EC2 主要看 EBS 加密、AMI/snapshot 加密、实例到服务的 TLS。"
+          ],
+          [
+            "",
+            "Containers",
+            "中高",
+            "容器平台会涉及镜像加密、Secrets、KMS、TLS、service mesh/mTLS、EKS 加密配置",
+            "EKS、ECS、ECR。尤其 EKS 常涉及 Kubernetes Secrets 加密、API Server 通信 TLS、Pod 间 mTLS 等。"
+          ],
+          [
+            "",
+            "Application Integration",
+            "中等",
+            "消息、队列、事件总线等服务通常涉及静态加密、传输加密、KMS key",
+            "SQS、SNS、EventBridge、Step Functions、AppSync、MQ。重点看是否能选择 KMS key、是否支持 TLS、是否支持客户托管密钥。"
+          ],
+          [
+            "",
+            "Developer Tools",
+            "中等",
+            "CI/CD、代码仓库、制品库会涉及 artifact 加密、secret 管理、签名、连接凭据",
+            "CodeBuild、CodePipeline、CodeArtifact、CodeCommit。重点看构建密钥、环境变量加密、artifact bucket 加密、代码签名。"
+          ],
+          [
+            "",
+            "Management & Governance",
+            "中等",
+            "本身不是密码服务，但经常用于检查/强制加密配置",
+            "Config、CloudFormation、Control Tower、Organizations、CloudTrail。重点不是“密码算法”，而是加密合规检查、未加密资源检测、策略强制。"
+          ],
+          [
+            "",
+            "Analytics",
+            "中等",
+            "大数据服务通常保存大量数据，会涉及 KMS、S3 加密、传输加密",
+            "Athena、Glue、EMR、OpenSearch、Kinesis、QuickSight。重点看数据湖/S3/KMS、日志加密、集群间 TLS。"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet2",
+        "max_row": 8,
+        "max_column": 5,
+        "non_empty_rows": 7,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "项目",
+          "是否与密码/加密相关",
+          "主要涉及内容",
+          "是否有可配置密码相关项"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "AWS Certificate Manager（ACM）",
+            "是，强相关",
+            "SSL/TLS X.509 证书的创建、导入、存储、续期和部署，用于保护网站和应用通信",
+            "有。可申请/导入证书、选择公有/私有证书、域名、验证方式、证书部署到 ELB/CloudFront/API Gateway 等；但通常不在ACM本身选择 TLS 密码套件，密码套件多在 ELB、CloudFront、API Gateway 等使用证书的服务中配置。"
+          ],
+          [
+            "",
+            "Choosing an AWS cryptography service",
+            "相关，但不是具体服务",
+            "AWS 官方的密码服务选型指南，帮助选择 KMS、CloudHSM、ACM、Private CA 等",
+            "不是配置对象。它本身不提供加密能力，只是决策指南。"
+          ],
+          [
+            "",
+            "AWS CloudHSM",
+            "是，强相关",
+            "基于硬件安全模块 HSM 的密钥存储与密码运算，适合高合规、强密钥控制场景",
+            "有，而且很多。可管理 HSM 集群、用户、密钥；可通过 PKCS #11、JCE、CNG/KSP、CloudHSM CLI 等接口使用和管理密钥。CloudHSM 的核心就是安全存储密钥并执行密码运算。"
+          ],
+          [
+            "",
+            "AWS Crypto Tools",
+            "是，相关",
+            "偏向密码工具/库/SDK，帮助开发者正确使用加密能力",
+            "通常有，但取决于具体工具。例如客户端加密库可能涉及数据密钥、主密钥提供者、加密上下文、算法套件等。它不像 KMS/CloudHSM 是一个单一云资源服务，更偏工具集合。"
+          ],
+          [
+            "",
+            "AWS Key Management Service（KMS）",
+            "是，强相关",
+            "托管式密钥管理服务，用于创建和控制加密、解密、签名所用密钥",
+            "有，非常核心。可配置 customer managed key、key policy、IAM/grant、密钥轮换、别名、启用/禁用、删除计划、密钥用途、密钥类型等。KMS 官方定义就是用于创建和控制加密/签名密钥。"
+          ],
+          [
+            "",
+            "AWS Signer",
+            "是，强相关",
+            "代码签名服务，用于对 Lambda 包、IoT 设备代码、容器镜像等进行数字签名，验证代码完整性和可信来源",
+            "有。主要配置 signing profile、签名平台、代码签名证书/配置、可信发布者等；它不是“数据加密”，而是数字签名/完整性验证。"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet3",
+        "max_row": 16,
+        "max_column": 6,
+        "non_empty_rows": 15,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "配置项",
+          "具体可选值/表现",
+          "建议判定",
+          "",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "",
+            "KeySpec：对称密钥",
+            "SYMMETRIC_DEFAULT",
+            "安全值",
+            "",
+            ""
+          ],
+          [
+            "",
+            "KeySpec：RSA 密钥长度",
+            "RSA_2048、RSA_3072、RSA_4096",
+            "RSA_3072/4096 更推荐；RSA_2048 可视为兼容值/中性偏风险值",
+            "",
+            ""
+          ],
+          [
+            "",
+            "KeySpec：ECC 曲线",
+            "ECC_NIST_P256、ECC_NIST_P384、ECC_NIST_P521、ECC_NIST_EDWARDS25519、ECC_SECG_P256K1",
+            "一般为安全值，需按用途判断",
+            "",
+            ""
+          ],
+          [
+            "",
+            "KeySpec：HMAC",
+            "HMAC_224、HMAC_256、HMAC_384、HMAC_512",
+            "HMAC_256/384/512 可视为安全值；HMAC_224 可视为兼容/较低安全强度值",
+            "",
+            ""
+          ],
+          [
+            "",
+            "KeySpec：ML-DSA",
+            "ML_DSA_44、ML_DSA_65、ML_DSA_87",
+            "后量子安全方向的安全值",
+            "",
+            ""
+          ],
+          [
+            "",
+            "KeyUsage",
+            "ENCRYPT_DECRYPT、SIGN_VERIFY、GENERATE_VERIFY_MAC、KEY_AGREEMENT",
+            "安全值，但必须与用途匹配；错配会造成不可用或安全边界混乱",
+            "",
+            ""
+          ],
+          [
+            "",
+            "RSA 加密算法",
+            "RSAES_OAEP_SHA_1、RSAES_OAEP_SHA_256",
+            "RSAES_OAEP_SHA_256 为安全值；RSAES_OAEP_SHA_1 可标为风险值/兼容值",
+            "",
+            ""
+          ],
+          [
+            "",
+            "RSA 签名算法",
+            "RSASSA_PSS_SHA_*、RSASSA_PKCS1_V1_5_SHA_*",
+            "RSASSA_PSS_SHA_* 为安全值；PKCS1_V1_5 可标为兼容值/偏风险值",
+            "",
+            ""
+          ],
+          [
+            "",
+            "密钥材料来源 Origin",
+            "AWS_KMS、EXTERNAL、AWS_CLOUDHSM、EXTERNAL_KEY_STORE",
+            "AWS_KMS 默认安全；EXTERNAL/EXTERNAL_KEY_STORE 不是弱算法，但有更高运维风险",
+            "",
+            ""
+          ],
+          [
+            "",
+            "自动密钥轮换",
+            "enabled / disabled；rotation period",
+            "enabled 为安全值；disabled 对长期密钥可视为风险值",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet4",
+        "max_row": 12,
+        "max_column": 15,
+        "non_empty_rows": 6,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "配置项",
+          "安全值",
+          "风险值/注意值",
+          "",
+          "",
+          "RSA 加密算法",
+          "判定",
+          "",
+          "RSA 签名算法",
+          "判定",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "",
+            "对称加密 KeySpec",
+            "SYMMETRIC_DEFAULT",
+            "基本无明显弱值；中国区域例外为 SM4-128，需要按国密合规场景判断",
+            "",
+            "",
+            "RSAES_OAEP_SHA_256",
+            "安全值",
+            "",
+            "RSASSA_PSS_SHA_256/384/512",
+            "安全值",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "RSA KeySpec",
+            "RSA_3072、RSA_4096",
+            "RSA_2048 可作为最低兼容值，不建议作为长期高安全等级首选",
+            "",
+            "",
+            "RSAES_OAEP_SHA_1",
+            "风险值/兼容值",
+            "",
+            "RSASSA_PKCS1_V1_5_SHA_256/384/512",
+            "兼容值/偏风险值",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECC KeySpec",
+            "ECC_NIST_P256/P384/P521、ED25519",
+            "ECC_SECG_P256K1 主要用于加密货币场景，非通用首选",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "配置项",
+            "安全值",
+            "风险值/兼容值"
+          ],
+          [
+            "",
+            "HMAC KeySpec",
+            "HMAC_256/384/512",
+            "HMAC_224 安全强度较低，可标为偏弱/兼容值",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "Wrapping key spec",
+            "RSA_4096",
+            "RSA_2048 可作为最低兼容值"
+          ],
+          [
+            "",
+            "ML-DSA KeySpec",
+            "ML_DSA_44/65/87",
+            "无传统意义弱值，但 ML_DSA_44/65/87 对应不同安全等级和成本",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "Wrapping algorithm",
+            "RSAES_OAEP_SHA_256",
+            "RSAES_OAEP_SHA_1 偏兼容；RSAES_PKCS1_V1 属于 deprecated"
+          ]
+        ]
+      },
+      {
+        "sheet": "总体表",
+        "max_row": 17,
+        "max_column": 6,
+        "non_empty_rows": 17,
+        "header_row_1_based": 2,
+        "headers": [
+          "",
+          "配置项",
+          "对应 CLI / API",
+          "典型可选值",
+          "安全值",
+          "风险值 / 注意值"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "KeySpec 密钥规格",
+            "创建时：aws kms create-key --key-spec ... / CreateKey；查看：describe-key",
+            "SYMMETRIC_DEFAULT、RSA_2048、RSA_3072、RSA_4096、ECC_NIST_P256、ECC_NIST_P384、ECC_NIST_P521、ECC_NIST_EDWARDS25519、ECC_SECG_P256K1、HMAC_224/256/384/512、ML_DSA_44/65/87 等",
+            "SYMMETRIC_DEFAULT、RSA_3072/4096、主流 ECC、HMAC_256/384/512、ML_DSA_65/87",
+            "RSA_2048 可作为兼容/最低安全值；HMAC_224 安全强度较低；ECC_SECG_P256K1 更偏特定区块链场景，不宜作为通用首选"
+          ],
+          [
+            "",
+            "KeyUsage 密钥用途",
+            "创建时：create-key --key-usage ...；查看：describe-key",
+            "ENCRYPT_DECRYPT、SIGN_VERIFY、GENERATE_VERIFY_MAC、KEY_AGREEMENT",
+            "与业务用途严格匹配",
+            "不是强弱问题，主要风险是用途混乱，例如签名 key、加密 key、MAC key 权限边界不清"
+          ],
+          [
+            "",
+            "Origin / KeyMaterialOrigin 密钥材料来源",
+            "创建时：create-key --origin ...；查看：describe-key",
+            "AWS_KMS、EXTERNAL、AWS_CLOUDHSM、EXTERNAL_KEY_STORE",
+            "AWS_KMS 适合大多数场景；AWS_CLOUDHSM 适合高合规场景",
+            "EXTERNAL、EXTERNAL_KEY_STORE 是条件安全值，不是弱算法，但带来密钥导入、备份、可用性、外部系统运维风险"
+          ],
+          [
+            "",
+            "MultiRegion 多区域密钥",
+            "创建：create-key --multi-region；复制：replicate-key；查看：describe-key",
+            "true / false",
+            "无跨区域解密需求时使用 single-Region；有灾备/跨区域需求时使用 multi-Region",
+            "不是密码弱值，但 multi-Region 会扩大密钥影响范围；EXTERNAL + MultiRegion 还要求每个副本独立导入相同 key material"
+          ],
+          [
+            "",
+            "EncryptionAlgorithm RSA 加密算法",
+            "使用时：encrypt --encryption-algorithm ...、decrypt --encryption-algorithm ...；策略限制：put-key-policy + kms:EncryptionAlgorithm",
+            "RSAES_OAEP_SHA_1、RSAES_OAEP_SHA_256",
+            "RSAES_OAEP_SHA_256",
+            "RSAES_OAEP_SHA_1 属于兼容/偏风险值；建议通过 key policy 或 IAM policy 禁止"
+          ],
+          [
+            "",
+            "SigningAlgorithm 签名算法",
+            "使用时：sign --signing-algorithm ...、verify --signing-algorithm ...；策略限制：put-key-policy + kms:SigningAlgorithm",
+            "RSA：RSASSA_PSS_SHA_256/384/512、RSASSA_PKCS1_V1_5_SHA_256/384/512；ECC：ECDSA_SHA_256/384/512；ML-DSA：对应 ML-DSA 签名算法",
+            "RSA 优先 RSASSA_PSS_SHA_*；ECC 按曲线匹配；ML-DSA 属于后量子签名方向",
+            "RSASSA_PKCS1_V1_5_* 是兼容值，AWS 文档也说明 RSA 签名时 PSS 更推荐，PKCS#1 v1.5 主要用于兼容已有应用"
+          ],
+          [
+            "",
+            "MacAlgorithm HMAC 算法",
+            "使用时：generate-mac --mac-algorithm ...、verify-mac --mac-algorithm ...",
+            "HMAC_SHA_224、HMAC_SHA_256、HMAC_SHA_384、HMAC_SHA_512",
+            "HMAC_SHA_256/384/512",
+            "HMAC_SHA_224 可标为较低安全强度/兼容值"
+          ],
+          [
+            "",
+            "Data key spec 数据密钥长度",
+            "使用时：generate-data-key --key-spec ...",
+            "AES_128、AES_256",
+            "AES_256",
+            "AES_128 不是传统意义弱值，但在高安全基线中通常低于 AES_256"
+          ],
+          [
+            "",
+            "自动密钥轮换 RotationEnabled",
+            "启用：enable-key-rotation；禁用：disable-key-rotation；查看：get-key-rotation-status",
+            "enabled / disabled",
+            "对长期 customer managed key 启用自动轮换",
+            "长期禁用轮换可视为密钥生命周期管理风险"
+          ],
+          [
+            "",
+            "RotationPeriodInDays 轮换周期",
+            "enable-key-rotation --rotation-period-in-days ...",
+            "90–2560 天，具体以 AWS 当前约束为准",
+            "按合规要求设置，例如 90、180、365 天",
+            "周期过长，或没有明确密钥生命周期策略"
+          ]
+        ]
+      },
+      {
+        "sheet": "0421",
+        "max_row": 56,
+        "max_column": 5,
+        "non_empty_rows": 45,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "CloudHSM CLI attribute",
+          "Value",
+          "Modifiable with key set-attribute",
+          "Settable at key creation"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "always-sensitive",
+            "The value is True if sensitive has always been set to True and has never changed.",
+            "No",
+            "No"
+          ],
+          [
+            "",
+            "check-value",
+            "The check value of the key. For more information, see Additional Details.",
+            "No",
+            "No"
+          ],
+          [
+            "",
+            "class",
+            "Possible values: secret-key, public-key, and private-key.",
+            "No",
+            "Yes"
+          ],
+          [
+            "",
+            "curve",
+            "Elliptic curve used to generate the EC key pair.",
+            "No",
+            "Settable with EC, not settable with RSA"
+          ],
+          [
+            "",
+            "",
+            "Valid Values: secp224r1, secp256r1, prime256v1, secp384r1, secp256k1, secp521r1, and ed25519",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "ed25519 is only supported on hsm2m.medium instances in non-FIPS mode.",
+            "",
+            ""
+          ],
+          [
+            "",
+            "decrypt",
+            "Default: False",
+            "Yes",
+            "Yes"
+          ],
+          [
+            "",
+            "derive",
+            "Default: False",
+            "Derive can be set on hsm2m.medium instances. It cannot be set for RSA keys on hsm1.medium instances.",
+            "Yes"
+          ],
+          [
+            "",
+            "destroyable",
+            "Default: True",
+            "Yes",
+            "Yes"
+          ],
+          [
+            "",
+            "ec-point",
+            "For EC keys, DER-encoding of ANSI X9.62 ECPoint value \"Q\" in a hexadecimal format.",
+            "No",
+            "No"
+          ]
+        ]
+      },
+      {
+        "sheet": "key attributes",
+        "max_row": 11,
+        "max_column": 4,
+        "non_empty_rows": 10,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "属性",
+          "作用",
+          "配置方式"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "encrypt",
+            "是否允许 key 用于加密",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "decrypt",
+            "是否允许解密",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "sign",
+            "是否允许签名",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "verify",
+            "是否允许验签",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "wrap",
+            "是否允许包装其他 key",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "unwrap",
+            "是否允许解包 key",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "derive",
+            "是否允许派生 key",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "extractable",
+            "是否允许导出/包装出 HSM",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "sensitive",
+            "是否作为敏感密钥保护",
+            "创建 key 时指定，通常创建后不可随意降低"
+          ]
+        ]
+      },
+      {
+        "sheet": "CloudHSM加密机制",
+        "max_row": 85,
+        "max_column": 6,
+        "non_empty_rows": 78,
+        "header_row_1_based": 12,
+        "headers": [
+          "",
+          "",
+          "CKM_SHA1_RSA_PKCS",
+          "使用 SHA-1 + RSA PKCS 签名；SHA-1 相关机制一般应标记为兼容/风险值",
+          "",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "",
+            "",
+            "CKM_SHA224_RSA_PKCS",
+            "SHA-224 安全强度较低，可标为兼容/注意值",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA256_RSA_PKCS",
+            "SHA-256 + RSA PKCS；虽然 SHA-256 没问题，但签名填充仍是 PKCS#1 v1.5；建议优先 PSS",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA384_RSA_PKCS",
+            "SHA-384 + RSA PKCS；同上",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA512_RSA_PKCS",
+            "SHA-512 + RSA PKCS；同上",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA1_RSA_PKCS_PSS",
+            "SHA-1 + RSA-PSS；SHA-1 部分仍需注意",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA224_RSA_PKCS_PSS",
+            "SHA-224 + RSA-PSS；较低强度/注意值",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA256_RSA_PKCS_PSS",
+            "SHA-256 + RSA-PSS，较推荐",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA384_RSA_PKCS_PSS",
+            "SHA-384 + RSA-PSS，较推荐",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA512_RSA_PKCS_PSS",
+            "SHA-512 + RSA-PSS，较推荐",
+            "",
+            ""
+          ],
+          [
+            "",
+            "Sign and verify - ECDSA",
+            "CKM_ECDSA",
+            "仅支持 single-part operations；raw ECDSA，single-part operations only；风险取决于外部哈希选择",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "CloudHSM签名机制",
+        "max_row": 52,
+        "max_column": 6,
+        "non_empty_rows": 50,
+        "header_row_1_based": 2,
+        "headers": [
+          "模块",
+          "机制/配置",
+          "可选值",
+          "对应命令",
+          "备注",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "Sign - ECDSA",
+            "签名机制",
+            "ecdsa",
+            "crypto sign ecdsa",
+            "使用 EC private key 生成 ECDSA 签名；私钥需在 HSM 中，且 sign=true。签名结果格式为 `r",
+            "https://docs.aws.amazon.com/cloudhsm/latest/userguide/cloudhsm_cli-crypto-sign-ecdsa.html"
+          ],
+          [
+            "",
+            "哈希函数",
+            "sha1、sha224、sha256、sha384、sha512",
+            "--hash-function <value>",
+            "sha1 可标为风险/兼容值，sha224 可标为注意值，sha256/384/512 较推荐。",
+            ""
+          ],
+          [
+            "",
+            "输入数据类型",
+            "raw、digest",
+            "--data-type <value>",
+            "raw 表示传入未哈希数据；digest 表示传入已哈希摘要。",
+            ""
+          ],
+          [
+            "",
+            "数据输入",
+            "base64 数据 / 文件路径",
+            "--data <DATA> 或 --data-path <PATH>",
+            "二选一。",
+            ""
+          ],
+          [
+            "",
+            "密钥选择",
+            "key reference 或 key attributes",
+            "--key-filter ...",
+            "例如 attr.label=ec-private。",
+            ""
+          ],
+          [
+            "Verify - ECDSA",
+            "验签机制",
+            "ecdsa",
+            "crypto verify ecdsa",
+            "使用 EC public key 验证 ECDSA 签名；签名格式需要是 `r",
+            "https://docs.aws.amazon.com/cloudhsm/latest/userguide/cloudhsm_cli-crypto-verify-ecdsa.html"
+          ],
+          [
+            "",
+            "哈希函数",
+            "sha1、sha224、sha256、sha384、sha512",
+            "--hash-function <value>",
+            "必须与签名时一致。",
+            ""
+          ],
+          [
+            "",
+            "输入数据类型",
+            "raw、digest",
+            "--data-type <value>",
+            "与签名侧保持一致。",
+            ""
+          ],
+          [
+            "",
+            "签名输入",
+            "base64 签名 / 签名文件路径",
+            "--signature <SIG> 或 --signature-path <PATH>",
+            "二选一。",
+            ""
+          ],
+          [
+            "",
+            "数据输入",
+            "base64 数据 / 文件路径",
+            "--data <DATA> 或 --data-path <PATH>",
+            "二选一。",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "整体",
+        "max_row": 15,
+        "max_column": 5,
+        "non_empty_rows": 14,
+        "header_row_1_based": 1,
+        "headers": [
+          "配置项",
+          "是否密码相关",
+          "可选值 / 表现",
+          "安全值",
+          "风险值 / 注意值"
+        ],
+        "sample_rows": [
+          [
+            "Cluster mode",
+            "是",
+            "FIPS mode / Non-FIPS mode",
+            "合规场景优先 FIPS mode",
+            "Non-FIPS mode 允许非 FIPS validated 机制，不一定不安全，但合规风险更高"
+          ],
+          [
+            "HSM type",
+            "间接相关",
+            "hsm1.medium / hsm2m.medium",
+            "按功能需求选择",
+            "某些算法/曲线只在特定 HSM type 或 non-FIPS 下支持"
+          ],
+          [
+            "Key type",
+            "是",
+            "AES、RSA、EC、Triple DES、GENERIC_SECRET",
+            "AES、RSA、EC",
+            "Triple DES 属于历史算法，FIPS 模式下已有弃用/限制趋势"
+          ],
+          [
+            "AES key length",
+            "是",
+            "128、192、256 bit",
+            "AES-256，AES-128 也仍可接受",
+            "高安全基线下不建议优先 AES-128"
+          ],
+          [
+            "RSA modulus size",
+            "是",
+            "2048–4096 bit，按 256 bit 递增",
+            "RSA-3072 / RSA-4096",
+            "RSA-2048 可作为最低兼容值，不建议作为长期高安全首选"
+          ],
+          [
+            "EC curve",
+            "是",
+            "secp224r1、secp256r1、prime256v1、secp384r1、secp521r1、secp256k1、ed25519",
+            "secp256r1/384r1/521r1、ed25519 按场景使用",
+            "secp224r1 安全强度偏低；secp256k1 更偏区块链场景；ed25519 仅 hsm2m.medium non-FIPS 支持"
+          ],
+          [
+            "加密机制 Encryption mechanism",
+            "是",
+            "AES-GCM、AES-CBC、AES-CTR、AES-ECB、DES3-CBC、RSA-OAEP、RSA-PKCS 等，具体见加密机制单独表",
+            "AES-GCM、RSA-OAEP",
+            "AES-ECB、DES3、RSA-PKCS 属于风险/兼容机制；AES-CBC/CTR 需配合正确 IV/MAC"
+          ],
+          [
+            "签名机制 Signing mechanism",
+            "是",
+            "RSA-PSS、RSA-PKCS、ECDSA、HMAC、Ed25519ph 等，具体见签名机制单独表",
+            "RSA-PSS、ECDSA-SHA256/384/512、Ed25519ph",
+            "RSA-PKCS v1.5、SHA1 相关签名机制偏兼容/风险"
+          ],
+          [
+            "摘要机制 Digest mechanism",
+            "是",
+            "SHA1、SHA224、SHA256、SHA384、SHA512，具体见加密机制单独表",
+            "SHA256/384/512",
+            "SHA1 不建议作为安全基线；SHA224 安全强度较低"
+          ],
+          [
+            "HMAC mechanism",
+            "是",
+            "HMAC-SHA1、HMAC-SHA224、HMAC-SHA256/384/512，具体见加密机制单独表",
+            "HMAC-SHA256/384/512",
+            "HMAC-SHA1、HMAC-SHA224 偏兼容/较低强度"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "张聪艺-工作日报0424AWS_Signer.xlsx",
+    "sheets": [
+      {
+        "sheet": "Sheet1",
+        "max_row": 11,
+        "max_column": 6,
+        "non_empty_rows": 10,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "配置项",
+          "可选值",
+          "风险值",
+          "安全值",
+          "对应命令 / API"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "签名平台 platformId",
+            "典型平台包括 AWSIoTDeviceManagement-SHA256-ECDSA、AmazonFreeRTOS-Default、AmazonFreeRTOS-TI-CC3220SF、AWSLambda-SHA384-ECDSA、Notation-OCI-SHA384-ECDSA",
+            "AmazonFreeRTOS-TI-CC3220SF 可视为风险/兼容值，因为其平台名即表明使用 SHA1-RSA；这类平台更偏旧兼容场景",
+            "AWSLambda-SHA384-ECDSA、Notation-OCI-SHA384-ECDSA、AWSIoTDeviceManagement-SHA256-ECDSA、AmazonFreeRTOS-Default",
+            "CLI：aws signer put-signing-profile --platform-id ...；API：PutSigningProfile；查看平台详情：aws signer get-signing-platform --platform-id ... / GetSigningPlatform (AWS 文档)"
+          ],
+          [
+            "",
+            "签名证书 signingMaterial.certificateArn",
+            "ACM 证书 ARN；对 Lambda/容器工作流，Signer 管理关联证书和密钥；对 IoT 工作流，需要将第三方代码签名证书导入 ACM",
+            "使用来源不明、弱算法或管理不当的 ACM 证书属于风险；IoT 场景下如果导入证书链和私钥管理薄弱也有风险",
+            "使用受控、受信任、算法合理的 ACM 证书",
+            "CLI：aws signer put-signing-profile --signing-material certificateArn=...；API：PutSigningProfile (AWS 文档)"
+          ],
+          [
+            "",
+            "签名算法覆盖 overrides.signingConfiguration.encryptionAlgorithm",
+            "RSA、ECDSA",
+            "RSA 不一定是弱值，但在支持良好的平台上通常不是首选；若与 SHA1 组合则风险更高",
+            "ECDSA 通常更推荐",
+            "CLI：aws signer put-signing-profile --overrides signingConfiguration={encryptionAlgorithm=...,hashAlgorithm=...}；API：PutSigningProfile；平台允许值可用 GetSigningPlatform 查看 (AWS 文档)"
+          ],
+          [
+            "",
+            "哈希算法覆盖 overrides.signingConfiguration.hashAlgorithm",
+            "SHA1、SHA256",
+            "SHA1 应视为明确风险值",
+            "SHA256",
+            "CLI：同上；API：PutSigningProfile；平台允许值可用 GetSigningPlatform 查看 (AWS 文档)"
+          ],
+          [
+            "",
+            "签名图像格式 overrides.signingImageFormat",
+            "JSON、JSONEmbedded、JSONDetached；平台返回支持格式和默认格式",
+            "不是传统“弱算法”风险，但 JSONDetached 需要额外妥善管理被签名对象与签名的绑定关系；误用会增加运维/验证风险",
+            "通常优先使用平台默认格式；在需要“签名与对象强绑定”的场景下，JSONEmbedded 更稳妥",
+            "CLI：aws signer put-signing-profile --overrides signingImageFormat=...；API：PutSigningProfile；平台支持情况可用 GetSigningPlatform 查看 supportedFormats 与 defaultFormat (AWS 文档)"
+          ],
+          [
+            "",
+            "签名有效期 signatureValidityPeriod",
+            "单位 DAYS、MONTHS、YEARS；未指定默认 135 个月；仅适用于 AWSLambda-SHA384-ECDSA 和 Notation-OCI-SHA384-ECDSA 平台",
+            "过长有效期可视为生命周期风险；默认 135 个月在某些高安全场景下偏长",
+            "按业务与合规要求设置更合理的有限有效期",
+            "CLI：aws signer put-signing-profile --signature-validity-period value=,type=MONTHS"
+          ],
+          [
+            "",
+            "待签名负载格式 payloadFormat（容器 / Notation 场景）",
+            "当前唯一有效值：application/vnd.cncf.notary.payload.v1+json",
+            "这里没有“弱值”可选；风险主要在于格式不匹配导致签名/验证失败",
+            "使用唯一受支持格式",
+            "CLI：aws signer sign-payload；API：SignPayload (AWS 文档)"
+          ],
+          [
+            "",
+            "待签名负载内容 payload",
+            "Base64 编码二进制，表示“对象摘要（hash）”而不是原始大文件；长度 1–4096",
+            "若应用侧对摘要计算、对象绑定、摘要来源控制不当，会形成实现风险",
+            "使用受控的摘要生成链路",
+            "CLI：aws signer sign-payload --payload ... --payload-format ... --profile-name ...；API：SignPayload (AWS 文档)"
+          ],
+          [
+            "",
+            "是否支持撤销 revocationSupported",
+            "true / false，由平台决定，不是用户自由指定",
+            "若平台不支持撤销，签名生命周期治理能力较弱",
+            "支持撤销的平台更利于治理",
+            "查看：aws signer get-signing-platform --platform-id ...；API：GetSigningPlatform (AWS 文档)"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet2",
+        "max_row": 21,
+        "max_column": 8,
+        "non_empty_rows": 17,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "配置项",
+          "风险值",
+          "原因",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "",
+            "hashAlgorithm",
+            "SHA1",
+            "明确属于过时哈希，作为代码签名基线不应优先使用。(AWS 文档)",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "platformId",
+            "AmazonFreeRTOS-TI-CC3220SF",
+            "该平台在官方列表中就标注为 SHA1-RSA。(AWS 文档)",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "signatureValidityPeriod",
+            "过长",
+            "不属于算法弱点，但属于签名生命周期风险。(AWS 文档)",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "signingMaterial.certificateArn",
+            "弱证书 / 不受控证书",
+            "会直接影响签名可信根。(AWS 文档)",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "配置项",
+            "安全值",
+            "原因"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "platformId",
+            "AWSLambda-SHA384-ECDSA、Notation-OCI-SHA384-ECDSA",
+            "平台名本身就反映更现代的 ECDSA + SHA384 组合。"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "encryptionAlgorithm",
+            "ECDSA",
+            "一般优于传统 RSA 兼容路线。"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "hashAlgorithm",
+            "SHA256",
+            "是 Signer 覆盖项中的现代默认推荐值。"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "signingImageFormat",
+            "平台默认格式；常见可优先 JSONEmbedded",
+            "更容易减少签名对象与签名分离后的管理问题。"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "signatureValidityPeriod",
+            "合理有限期",
+            "有利于控制签名长期暴露面。"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "张聪艺-工作日报0428AWS_Database_Encryption_SDK.xlsx",
+    "sheets": [
+      {
+        "sheet": "Sheet1",
+        "max_row": 10,
+        "max_column": 3,
+        "non_empty_rows": 9,
+        "header_row_1_based": 1,
+        "headers": [
+          "配置项",
+          "说明",
+          "典型风险点"
+        ],
+        "sample_rows": [
+          [
+            "Keyring 类型",
+            "KMS keyring、KMS Hierarchical keyring、raw AES、raw RSA 等",
+            "裸 discovery mode、raw key 管理不当"
+          ],
+          [
+            "Wrapping key 类型",
+            "对称 KMS key、RSA KMS key、raw AES-GCM、raw RSA",
+            "用错 key 标识；未使用 ARN；原始密钥管理薄弱"
+          ],
+          [
+            "Cryptographic actions",
+            "字段是加密并签名、只签名、还是忽略",
+            "敏感字段未加密；关键字段未签名"
+          ],
+          [
+            "默认/实际 algorithm suite",
+            "AES-GCM + HKDF + ECDSA",
+            "去掉签名或降级保护"
+          ],
+          [
+            "Encryption context / material description",
+            "绑定元数据和解密识别信息",
+            "放敏感信息；上下文校验不足"
+          ],
+          [
+            "Strict / discovery mode",
+            "解密如何识别 wrapping keys",
+            "discovery 过宽"
+          ],
+          [
+            "Searchable encryption / beacons",
+            "查询加密数据的配置",
+            "泄露过多查询面；beacon 设计不当"
+          ],
+          [
+            "Hierarchical keyring / branch key cache",
+            "KMS 调用优化与密钥材料缓存",
+            "缓存/branch key 生命周期控制不当"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet2",
+        "max_row": 17,
+        "max_column": 5,
+        "non_empty_rows": 16,
+        "header_row_1_based": 1,
+        "headers": [
+          "配置项",
+          "可选值",
+          "风险值",
+          "安全值",
+          "对应命令或 API"
+        ],
+        "sample_rows": [
+          [
+            "Keyring 类型",
+            "AWS KMS keyring、AWS KMS Hierarchical keyring、raw AES keyring、raw RSA keyring，以及其他实现支持的 keyring",
+            "裸 discovery mode；raw keyring 管理不当",
+            "AWS KMS keyring；需要降低 KMS 调用时使用 AWS KMS Hierarchical keyring",
+            "SDK 接口：各语言创建 keyring；若用 KMS keyring，底层涉及 KMS API。AWS 明确建议尽可能使用 AWS KMS keyrings。 (AWS 文档)"
+          ],
+          [
+            "Wrapping key 类型",
+            "对称 KMS key、非对称 RSA KMS key、raw AES-GCM key、raw RSA key",
+            "原始对称/非对称 key 自行管理不当；解密标识不一致",
+            "KMS 对称 key；需要时可用 RSA KMS key",
+            "SDK 接口：创建 keyring 时指定；底层 KMS API：取决于 keyring。文档说明支持 KMS 对称 key、RSA KMS key、raw AES-GCM、raw RSA。 (AWS 文档)"
+          ],
+          [
+            "KMS key 标识方式",
+            "key ARN、alias name、alias ARN、key ID；严格解密时要求 key ARN；非对称 RSA KMS key 也要求 key ARN",
+            "严格解密时不用 key ARN；RSA KMS key 不用 ARN",
+            "严格模式统一使用 key ARN",
+            "SDK 接口：创建 AWS KMS keyring 时传入；底层 KMS API：解密时校验 material description 中的 key ARN。 (AWS 文档)"
+          ],
+          [
+            "Strict mode / Discovery mode",
+            "strict mode、discovery mode",
+            "不加限制的 discovery mode",
+            "strict mode；若必须 discovery，则加 discovery filter",
+            "SDK 接口：不同语言 keyring builder。文档明确说 strict mode 是默认解密方式；discovery mode 不指定 wrapping keys。 (AWS 文档)"
+          ],
+          [
+            "Discovery filter",
+            "account ID + partition（如 aws、aws-cn、aws-us-gov）",
+            "discovery mode 不加 filter",
+            "discovery mode 下使用严格 filter",
+            "SDK 接口：创建 discovery filter；文档明确说如果必须用 discovery mode，推荐总是使用 discovery filter。 (AWS 文档)"
+          ],
+          [
+            "Cryptographic actions（字段级动作）",
+            "ENCRYPT_AND_SIGN、SIGN_ONLY、SIGN_AND_INCLUDE_IN_ENCRYPTION_CONTEXT、DO_NOTHING",
+            "敏感字段配置为 DO_NOTHING；关键字段不签名；把应保密字段只做 SIGN_ONLY",
+            "敏感字段 ENCRYPT_AND_SIGN；关键索引/主键等按需用 SIGN_ONLY 或 SIGN_AND_INCLUDE_IN_ENCRYPTION_CONTEXT",
+            "SDK 接口：表 schema / actions 配置。文档说明这些动作决定字段是“加密并签名、只签名、签名并纳入加密上下文，还是不处理”。 (AWS 文档)"
+          ],
+          [
+            "Algorithm suite",
+            "默认套件；某些实现可选替代套件（含或不含数字签名）",
+            "去掉数字签名；偏离默认而无明确需求",
+            "默认套件",
+            "SDK 接口：CMM/材料配置；不是独立 AWS 服务命令。默认套件使用 AES-GCM、HKDF 和 ECDSA signing。 (AWS 文档)"
+          ],
+          [
+            "Digital signatures",
+            "启用 / 不启用（由 algorithm suite 决定）",
+            "不带签名套件；尤其在“加密者”和“解密者”权限可区分时",
+            "使用默认带签名套件",
+            "间接配置：通过 algorithm suite 选择。文档说明 ECDSA 数字签名默认启用但不是强制；若加解密双方同等可信，才可能考虑去掉。 (AWS 文档)"
+          ],
+          [
+            "Encryption context",
+            "自定义键值对；默认至少包含部分关键字段；可加入更多字段",
+            "把敏感明文放进去；不校验关键上下文",
+            "仅放非敏感认证元数据；必要时把关键字段纳入",
+            "SDK 接口：schema/CMM/搜索配置。文档说明 partition/sort keys 默认会进入 encryption context，某些字段可配置为 SIGN_AND_INCLUDE_IN_ENCRYPTION_CONTEXT。 (AWS 文档)"
+          ],
+          [
+            "Material description",
+            "自动保存 encrypted data keys 及 wrapping key 相关元数据",
+            "标识不一致导致无法解密；依赖不受控 metadata",
+            "与 keyring 和 key 标识严格匹配",
+            "SDK 自动处理；解密流程会依赖其中保存的 key ARN 或 raw key 的 namespace/name。 (AWS 文档)"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet3",
+        "max_row": 20,
+        "max_column": 4,
+        "non_empty_rows": 15,
+        "header_row_1_based": 2,
+        "headers": [
+          "",
+          "配置项",
+          "风险值",
+          "原因"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "Strict / Discovery mode",
+            "discovery mode 且不加 filter",
+            "文档明确说这种模式下，SDK 可请求任何能解开该数据键的 KMS key 来解密。 (AWS 文档)"
+          ],
+          [
+            "",
+            "Cryptographic actions",
+            "敏感字段 DO_NOTHING",
+            "会直接失去机密性与完整性保护。 (AWS 文档)"
+          ],
+          [
+            "",
+            "Algorithm suite / signatures",
+            "去掉数字签名",
+            "默认套件加入 ECDSA 签名就是为了防止可解密者伪造新密文。 (AWS 文档)"
+          ],
+          [
+            "",
+            "Raw keyring",
+            "raw AES/raw RSA 管理不当",
+            "原始 wrapping key 的安全性和持久性由你自己负责。 (AWS 文档)"
+          ],
+          [
+            "",
+            "Searchable encryption / beacons",
+            "不评估威胁模型就启用",
+            "会引入可查询性与泄露面的权衡。 (AWS 文档)"
+          ],
+          [
+            "",
+            "安全",
+            "",
+            ""
+          ],
+          [
+            "",
+            "配置项",
+            "安全值",
+            "原因"
+          ],
+          [
+            "",
+            "Keyring",
+            "AWS KMS keyring",
+            "AWS 明确建议尽可能使用 KMS keyrings。 (AWS 文档)"
+          ],
+          [
+            "",
+            "Mode",
+            "strict mode",
+            "最小化允许的 wrapping keys 范围。 (AWS 文档)"
+          ],
+          [
+            "",
+            "Discovery filter",
+            "account + partition 严格限制",
+            "文档明确作为 best practice 推荐。 (AWS 文档)"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "张聪艺-工作日报0430汇总表格.xlsx",
+    "sheets": [
+      {
+        "sheet": "Sheet1",
+        "max_row": 20,
+        "max_column": 7,
+        "non_empty_rows": 20,
+        "header_row_1_based": 1,
+        "headers": [
+          "Public_Cloud",
+          "Service",
+          "Description",
+          "API_Endpoint",
+          "Recommended_Values",
+          "Risky_Values",
+          "References"
+        ],
+        "sample_rows": [
+          [
+            "AWS",
+            "CloudFront",
+            "AWS CDN Service",
+            "DistributionConfig.ViewerCertificate.MinimumProtocolVersion",
+            "TLSv1.3_2025 / TLSv1.2_2025 / TLSv1.2_2021",
+            "SSLv3 / TLSv1 / TLSv1_2016 / TLSv1.1_2016 / TLSv1.2_2018 / TLSv1.2_2019",
+            "https://docs.aws.amazon.com/cli/latest/reference/cloudfront/update-distribution.html ; https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-viewer-protocols-ciphers.html"
+          ],
+          [
+            "AWS",
+            "ALB",
+            "AWS Application Load Balancer",
+            "Listener.SslPolicy",
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06 / ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09 / other modern TLS 1.2/1.3 policies",
+            "ELBSecurityPolicy-2016-08 / policies supporting TLS 1.0 / TLS 1.1 / CBC / non-FS ciphers",
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/describe-ssl-policies.html ; https://docs.aws.amazon.com/cli/latest/reference/elbv2/modify-listener.html"
+          ],
+          [
+            "AWS",
+            "NLB",
+            "AWS Network Load Balancer (TLS Listener)",
+            "Listener.SslPolicy",
+            "Modern TLS 1.2 / TLS 1.3 policies, especially policies emphasizing FS/PQ support",
+            "Old TLS policies supporting TLS 1.0 / TLS 1.1, CBC suites, SHA-1 related suites, non-FS suites",
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/describe-ssl-policies.html ; https://docs.aws.amazon.com/cli/latest/reference/elbv2/modify-listener.html"
+          ],
+          [
+            "AWS",
+            "VPC Lattice",
+            "Application networking / service-to-service connectivity",
+            "TLS/密码套件通常非细粒度可配；更关注 listener/custom domain/certificate related settings",
+            "使用 HTTPS / 绑定 ACM 证书 / 启用安全通信",
+            "明文 HTTP、未绑定证书、依赖不安全上层配置",
+            "https://docs.aws.amazon.com/vpc-lattice/latest/ug/what-is-vpc-lattice.html ; https://docs.aws.amazon.com/vpc-lattice/latest/ug/data-protection.html"
+          ],
+          [
+            "AWS",
+            "Route 53",
+            "Managed DNS Service",
+            "EnableHostedZoneDNSSEC / CreateKeySigningKey",
+            "Enable DNSSEC; use managed KSK with proper KMS permissions",
+            "DNSSEC disabled for security-sensitive hosted zones",
+            "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec.html ; https://docs.aws.amazon.com/cli/latest/reference/route53/enable-hosted-zone-dnssec.html ; https://docs.aws.amazon.com/cli/latest/reference/route53/create-key-signing-key.html"
+          ],
+          [
+            "AWS",
+            "KMS",
+            "Key Management Service",
+            "CreateKey.KeySpec",
+            "SYMMETRIC_DEFAULT, RSA_3072, RSA_4096, ECC_NIST_P384, ECC_NIST_P521, choose according to scenario",
+            "Using weaker / legacy choices without business need, e.g. low-strength asymmetric options where stronger modern choices are more suitable",
+            "https://docs.aws.amazon.com/kms/latest/APIReference/API_CreateKey.html"
+          ],
+          [
+            "AWS",
+            "KMS",
+            "Key Management Service",
+            "CreateKey.KeyUsage",
+            "ENCRYPT_DECRYPT, SIGN_VERIFY, GENERATE_VERIFY_MAC chosen according to actual purpose",
+            "Misuse of key purpose; over-broad use assumptions",
+            "https://docs.aws.amazon.com/kms/latest/APIReference/API_CreateKey.html"
+          ],
+          [
+            "AWS",
+            "KMS",
+            "Key Management Service",
+            "EnableKeyRotation",
+            "Enabled (for symmetric customer managed keys where supported)",
+            "Rotation disabled without justification",
+            "https://docs.aws.amazon.com/kms/latest/developerguide/rotating-keys-enable.html"
+          ],
+          [
+            "AWS",
+            "KMS",
+            "Key Management Service",
+            "Origin",
+            "AWS_KMS unless external-origin requirement exists and is properly governed",
+            "EXTERNAL with poor external key governance / import lifecycle control",
+            "https://docs.aws.amazon.com/kms/latest/developerguide/importing-keys.html"
+          ],
+          [
+            "AWS",
+            "CloudHSM",
+            "Hardware Security Module Service",
+            "Mechanism / crypto operation configuration via PKCS#11, JCE, CLI tools",
+            "Modern approved mechanisms; align with FIPS/compliance requirements; strict key access control",
+            "Weak / legacy mechanisms, improper key permissions, non-compliant usage in regulated environments",
+            "https://docs.aws.amazon.com/cloudhsm/latest/userguide/ ; https://docs.aws.amazon.com/cloudhsm/latest/userguide/pkcs11-mechanisms.html"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet2",
+        "max_row": 46,
+        "max_column": 11,
+        "non_empty_rows": 39,
+        "header_row_1_based": 2,
+        "headers": [
+          "Public_Cloud",
+          "Service",
+          "Description",
+          "Crypto_Category",
+          "Configuration_Item",
+          "API_Endpoint",
+          "Recommended_Values",
+          "Risky_Values",
+          "Risk_Reason",
+          "Security_Value_Reason",
+          "References"
+        ],
+        "sample_rows": [
+          [
+            "AWS",
+            "CloudFront",
+            "AWS CDN Service",
+            "TLS / HTTPS",
+            "Minimum viewer TLS protocol version",
+            "DistributionConfig.ViewerCertificate.MinimumProtocolVersion",
+            "TLSv1.3_2025; TLSv1.2_2025; TLSv1.2_2021",
+            "SSLv3; TLSv1; TLSv1_2016; TLSv1.1_2016; TLSv1.2_2018; TLSv1.2_2019",
+            "旧策略可能允许过时 TLS 版本或较弱密码套件；TLS 1.0/1.1 已被 RFC 8996 废弃，不应继续使用。",
+            "较新的 CloudFront 安全策略通常限制为 TLS 1.2/1.3，并减少遗留密码套件暴露面。",
+            "CloudFront 安全策略决定 viewer 与 CloudFront 之间可用的协议和密码套件；RFC 8996 明确废弃 TLS 1.0/1.1。(AWS 文档)"
+          ],
+          [
+            "AWS",
+            "CloudFront",
+            "AWS CDN Service",
+            "TLS / Certificate",
+            "Viewer certificate",
+            "DistributionConfig.ViewerCertificate.ACMCertificateArn / IAMCertificateId / CloudFrontDefaultCertificate",
+            "Use ACM certificate for custom domain; use modern certificate algorithm where applicable",
+            "Relying on default certificate for custom domain requirements; expired or unmanaged imported certificate",
+            "证书管理不当会导致 TLS 身份认证失败、证书过期或域名不匹配。",
+            "ACM 托管证书便于自动续期和统一管理。",
+            "CloudFront HTTPS 配置依赖 viewer certificate 与安全策略。(AWS 文档)"
+          ],
+          [
+            "AWS",
+            "ALB",
+            "Application Load Balancer",
+            "TLS / HTTPS",
+            "Listener SSL security policy",
+            "Listener.SslPolicy / modify-listener --ssl-policy",
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09; ELBSecurityPolicy-TLS13-1-2-Res-2021-06; other TLS 1.2/1.3 modern policies",
+            "ELBSecurityPolicy-2016-08; ELBSecurityPolicy-TLS-1-1-2017-01; policies allowing TLS 1.0/1.1, CBC, SHA-1, or non-FS suites",
+            "旧 ELB 策略可能包含 TLS 1.0/1.1、CBC、SHA-1 或非前向安全套件，扩大降级和兼容性风险。",
+            "TLS 1.2/1.3 现代策略减少遗留协议和弱套件，并优先支持更强的密钥交换与加密套件。",
+            "AWS ALB 文档列出安全策略及其协议/密码套件，且 AWS 推荐新的 PQ-TLS 策略；TLS 1.0/1.1 已被废弃。(AWS 文档)"
+          ],
+          [
+            "AWS",
+            "ALB",
+            "Application Load Balancer",
+            "TLS / Certificate",
+            "HTTPS listener certificate",
+            "Listener.Certificates / modify-listener --certificates",
+            "ACM-managed certificate; valid certificate chain; certificate matches domain",
+            "Expired certificate; weak or unmanaged imported certificate; domain mismatch",
+            "证书异常会破坏 TLS 身份认证，导致连接失败或中间人风险。",
+            "ACM 证书便于生命周期管理，适合与 ALB 绑定。",
+            "ACM 可为其他 AWS 服务请求和管理证书。(AWS 文档)"
+          ],
+          [
+            "AWS",
+            "NLB",
+            "Network Load Balancer",
+            "TLS / HTTPS",
+            "TLS listener SSL security policy",
+            "Listener.SslPolicy / modify-listener --ssl-policy",
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09; ELBSecurityPolicy-TLS13-1-2-Res-2021-06; other modern TLS 1.2/1.3 policies",
+            "ELBSecurityPolicy-2016-08; ELBSecurityPolicy-TLS-1-1-2017-01; TLS 1.0/1.1 policies; policies with CBC/SHA-1/non-FS suites",
+            "NLB TLS Listener 若使用旧策略，也会暴露旧协议和弱密码套件。",
+            "现代 TLS 1.2/1.3 策略更符合当前 TLS 配置基线。",
+            "AWS NLB 文档列出安全策略并推荐新的 PQ-TLS 策略。(AWS 文档)"
+          ],
+          [
+            "AWS",
+            "NLB",
+            "Network Load Balancer",
+            "TLS / Certificate",
+            "TLS listener certificate",
+            "Listener.Certificates",
+            "ACM certificate; valid certificate chain",
+            "Expired certificate; unmanaged imported certificate; certificate mismatch",
+            "证书不可信或过期会导致 TLS 握手失败或身份认证风险。",
+            "ACM 可集中管理证书并降低手工维护成本。",
+            "ACM 支持请求证书供 AWS 服务使用。(AWS 文档)"
+          ],
+          [
+            "AWS",
+            "VPC Lattice",
+            "Service-to-service application networking",
+            "TLS / Service Communication",
+            "Service listener protocol / custom domain certificate",
+            "Service listener / custom domain / certificate related settings",
+            "HTTPS listener; ACM certificate for custom domain where applicable",
+            "Plain HTTP for sensitive service traffic; missing or mismanaged certificate",
+            "VPC Lattice 更偏向服务通信与访问控制，不通常暴露像 ALB/NLB 那样的细粒度密码套件选择；风险主要在是否使用 HTTPS 和证书是否正确。",
+            "HTTPS 与 ACM 证书可提升服务间通信的传输保护与身份绑定。",
+            "VPC Lattice 文档说明服务网络和数据保护相关能力。(AWS 文档)"
+          ],
+          [
+            "DNS / 域名完整性类服务",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "Public_Cloud",
+            "Service",
+            "Description",
+            "Crypto_Category",
+            "Configuration_Item",
+            "API_Endpoint",
+            "Recommended_Values",
+            "Risky_Values",
+            "Risk_Reason",
+            "Security_Value_Reason",
+            "References"
+          ],
+          [
+            "AWS",
+            "Route 53",
+            "Managed DNS Service",
+            "DNSSEC",
+            "Hosted zone DNSSEC signing",
+            "EnableHostedZoneDNSSEC",
+            "Enabled for security-sensitive hosted zones",
+            "Disabled for important public hosted zones",
+            "未启用 DNSSEC 时，DNS 响应缺少 DNSSEC 完整性保护，难以抵御 DNS 响应篡改和伪造风险。",
+            "DNSSEC 为 DNS 数据提供签名验证能力，可增强域名解析完整性保护。",
+            "Route 53 文档说明如何启用 DNSSEC signing。(AWS 文档)"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet3",
+        "max_row": 1,
+        "max_column": 1,
+        "non_empty_rows": 0,
+        "header_row_1_based": null,
+        "headers": [],
+        "sample_rows": []
+      }
+    ]
+  },
+  {
+    "file": "张聪艺-工作日报0506Security_Identity_Compliance分析.xlsx",
+    "sheets": [
+      {
+        "sheet": "Sheet2",
+        "max_row": 27,
+        "max_column": 4,
+        "non_empty_rows": 27,
+        "header_row_1_based": 1,
+        "headers": [
+          "序号",
+          "页面列出的项目",
+          "与密码/加密相关性",
+          "简要说明"
+        ],
+        "sample_rows": [
+          [
+            "1",
+            "AWS Artifact",
+            "弱相关",
+            "主要提供 AWS 安全与合规报告、协议文档等。它可能包含加密合规证明材料，但本身不提供加密、密钥或证书配置。"
+          ],
+          [
+            "2",
+            "AWS Certificate Manager",
+            "强相关",
+            "直接涉及 SSL/TLS X.509 证书的创建、导入、存储、续期和部署，是证书与 TLS 场景的核心服务。AWS 文档说明 ACM 用于创建、存储和续期保护 AWS 网站与应用的公有/私有 SSL/TLS 证书和密钥。(AWS 文档)"
+          ],
+          [
+            "3",
+            "Choosing AWS security, identity, and governance services",
+            "基本不相关",
+            "这不是一个具体服务，而是 AWS 的安全、身份与治理服务选择指南。可作为分类参考，但不是密码模块或可配置服务。"
+          ],
+          [
+            "4",
+            "Amazon Cognito",
+            "中等相关",
+            "主要用于用户注册、登录、身份认证、用户池/身份池、JWT/OIDC 等。它与认证、token、MFA、用户凭证保护有关，但不是专门的加密服务。"
+          ],
+          [
+            "5",
+            "AWS Directory Service",
+            "中等相关",
+            "托管 Microsoft AD 等目录服务，涉及身份认证、域控、LDAP/Kerberos/SSO 等身份基础设施。它与认证协议相关，但不是独立密码模块。"
+          ],
+          [
+            "6",
+            "Amazon GuardDuty",
+            "弱相关",
+            "威胁检测服务，可能检测凭证泄露、异常 API 调用、恶意行为等，但不提供加密算法、密钥管理或证书配置。"
+          ],
+          [
+            "7",
+            "AWS Identity and Access Management, IAM",
+            "中等相关",
+            "主要负责身份、角色、权限策略、访问密钥、临时凭证、MFA 等。它与认证和凭证安全密切相关，但不是加密/密钥管理服务。"
+          ],
+          [
+            "8",
+            "AWS Audit Manager",
+            "弱到中等相关",
+            "审计与合规证据收集服务。可用于证明加密控制项是否满足要求，但本身不执行加密，也不管理密钥。"
+          ],
+          [
+            "9",
+            "Amazon Cloud Directory",
+            "中等相关",
+            "主要是云目录/对象层级目录服务，偏身份与目录数据管理。它和认证/目录结构相关，但不是密码模块。需要注意：AWS 文档显示 Amazon Cloud Directory 从 2025 年 11 月 7 日起不再向新客户开放，已有客户仍可继续使用。(AWS 文档)"
+          ],
+          [
+            "10",
+            "Amazon Detective",
+            "弱相关",
+            "安全调查与根因分析服务，用于分析安全事件关系和行为模式。本身不涉及用户可配置的加密、密钥或证书。"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet3",
+        "max_row": 7,
+        "max_column": 3,
+        "non_empty_rows": 7,
+        "header_row_1_based": 3,
+        "headers": [
+          "P0：应重点分析密码配置",
+          "AWS Certificate Manager、AWS Payment Cryptography、AWS Secrets Manager",
+          "直接涉及证书、TLS、支付密码、Secret/凭证保护，适合整理“配置项 / 可选值 / 风险值 / 安全值 / API”。"
+        ],
+        "sample_rows": [
+          [
+            "P1：身份认证与凭证安全相关",
+            "Amazon Cognito、AWS Directory Service、IAM、IAM Identity Center、Amazon Cloud Directory、Amazon Verified Permissions",
+            "主要涉及认证、授权、访问密钥、MFA、SSO、目录服务等，和密码学不是一回事，但和身份安全强相关。"
+          ],
+          [
+            "P2：检测/审计/合规中可能涉及加密检查",
+            "Amazon Macie、AWS Security Hub、AWS Audit Manager、Amazon Inspector、GuardDuty、Security Lake、Security Incident Response",
+            "本身不提供密码能力，但可能检查未加密资源、凭证泄露、敏感数据暴露或安全合规状态。"
+          ],
+          [
+            "P3：网络/应用防护，密码相关性较弱",
+            "AWS WAF、AWS Shield、AWS Firewall Manager、AWS Network Firewall",
+            "主要是防火墙、DDoS、防护策略，与 TLS/加密配置不是同一层。"
+          ],
+          [
+            "P4：不是具体密码服务",
+            "AWS Artifact、Choosing AWS security, identity, and governance services、Security Documentation、AWS GovCloud (US)、AWS RAM",
+            "更偏文档、合规材料、区域或资源共享管理，不适合作为“密码配置项”重点服务。"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "张聪艺-工作日报0507ACM.xlsx",
+    "sheets": [
+      {
+        "sheet": "完整表",
+        "max_row": 17,
+        "max_column": 6,
+        "non_empty_rows": 17,
+        "header_row_1_based": 2,
+        "headers": [
+          "配置项",
+          "可选值",
+          "风险值",
+          "安全值 / 推荐值",
+          "对应命令或 API",
+          "参考网址 / 依据"
+        ],
+        "sample_rows": [
+          [
+            "证书来源 / 证书类型",
+            "ACM 签发公有证书；ACM 私有证书；导入第三方证书；可导出 ACM 证书",
+            "导入第三方证书风险较高：私钥由用户自行生成和保管，且导入证书不享受 ACM 托管续期",
+            "优先使用 ACM 签发并托管续期的证书；需要私有 PKI 时使用 AWS Private CA；确有外部 CA 或跨平台部署需求时再导入",
+            "RequestCertificate / aws acm request-certificate；ImportCertificate / aws acm import-certificate",
+            "ACM 用于创建、存储和续期 SSL/TLS X.509 证书及密钥，也支持导入第三方证书；ACM 托管续期适用于 Amazon-issued 证书，而 imported 证书不符合自动续期条件。(docs.aws.amazon.com)"
+          ],
+          [
+            "KeyAlgorithm：ACM 申请证书时的密钥算法",
+            "RSA_2048、EC_prime256v1、EC_secp384r1；默认 RSA_2048",
+            "申请 ACM 证书时，其他算法主要属于 imported certificates only；从安全角度，RSA_1024 不应作为新系统安全值",
+            "兼容性优先：RSA_2048；性能/效率优先且客户端支持时：EC_prime256v1、EC_secp384r1",
+            "aws acm request-certificate --key-algorithm RSA_2048；API：RequestCertificate.KeyAlgorithm",
+            "RequestCertificate 文档说明 ACM 申请证书支持 RSA_2048、EC_prime256v1、EC_secp384r1，默认 RSA_2048；ECDSA 密钥更小、效率更高，但不是所有客户端都支持。(docs.aws.amazon.com)"
+          ],
+          [
+            "导入证书时的密钥算法",
+            "RSA_1024、RSA_2048、RSA_3072、RSA_4096、EC_prime256v1、EC_secp384r1、EC_secp521r1",
+            "RSA_1024；以及目标集成服务不支持的算法/密钥长度",
+            "RSA_2048 及以上，或 EC_prime256v1、EC_secp384r1；部署前核对 CloudFront、ALB、API Gateway 等目标服务的支持范围",
+            "aws acm import-certificate --certificate fileb://cert.pem --private-key fileb://key.pem --certificate-chain fileb://chain.pem；API：ImportCertificate",
+            "导入证书支持 RSA 1024/2048/3072/4096 和 ECDSA 256/384/521；但 ACM 集成服务只允许其自身支持的算法和密钥长度，例如 CloudFront 与 ALB 支持范围不同。(docs.aws.amazon.com)"
+          ],
+          [
+            "域名验证方式 ValidationMethod",
+            "DNS、EMAIL、HTTP",
+            "EMAIL 运维风险较高，依赖邮件审批；域名数量多时操作量增加；HTTP 适用范围较窄，主要用于 CloudFront 相关场景",
+            "AWS 推荐 DNS validation；保留 DNS CNAME 记录有利于自动续期",
+            "aws acm request-certificate --validation-method DNS；API：RequestCertificate.ValidationMethod",
+            "RequestCertificate API 给出 EMAIL | DNS | HTTP，并明确推荐 DNS validation；最佳实践页面也说明 DNS validation 更适合自动化，Email validation 在多域名情况下会产生大量验证邮件。(docs.aws.amazon.com)"
+          ],
+          [
+            "Subject Alternative Names, SAN",
+            "一个或多个 FQDN；支持通配符域名，例如 *.example.com；最多 100 个 SAN，初始配额通常为 10 个",
+            "SAN 范围过宽、无关系统共用同一证书、通配符证书滥用，会扩大私钥泄露或误配置影响范围",
+            "最小化 SAN 范围；按业务、环境、域名边界拆分证书；谨慎使用通配符证书",
+            "aws acm request-certificate --domain-name example.com --subject-alternative-names www.example.com；API：RequestCertificate.SubjectAlternativeNames",
+            "RequestCertificate 文档说明 SAN 是证书 Subject Alternative Name 扩展中的额外 FQDN，并列出数量、长度和格式限制。(docs.aws.amazon.com)"
+          ],
+          [
+            "Certificate Transparency Logging, CT 日志",
+            "ENABLED、DISABLED",
+            "一般公有证书场景下，DISABLED 会降低误签发/恶意签发证书的可发现性；部分浏览器可能对未记录 CT 的公有证书报错",
+            "公有证书默认/推荐保持 ENABLED；只有明确存在内部域名、未发布产品名等隐私泄露顾虑时才考虑关闭",
+            "创建时：aws acm request-certificate --options CertificateTransparencyLoggingPreference=ENABLED；更新时：aws acm update-certificate-options --certificate-arn ... --options CertificateTransparencyLoggingPreference=ENABLED；API：CertificateOptions / UpdateCertificateOptions",
+            "CertificateOptions 支持 ENABLED | DISABLED；AWS 说明 CT 有助于发现误签发或恶意签发证书，未记录的证书通常会导致浏览器错误；最佳实践也说明 Amazon CA 默认发布到公共 CT logs，但用户可选择 opt out。(docs.aws.amazon.com)"
+          ],
+          [
+            "证书导出 Export",
+            "ENABLED、DISABLED",
+            "无必要时启用 ENABLED，会允许私钥离开 ACM 托管边界，扩大泄露面；并且 Export 创建后不能更新",
+            "不需要在 AWS 外部或非集成服务中使用证书时，推荐 DISABLED；确有跨平台部署、EC2/on-prem 使用需求时再启用",
+            "创建时：aws acm request-certificate --options Export=ENABLED；导出：aws acm export-certificate --certificate-arn ... --passphrase fileb://passphrase.txt；API：ExportCertificate",
+            "CertificateOptions.Export 可选 ENABLED | DISABLED，并且创建后不能更新；ACM 支持导出公有证书用于 AWS 服务或 AWS Cloud 外部。(docs.aws.amazon.com)"
+          ],
+          [
+            "导出私钥口令 Passphrase",
+            "导出公有/私有证书时必须提供 passphrase；私有证书 passphrase 可用 ASCII 字符，但不包括 #、$、%",
+            "弱口令；命令行明文输入；写入 shell history；口令文件泄露",
+            "使用高强度 passphrase；通过 fileb:// 文件传入，避免出现在命令历史或屏幕回显中；妥善保护口令文件",
+            "aws acm export-certificate --certificate-arn ... --passphrase fileb://path-to-passphrase-file",
+            "公有证书和私有证书导出文档都说明运行导出命令时必须提供 passphrase，并建议用文件提供口令以避免命令历史和屏幕泄露；私有证书文档还列出口令字符限制。(docs.aws.amazon.com)"
+          ],
+          [
+            "导入证书私钥与证书材料格式",
+            "证书、私钥、证书链需 PEM 编码；私钥必须与证书匹配；私钥必须未加密；私钥最大 5 KB",
+            "导入未加密私钥过程风险高；私钥进入代码仓库、CI/CD 日志、命令历史或权限不当的本地文件会导致泄露",
+            "只在受控环境处理私钥；导入完成后安全删除本地明文私钥；限制 IAM 权限；避免日志记录私钥内容",
+            "aws acm import-certificate --certificate fileb://certificate.pem --private-key fileb://private-key.pem --certificate-chain fileb://chain.pem；API：ImportCertificate",
+            "ACM 导入证书前提要求包括：证书为 SSL/TLS X.509 v3，包含公钥和 FQDN/IP；私钥最大 5 KB 且未加密；证书、私钥和证书链均需 PEM 编码。(docs.aws.amazon.com)"
+          ],
+          [
+            "证书续期方式",
+            "ACM 托管续期；Email 通知续期；导入证书重新导入；过期后不符合续期条件",
+            "导入证书不支持 ACM managed renewal；Email validation 依赖人工邮件处理，容易因遗漏导致证书过期；已过期证书不符合自动续期条件",
+            "使用 ACM 签发证书 + DNS validation；保留 DNS 验证记录；导入证书需单独设置过期监控和自动化重导入流程",
+            "查看：aws acm describe-certificate；重新导入：aws acm import-certificate --certificate-arn ...",
+            "托管续期文档说明 ACM 对 Amazon-issued SSL/TLS 证书提供 managed renewal；DNS validation 可自动续期或使用 email notices；imported 和 already expired 证书不符合自动续期条件。(docs.aws.amazon.com)"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet2",
+        "max_row": 11,
+        "max_column": 4,
+        "non_empty_rows": 10,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "配置项",
+          "风险值",
+          "安全值"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "KeyAlgorithm",
+            "RSA_1024；或使用目标服务不支持的算法",
+            "RSA_2048、EC_prime256v1、EC_secp384r1"
+          ],
+          [
+            "",
+            "ValidationMethod",
+            "EMAIL，以及不适用场景下的 HTTP",
+            "DNS"
+          ],
+          [
+            "",
+            "CertificateTransparencyLoggingPreference",
+            "DISABLED",
+            "ENABLED"
+          ],
+          [
+            "",
+            "Export",
+            "无必要时 ENABLED",
+            "无跨平台导出需求时 DISABLED"
+          ],
+          [
+            "",
+            "Imported certificate",
+            "私钥管理不当、证书链不完整、过期未更新、弱算法",
+            "ACM 签发托管证书；或强算法、完整证书链、受控私钥管理的导入证书"
+          ],
+          [
+            "",
+            "Export passphrase",
+            "弱口令、命令行明文、写入历史",
+            "强口令 + fileb:// 文件传入"
+          ],
+          [
+            "",
+            "Renewal mode",
+            "导入证书无自动续期；Email 续期依赖人工确认",
+            "ACM 托管证书 + DNS validation + CNAME 保留"
+          ],
+          [
+            "",
+            "SAN / wildcard",
+            "SAN 过宽、通配符滥用",
+            "最小化域名范围，按业务拆分证书"
+          ],
+          [
+            "",
+            "TLS policy",
+            "在集成服务中使用旧 TLS/弱密码套件",
+            "在 CloudFront/ELB/API Gateway 等服务中选择现代 TLS policy"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "张聪艺_工作日报0409_ALB_TLS_SP.xlsx",
+    "sheets": [
+      {
+        "sheet": "TLS表1",
+        "max_row": 19,
+        "max_column": 11,
+        "non_empty_rows": 19,
+        "header_row_1_based": 2,
+        "headers": [
+          "Security policies",
+          "TLS 1.3",
+          "TLS 1.2",
+          "TLS 1.1",
+          "TLS 1.0",
+          "",
+          "RFC 8996 明确规定：TLS 1.0 和 TLS 1.1 MUST NOT be used",
+          "",
+          "",
+          "相关判定为risky",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "TLS主要的表2",
+        "max_row": 167,
+        "max_column": 5,
+        "non_empty_rows": 167,
+        "header_row_1_based": 2,
+        "headers": [
+          "Security policy",
+          "Ciphers",
+          "问题",
+          "说明",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "TLS_AES_128_GCM_SHA256",
+            "",
+            "1.不含ECDHE或者TLS_，即缺乏前向安全FS的，可以认为是有风险的",
+            ""
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "2.CBC 模式（非 AEAD），有相关攻击，没被攻破但不推荐，可以认为是有风险的",
+            "参考例子给出的"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "TLS_CHACHA20_POLY1305_SHA256",
+            "",
+            "3.SHA（不是 SHA256/384/512），已被攻破，有风险",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "TLS_AES_128_GCM_SHA256",
+            "CBC",
+            "",
+            ""
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "AEAD 加密：ChaCha20和GCM",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            "TLS_CHACHA20_POLY1305_SHA256",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            "标红的是有问题的密码套件，黄色高亮是推荐的安全策略",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-SHA256",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-SHA256",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "TLS表3",
+        "max_row": 245,
+        "max_column": 5,
+        "non_empty_rows": 245,
+        "header_row_1_based": 2,
+        "headers": [
+          "Cipher name",
+          "Security policies",
+          "Cipher suite",
+          "",
+          "和表2信息表达一样，只是主体换了（相当于转置），可以用于工程排查"
+        ],
+        "sample_rows": [
+          [
+            "OpenSSL – TLS_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "1301",
+            "",
+            "若客户端只支持某个加密套件，可以用这张表选择，支持该加密套件的安全策略"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "IANA – TLS_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "",
+            "",
+            "IANA：nternet Assigned Numbers Authority，TLS 标准官方命名（RFC定义）"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06",
+            "",
+            "",
+            "OpenSSL：实际使用最广的加密库，工程实现的名字"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-2021-06",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-2021-06",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-PQ-2025-09",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FIPS表1",
+        "max_row": 17,
+        "max_column": 10,
+        "non_empty_rows": 17,
+        "header_row_1_based": 2,
+        "headers": [
+          "Security policies",
+          "TLS 1.3",
+          "TLS 1.2",
+          "TLS 1.1",
+          "TLS 1.0",
+          "",
+          "RFC 8996 明确规定：TLS 1.0 和 TLS 1.1 MUST NOT be used",
+          "",
+          "",
+          "相关判定为risky"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "标红"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-PQ-2025-09",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FIPS主要的表2",
+        "max_row": 109,
+        "max_column": 4,
+        "non_empty_rows": 109,
+        "header_row_1_based": 2,
+        "headers": [
+          "Security policy",
+          "Ciphers",
+          "问题",
+          "说明"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04",
+            "TLS_AES_128_GCM_SHA256",
+            "",
+            "1.不含ECDHE或者TLS_，即缺乏前向安全FS的，可以认为是有风险的"
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "2.CBC 模式（非 AEAD），有相关攻击，没被攻破但不被推荐，可以认为是有风险的"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-PQ-2025-09",
+            "",
+            "",
+            "3.SHA1，有相关攻击，已被弃用，有风险"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04",
+            "TLS_AES_128_GCM_SHA256",
+            "CBC",
+            ""
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "AEAD 加密：ChaCha20和GCM"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-SHA256",
+            "",
+            "标红的是有问题的密码套件，黄色高亮是推荐的安全策略"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FIPS表3",
+        "max_row": 194,
+        "max_column": 5,
+        "non_empty_rows": 194,
+        "header_row_1_based": 2,
+        "headers": [
+          "ipher name",
+          "Security policies",
+          "Cipher suite",
+          "",
+          "和表2信息表达一样，只是主体换了（相当于转置），可以用于工程排查"
+        ],
+        "sample_rows": [
+          [
+            "OpenSSL – TLS_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04",
+            "1301",
+            "",
+            "若客户端只支持某个加密套件，可以用这张表选择，支持该加密套件的安全策略"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "IANA – TLS_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-2023-04",
+            "",
+            "",
+            "IANA：nternet Assigned Numbers Authority，TLS 标准官方命名（RFC定义）"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04",
+            "",
+            "",
+            "OpenSSL：实际使用最广的加密库，工程实现的名字"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-2023-04",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-PQ-2025-09",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FS表1",
+        "max_row": 7,
+        "max_column": 10,
+        "non_empty_rows": 6,
+        "header_row_1_based": 1,
+        "headers": [
+          "Security policies",
+          "TLS 1.3",
+          "TLS 1.2",
+          "TLS 1.1",
+          "TLS 1.0",
+          "",
+          "RFC 8996 明确规定：TLS 1.0 和 TLS 1.1 MUST NOT be used",
+          "",
+          "",
+          "相关判定为risky"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "No",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "标红"
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "No",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-2-2019-08",
+            "No",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-1-2019-08",
+            "No",
+            "Yes",
+            "Yes",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-2018-06",
+            "No",
+            "Yes",
+            "Yes",
+            "Yes",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FS主要的表2",
+        "max_row": 50,
+        "max_column": 4,
+        "non_empty_rows": 49,
+        "header_row_1_based": 1,
+        "headers": [
+          "Security policy",
+          "Ciphers",
+          "问题",
+          "说明"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "",
+            "1.不含ECDHE或者TLS_，即缺乏前向安全FS的，可以认为是有风险的"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            "2.CBC 模式（非 AEAD），有相关攻击，没被攻破但不被推荐，可以认为是有风险的"
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES256-GCM-SHA384",
+            "",
+            "3.SHA1，有相关攻击，已被弃用，有风险"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "CBC",
+            "AEAD 加密：ChaCha20和GCM"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-SHA256",
+            "",
+            "标红的是有问题的密码套件，黄色高亮是推荐的安全策略"
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FS表3",
+        "max_row": 50,
+        "max_column": 5,
+        "non_empty_rows": 49,
+        "header_row_1_based": 1,
+        "headers": [
+          "Cipher name",
+          "Security policies",
+          "Cipher suite",
+          "",
+          "和表2信息表达一样，只是主体换了（相当于转置），可以用于工程排查"
+        ],
+        "sample_rows": [
+          [
+            "OpenSSL – ECDHE-ECDSA-AES128-GCM-SHA256",
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "c02b",
+            "",
+            "若客户端只支持某个加密套件，可以用这张表选择，支持该加密套件的安全策略"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "",
+            "",
+            ""
+          ],
+          [
+            "IANA – TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-FS-1-2-2019-08",
+            "",
+            "",
+            "IANA：nternet Assigned Numbers Authority，TLS 标准官方命名（RFC定义）"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-1-2019-08",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-2018-06",
+            "",
+            "",
+            "OpenSSL：实际使用最广的加密库，工程实现的名字"
+          ],
+          [
+            "OpenSSL – ECDHE-RSA-AES128-GCM-SHA256",
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "c02f",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "",
+            "",
+            ""
+          ],
+          [
+            "IANA – TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-FS-1-2-2019-08",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-1-2019-08",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-2018-06",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "总结",
+        "max_row": 36,
+        "max_column": 7,
+        "non_empty_rows": 35,
+        "header_row_1_based": 1,
+        "headers": [
+          "Public_Cloud",
+          "Service",
+          "Description",
+          "API_Endpoint",
+          "Recommended_Values",
+          "Risky_Values",
+          "References"
+        ],
+        "sample_rows": [
+          [
+            "AWS",
+            "CloudFront",
+            "AWS CDN Service",
+            "DistributionCo nfig.ViewerCer tificate.Minimu mProtocolVersi on",
+            "TLSv1. 3_2025",
+            "SSLv3",
+            "https://docs.aws.amazon.com/cli/latest/reference/cloudfront/update-distribution.html"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "TLSv1 .2_2025",
+            "TLSv1",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "TLSv1. 2_2021",
+            "TL Sv1_2016",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "TLSv1.1_2016",
+            "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-viewer-protocols-ciphers.html"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "TLSv1.2_ 2018",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "TLSv1.2_20 19",
+            ""
+          ],
+          [
+            "AWS",
+            "Elastic Load Balancing——Application Load Balancer",
+            "ELB: Managed load balancing service for distributing traffic across multiple targets.",
+            "CreateListener.SslPolicy / ModifyListener.SslPolicy",
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-2021-06",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "官网示例：aws elbv2 describe-ssl-policies \\ --names \"ELBSecurityPolicy-TLS13-1-2-Res-2021-06\"",
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09",
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/describe-ssl-policies.html"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "张聪艺_工作日报0410_ALB完整统计.xlsx",
+    "sheets": [
+      {
+        "sheet": "TLS表1",
+        "max_row": 19,
+        "max_column": 11,
+        "non_empty_rows": 19,
+        "header_row_1_based": 2,
+        "headers": [
+          "Security policies",
+          "TLS 1.3",
+          "TLS 1.2",
+          "TLS 1.1",
+          "TLS 1.0",
+          "",
+          "RFC 8996 明确规定：TLS 1.0 和 TLS 1.1 MUST NOT be used",
+          "",
+          "",
+          "相关判定为risky",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "TLS主要的表2",
+        "max_row": 167,
+        "max_column": 5,
+        "non_empty_rows": 167,
+        "header_row_1_based": 2,
+        "headers": [
+          "Security policy",
+          "Ciphers",
+          "问题",
+          "说明",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "TLS_AES_128_GCM_SHA256",
+            "",
+            "1.不含ECDHE或者TLS_，即缺乏前向安全FS的，可以认为是有风险的",
+            ""
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "2.CBC 模式（非 AEAD），有相关攻击，没被攻破但不推荐，可以认为是有风险的",
+            "参考例子给出的"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "TLS_CHACHA20_POLY1305_SHA256",
+            "",
+            "3.SHA（不是 SHA256/384/512），已被攻破，有风险",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "TLS_AES_128_GCM_SHA256",
+            "CBC",
+            "",
+            ""
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "AEAD 加密：ChaCha20和GCM",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            "TLS_CHACHA20_POLY1305_SHA256",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            "标红的是有问题的密码套件，黄色高亮是推荐的安全策略",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-SHA256",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-SHA256",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "TLS表3",
+        "max_row": 245,
+        "max_column": 5,
+        "non_empty_rows": 245,
+        "header_row_1_based": 2,
+        "headers": [
+          "Cipher name",
+          "Security policies",
+          "Cipher suite",
+          "",
+          "和表2信息表达一样，只是主体换了（相当于转置），可以用于工程排查"
+        ],
+        "sample_rows": [
+          [
+            "OpenSSL – TLS_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "1301",
+            "",
+            "若客户端只支持某个加密套件，可以用这张表选择，支持该加密套件的安全策略"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "IANA – TLS_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "",
+            "",
+            "IANA：nternet Assigned Numbers Authority，TLS 标准官方命名（RFC定义）"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06",
+            "",
+            "",
+            "OpenSSL：实际使用最广的加密库，工程实现的名字"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-2021-06",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-2021-06",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-PQ-2025-09",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FIPS表1",
+        "max_row": 17,
+        "max_column": 10,
+        "non_empty_rows": 17,
+        "header_row_1_based": 2,
+        "headers": [
+          "Security policies",
+          "TLS 1.3",
+          "TLS 1.2",
+          "TLS 1.1",
+          "TLS 1.0",
+          "",
+          "RFC 8996 明确规定：TLS 1.0 和 TLS 1.1 MUST NOT be used",
+          "",
+          "",
+          "相关判定为risky"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "标红"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-PQ-2025-09",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FIPS主要的表2",
+        "max_row": 109,
+        "max_column": 4,
+        "non_empty_rows": 109,
+        "header_row_1_based": 2,
+        "headers": [
+          "Security policy",
+          "Ciphers",
+          "问题",
+          "说明"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04",
+            "TLS_AES_128_GCM_SHA256",
+            "",
+            "1.不含ECDHE或者TLS_，即缺乏前向安全FS的，可以认为是有风险的"
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "2.CBC 模式（非 AEAD），有相关攻击，没被攻破但不被推荐，可以认为是有风险的"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-PQ-2025-09",
+            "",
+            "",
+            "3.SHA1，有相关攻击，已被弃用，有风险"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04",
+            "TLS_AES_128_GCM_SHA256",
+            "CBC",
+            ""
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "AEAD 加密：ChaCha20和GCM"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-SHA256",
+            "",
+            "标红的是有问题的密码套件，黄色高亮是推荐的安全策略"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FIPS表3",
+        "max_row": 194,
+        "max_column": 5,
+        "non_empty_rows": 194,
+        "header_row_1_based": 2,
+        "headers": [
+          "ipher name",
+          "Security policies",
+          "Cipher suite",
+          "",
+          "和表2信息表达一样，只是主体换了（相当于转置），可以用于工程排查"
+        ],
+        "sample_rows": [
+          [
+            "OpenSSL – TLS_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04",
+            "1301",
+            "",
+            "若客户端只支持某个加密套件，可以用这张表选择，支持该加密套件的安全策略"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "IANA – TLS_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-2023-04",
+            "",
+            "",
+            "IANA：nternet Assigned Numbers Authority，TLS 标准官方命名（RFC定义）"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04",
+            "",
+            "",
+            "OpenSSL：实际使用最广的加密库，工程实现的名字"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-2023-04",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-PQ-2025-09",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FS表1",
+        "max_row": 7,
+        "max_column": 10,
+        "non_empty_rows": 6,
+        "header_row_1_based": 1,
+        "headers": [
+          "Security policies",
+          "TLS 1.3",
+          "TLS 1.2",
+          "TLS 1.1",
+          "TLS 1.0",
+          "",
+          "RFC 8996 明确规定：TLS 1.0 和 TLS 1.1 MUST NOT be used",
+          "",
+          "",
+          "相关判定为risky"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "No",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "标红"
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "No",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-2-2019-08",
+            "No",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-1-2019-08",
+            "No",
+            "Yes",
+            "Yes",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-2018-06",
+            "No",
+            "Yes",
+            "Yes",
+            "Yes",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FS主要的表2",
+        "max_row": 50,
+        "max_column": 4,
+        "non_empty_rows": 49,
+        "header_row_1_based": 1,
+        "headers": [
+          "Security policy",
+          "Ciphers",
+          "问题",
+          "说明"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "",
+            "1.不含ECDHE或者TLS_，即缺乏前向安全FS的，可以认为是有风险的"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            "2.CBC 模式（非 AEAD），有相关攻击，没被攻破但不被推荐，可以认为是有风险的"
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES256-GCM-SHA384",
+            "",
+            "3.SHA1，有相关攻击，已被弃用，有风险"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "CBC",
+            "AEAD 加密：ChaCha20和GCM"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-SHA256",
+            "",
+            "标红的是有问题的密码套件，黄色高亮是推荐的安全策略"
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FS表3",
+        "max_row": 50,
+        "max_column": 5,
+        "non_empty_rows": 49,
+        "header_row_1_based": 1,
+        "headers": [
+          "Cipher name",
+          "Security policies",
+          "Cipher suite",
+          "",
+          "和表2信息表达一样，只是主体换了（相当于转置），可以用于工程排查"
+        ],
+        "sample_rows": [
+          [
+            "OpenSSL – ECDHE-ECDSA-AES128-GCM-SHA256",
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "c02b",
+            "",
+            "若客户端只支持某个加密套件，可以用这张表选择，支持该加密套件的安全策略"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "",
+            "",
+            ""
+          ],
+          [
+            "IANA – TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-FS-1-2-2019-08",
+            "",
+            "",
+            "IANA：nternet Assigned Numbers Authority，TLS 标准官方命名（RFC定义）"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-1-2019-08",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-2018-06",
+            "",
+            "",
+            "OpenSSL：实际使用最广的加密库，工程实现的名字"
+          ],
+          [
+            "OpenSSL – ECDHE-RSA-AES128-GCM-SHA256",
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "c02f",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "",
+            "",
+            ""
+          ],
+          [
+            "IANA – TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-FS-1-2-2019-08",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-1-2019-08",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-2018-06",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "总结",
+        "max_row": 44,
+        "max_column": 7,
+        "non_empty_rows": 42,
+        "header_row_1_based": 1,
+        "headers": [
+          "Public_Cloud",
+          "Service",
+          "Description",
+          "API_Endpoint",
+          "Recommended_Values",
+          "Risky_Values",
+          "References"
+        ],
+        "sample_rows": [
+          [
+            "AWS",
+            "CloudFront",
+            "AWS CDN Service",
+            "DistributionCo nfig.ViewerCer tificate.Minimu mProtocolVersi on",
+            "TLSv1. 3_2025",
+            "SSLv3",
+            "https://docs.aws.amazon.com/cli/latest/reference/cloudfront/update-distribution.html"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "TLSv1 .2_2025",
+            "TLSv1",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "TLSv1. 2_2021",
+            "TL Sv1_2016",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "TLSv1.1_2016",
+            "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-viewer-protocols-ciphers.html"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "TLSv1.2_ 2018",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "TLSv1.2_20 19",
+            ""
+          ],
+          [
+            "AWS",
+            "Elastic Load Balancing——Application Load Balancer",
+            "ELB: Managed load balancing service for distributing traffic across multiple targets.",
+            "CreateListener.SslPolicy / ModifyListener.SslPolicy",
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-2021-06",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "官网示例：aws elbv2 describe-ssl-policies \\ --names \"ELBSecurityPolicy-TLS13-1-2-Res-2021-06\"",
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09",
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/describe-ssl-policies.html"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet1",
+        "max_row": 8,
+        "max_column": 7,
+        "non_empty_rows": 8,
+        "header_row_1_based": 1,
+        "headers": [
+          "Public_Cloud",
+          "Service",
+          "Description",
+          "API_Endpoint",
+          "Recommended_Values",
+          "Risky_Values",
+          "References"
+        ],
+        "sample_rows": [
+          [
+            "AWS",
+            "AWS Virtual Private Network—— Site-to-Site VPN",
+            "AWS Virtual Private Network (Site-to-Site VPN) establishes a secure and private tunnel from your network or device to the AWS Cloud.",
+            "",
+            "ikev1",
+            "ikev2",
+            "https://docs.aws.amazon.com/cli/latest/reference/ec2/modify-vpn-connection-options.html"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "Phase 1加密：AES128/AES 256",
+            "AES128-GCM-16/AES256-GCM-16",
+            "https://docs.aws.amazon.com/zh_cn/vpn/latest/s2svpn/security.html"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "Phase 2加密：AES128/AES256",
+            "AES128-GCM-16/AES256-GCM-16",
+            "AWS Virtual Private Network Documentation"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "Phase 1完整性：SHA1",
+            "SHA2-256 及以上",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "Phase 2完整性：SHA1",
+            "SHA2-256 及以上",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "DH组：2",
+            "14及以上，19/20/21 为主",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "DH组：2, 5",
+            "14及以上，19/20/21 为主",
+            ""
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "张聪艺_工作日报0422.xlsx",
+    "sheets": [
+      {
+        "sheet": "0421",
+        "max_row": 56,
+        "max_column": 5,
+        "non_empty_rows": 45,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "CloudHSM CLI attribute",
+          "Value",
+          "Modifiable with key set-attribute",
+          "Settable at key creation"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "always-sensitive",
+            "The value is True if sensitive has always been set to True and has never changed.",
+            "No",
+            "No"
+          ],
+          [
+            "",
+            "check-value",
+            "The check value of the key. For more information, see Additional Details.",
+            "No",
+            "No"
+          ],
+          [
+            "",
+            "class",
+            "Possible values: secret-key, public-key, and private-key.",
+            "No",
+            "Yes"
+          ],
+          [
+            "",
+            "curve",
+            "Elliptic curve used to generate the EC key pair.",
+            "No",
+            "Settable with EC, not settable with RSA"
+          ],
+          [
+            "",
+            "",
+            "Valid Values: secp224r1, secp256r1, prime256v1, secp384r1, secp256k1, secp521r1, and ed25519",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "ed25519 is only supported on hsm2m.medium instances in non-FIPS mode.",
+            "",
+            ""
+          ],
+          [
+            "",
+            "decrypt",
+            "Default: False",
+            "Yes",
+            "Yes"
+          ],
+          [
+            "",
+            "derive",
+            "Default: False",
+            "Derive can be set on hsm2m.medium instances. It cannot be set for RSA keys on hsm1.medium instances.",
+            "Yes"
+          ],
+          [
+            "",
+            "destroyable",
+            "Default: True",
+            "Yes",
+            "Yes"
+          ],
+          [
+            "",
+            "ec-point",
+            "For EC keys, DER-encoding of ANSI X9.62 ECPoint value \"Q\" in a hexadecimal format.",
+            "No",
+            "No"
+          ]
+        ]
+      },
+      {
+        "sheet": "key attributes",
+        "max_row": 11,
+        "max_column": 4,
+        "non_empty_rows": 10,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "属性",
+          "作用",
+          "配置方式"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "encrypt",
+            "是否允许 key 用于加密",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "decrypt",
+            "是否允许解密",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "sign",
+            "是否允许签名",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "verify",
+            "是否允许验签",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "wrap",
+            "是否允许包装其他 key",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "unwrap",
+            "是否允许解包 key",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "derive",
+            "是否允许派生 key",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "extractable",
+            "是否允许导出/包装出 HSM",
+            "创建 key 时指定，或 key set-attribute"
+          ],
+          [
+            "",
+            "sensitive",
+            "是否作为敏感密钥保护",
+            "创建 key 时指定，通常创建后不可随意降低"
+          ]
+        ]
+      },
+      {
+        "sheet": "CloudHSM加密机制",
+        "max_row": 85,
+        "max_column": 6,
+        "non_empty_rows": 78,
+        "header_row_1_based": 12,
+        "headers": [
+          "",
+          "",
+          "CKM_SHA1_RSA_PKCS",
+          "使用 SHA-1 + RSA PKCS 签名；SHA-1 相关机制一般应标记为兼容/风险值",
+          "",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "",
+            "",
+            "CKM_SHA224_RSA_PKCS",
+            "SHA-224 安全强度较低，可标为兼容/注意值",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA256_RSA_PKCS",
+            "SHA-256 + RSA PKCS；虽然 SHA-256 没问题，但签名填充仍是 PKCS#1 v1.5；建议优先 PSS",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA384_RSA_PKCS",
+            "SHA-384 + RSA PKCS；同上",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA512_RSA_PKCS",
+            "SHA-512 + RSA PKCS；同上",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA1_RSA_PKCS_PSS",
+            "SHA-1 + RSA-PSS；SHA-1 部分仍需注意",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA224_RSA_PKCS_PSS",
+            "SHA-224 + RSA-PSS；较低强度/注意值",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA256_RSA_PKCS_PSS",
+            "SHA-256 + RSA-PSS，较推荐",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA384_RSA_PKCS_PSS",
+            "SHA-384 + RSA-PSS，较推荐",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "CKM_SHA512_RSA_PKCS_PSS",
+            "SHA-512 + RSA-PSS，较推荐",
+            "",
+            ""
+          ],
+          [
+            "",
+            "Sign and verify - ECDSA",
+            "CKM_ECDSA",
+            "仅支持 single-part operations；raw ECDSA，single-part operations only；风险取决于外部哈希选择",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "CloudHSM签名机制",
+        "max_row": 52,
+        "max_column": 6,
+        "non_empty_rows": 50,
+        "header_row_1_based": 2,
+        "headers": [
+          "模块",
+          "机制/配置",
+          "可选值",
+          "对应命令",
+          "备注",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "Sign - ECDSA",
+            "签名机制",
+            "ecdsa",
+            "crypto sign ecdsa",
+            "使用 EC private key 生成 ECDSA 签名；私钥需在 HSM 中，且 sign=true。签名结果格式为 `r",
+            "https://docs.aws.amazon.com/cloudhsm/latest/userguide/cloudhsm_cli-crypto-sign-ecdsa.html"
+          ],
+          [
+            "",
+            "哈希函数",
+            "sha1、sha224、sha256、sha384、sha512",
+            "--hash-function <value>",
+            "sha1 可标为风险/兼容值，sha224 可标为注意值，sha256/384/512 较推荐。",
+            ""
+          ],
+          [
+            "",
+            "输入数据类型",
+            "raw、digest",
+            "--data-type <value>",
+            "raw 表示传入未哈希数据；digest 表示传入已哈希摘要。",
+            ""
+          ],
+          [
+            "",
+            "数据输入",
+            "base64 数据 / 文件路径",
+            "--data <DATA> 或 --data-path <PATH>",
+            "二选一。",
+            ""
+          ],
+          [
+            "",
+            "密钥选择",
+            "key reference 或 key attributes",
+            "--key-filter ...",
+            "例如 attr.label=ec-private。",
+            ""
+          ],
+          [
+            "Verify - ECDSA",
+            "验签机制",
+            "ecdsa",
+            "crypto verify ecdsa",
+            "使用 EC public key 验证 ECDSA 签名；签名格式需要是 `r",
+            "https://docs.aws.amazon.com/cloudhsm/latest/userguide/cloudhsm_cli-crypto-verify-ecdsa.html"
+          ],
+          [
+            "",
+            "哈希函数",
+            "sha1、sha224、sha256、sha384、sha512",
+            "--hash-function <value>",
+            "必须与签名时一致。",
+            ""
+          ],
+          [
+            "",
+            "输入数据类型",
+            "raw、digest",
+            "--data-type <value>",
+            "与签名侧保持一致。",
+            ""
+          ],
+          [
+            "",
+            "签名输入",
+            "base64 签名 / 签名文件路径",
+            "--signature <SIG> 或 --signature-path <PATH>",
+            "二选一。",
+            ""
+          ],
+          [
+            "",
+            "数据输入",
+            "base64 数据 / 文件路径",
+            "--data <DATA> 或 --data-path <PATH>",
+            "二选一。",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "整体",
+        "max_row": 15,
+        "max_column": 5,
+        "non_empty_rows": 14,
+        "header_row_1_based": 1,
+        "headers": [
+          "配置项",
+          "是否密码相关",
+          "可选值 / 表现",
+          "安全值",
+          "风险值 / 注意值"
+        ],
+        "sample_rows": [
+          [
+            "Cluster mode",
+            "是",
+            "FIPS mode / Non-FIPS mode",
+            "合规场景优先 FIPS mode",
+            "Non-FIPS mode 允许非 FIPS validated 机制，不一定不安全，但合规风险更高"
+          ],
+          [
+            "HSM type",
+            "间接相关",
+            "hsm1.medium / hsm2m.medium",
+            "按功能需求选择",
+            "某些算法/曲线只在特定 HSM type 或 non-FIPS 下支持"
+          ],
+          [
+            "Key type",
+            "是",
+            "AES、RSA、EC、Triple DES、GENERIC_SECRET",
+            "AES、RSA、EC",
+            "Triple DES 属于历史算法，FIPS 模式下已有弃用/限制趋势"
+          ],
+          [
+            "AES key length",
+            "是",
+            "128、192、256 bit",
+            "AES-256，AES-128 也仍可接受",
+            "高安全基线下不建议优先 AES-128"
+          ],
+          [
+            "RSA modulus size",
+            "是",
+            "2048–4096 bit，按 256 bit 递增",
+            "RSA-3072 / RSA-4096",
+            "RSA-2048 可作为最低兼容值，不建议作为长期高安全首选"
+          ],
+          [
+            "EC curve",
+            "是",
+            "secp224r1、secp256r1、prime256v1、secp384r1、secp521r1、secp256k1、ed25519",
+            "secp256r1/384r1/521r1、ed25519 按场景使用",
+            "secp224r1 安全强度偏低；secp256k1 更偏区块链场景；ed25519 仅 hsm2m.medium non-FIPS 支持"
+          ],
+          [
+            "加密机制 Encryption mechanism",
+            "是",
+            "AES-GCM、AES-CBC、AES-CTR、AES-ECB、DES3-CBC、RSA-OAEP、RSA-PKCS 等，具体见加密机制单独表",
+            "AES-GCM、RSA-OAEP",
+            "AES-ECB、DES3、RSA-PKCS 属于风险/兼容机制；AES-CBC/CTR 需配合正确 IV/MAC"
+          ],
+          [
+            "签名机制 Signing mechanism",
+            "是",
+            "RSA-PSS、RSA-PKCS、ECDSA、HMAC、Ed25519ph 等，具体见签名机制单独表",
+            "RSA-PSS、ECDSA-SHA256/384/512、Ed25519ph",
+            "RSA-PKCS v1.5、SHA1 相关签名机制偏兼容/风险"
+          ],
+          [
+            "摘要机制 Digest mechanism",
+            "是",
+            "SHA1、SHA224、SHA256、SHA384、SHA512，具体见加密机制单独表",
+            "SHA256/384/512",
+            "SHA1 不建议作为安全基线；SHA224 安全强度较低"
+          ],
+          [
+            "HMAC mechanism",
+            "是",
+            "HMAC-SHA1、HMAC-SHA224、HMAC-SHA256/384/512，具体见加密机制单独表",
+            "HMAC-SHA256/384/512",
+            "HMAC-SHA1、HMAC-SHA224 偏兼容/较低强度"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "张聪艺_工作日报0423ACM.xlsx",
+    "sheets": [
+      {
+        "sheet": "ACM整体表",
+        "max_row": 14,
+        "max_column": 5,
+        "non_empty_rows": 13,
+        "header_row_1_based": 1,
+        "headers": [
+          "配置项",
+          "可选值",
+          "风险值",
+          "安全值",
+          "对应命令 / API"
+        ],
+        "sample_rows": [
+          [
+            "证书密钥算法 KeyAlgorithm（申请 ACM 证书）",
+            "RSA_2048、EC_prime256v1、EC_secp384r1；API 枚举里还会出现 RSA_1024、RSA_3072、RSA_4096、EC_secp521r1，但 ACM 新申请证书支持的是 RSA_2048、EC_prime256v1、EC_secp384r1",
+            "无绝对弱值，但在现代基线中通常不优先把 RSA 视为性能最优；若业务强依赖旧客户端，ECDSA 兼容性要注意",
+            "EC_prime256v1、EC_secp384r1 在支持良好的场景下更优；RSA_2048 兼容性最好，也是 ACM 默认值",
+            "CLI：aws acm request-certificate --key-algorithm ...；API：RequestCertificate 的 KeyAlgorithm (AWS 文档)"
+          ],
+          [
+            "导入证书算法 / 密钥长度",
+            "RSA_1024、RSA_2048、RSA_3072、RSA_4096、EC_prime256v1、EC_secp384r1、EC_secp521r1",
+            "RSA_1024 可视为明显风险/过弱值；过大或不被集成服务支持的算法/长度会导致部署失败",
+            "RSA_2048/3072/4096、EC_prime256v1、EC_secp384r1；具体还要看挂载服务是否支持",
+            "CLI：aws acm import-certificate；API：ImportCertificate；约束见导入前提页面 (AWS 文档)"
+          ],
+          [
+            "私钥是否加密存储",
+            "ACM 托管，私钥由 ACM 管理；ACM 使用 AWS KMS key 加密私钥",
+            "这不是用户可调参数；风险更多来自证书导出或访问控制配置不当",
+            "ACM 托管 + KMS 加密私钥",
+            "非直接配置项；可通过 DescribeCertificate 查看证书元数据，私钥本身不直接暴露 (AWS 文档)"
+          ],
+          [
+            "证书是否可导出 Options.Export",
+            "ENABLED / DISABLED",
+            "ENABLED 会扩大私钥暴露面，应视为条件风险值；尤其在私钥分发和终端保存不严时风险更高",
+            "DISABLED 更符合最小暴露面原则；仅在确需站外部署时启用导出",
+            "CLI：`aws acm request-certificate --options Export=ENABLED"
+          ],
+          [
+            "导出证书时的私钥保护口令",
+            "用户自定义 passphrase",
+            "弱口令、命令行明文暴露、口令管理差",
+            "强口令，并通过文件输入而不是直接敲在命令行",
+            "CLI：aws acm export-certificate --passphrase fileb://...；API：ExportCertificate。导出私钥时必须提供 passphrase (AWS 文档)"
+          ],
+          [
+            "证书透明度日志 CertificateTransparencyLoggingPreference",
+            "ENABLED / DISABLED",
+            "对公开网站证书，DISABLED 通常应视为注意/风险值，因为 CT 有助于发现误签或恶意签发",
+            "ENABLED 一般更推荐",
+            "CLI：aws acm request-certificate --options CertificateTransparencyLoggingPreference=...；API：RequestCertificate / UpdateCertificateOptions (AWS 文档)"
+          ],
+          [
+            "域名验证方式 ValidationMethod",
+            "DNS / EMAIL",
+            "EMAIL 更依赖人工收信和处理，自动化与续期韧性较差，可视为运维风险值",
+            "DNS，AWS 也明确推荐 DNS 验证；CNAME 保留时可自动续期",
+            "CLI：aws acm request-certificate --validation-method DNS"
+          ],
+          [
+            "是否自动续期（DNS 验证场景）",
+            "由 ACM 自动处理；前提是证书在使用且 DNS CNAME 仍存在",
+            "若依赖 EMAIL 验证，续期更依赖邮箱流程；若误删 DNS 记录，也会影响自动续期",
+            "使用 DNS 验证并保留 CNAME，可持续自动续期",
+            "非直接开关；与 request-certificate 的验证方式相关 (AWS 文档)"
+          ],
+          [
+            "私有证书 / 公有证书类型",
+            "AMAZON_ISSUED、PRIVATE、IMPORTED（从证书来源看）",
+            "私有证书如果根信任分发不好，会出现信任失败；导入证书不享受 ACM 托管续期",
+            "公有证书适合公网；私有证书适合内部 PKI；按场景选择",
+            "CLI：公有/私有都可用 request-certificate，私有证书需 --certificate-authority-arn；API：RequestCertificate (AWS 文档)"
+          ],
+          [
+            "私有 CA 算法家族匹配",
+            "请求私有证书时，证书算法家族需与 CA 密钥家族匹配：RSA CA 对 RSA 证书，ECDSA CA 对 ECDSA 证书",
+            "算法家族不匹配会导致请求不符合要求",
+            "与 CA 家族匹配",
+            "API：RequestCertificate + CertificateAuthorityArn + KeyAlgorithm (AWS 文档)"
+          ]
+        ]
+      },
+      {
+        "sheet": "风险与安全",
+        "max_row": 17,
+        "max_column": 3,
+        "non_empty_rows": 16,
+        "header_row_1_based": 2,
+        "headers": [
+          "配置项",
+          "风险值",
+          "原因"
+        ],
+        "sample_rows": [
+          [
+            "导入证书算法",
+            "RSA_1024",
+            "密钥长度明显过低，不宜作为现代安全基线。(AWS 文档)"
+          ],
+          [
+            "证书导出开关",
+            "Export=ENABLED",
+            "会扩大私钥暴露面，应只在确有站外部署需求时启用。(AWS 文档)"
+          ],
+          [
+            "证书透明度日志",
+            "CertificateTransparencyLoggingPreference=DISABLED",
+            "对公网证书通常不推荐关闭。(AWS 文档)"
+          ],
+          [
+            "验证方式",
+            "EMAIL",
+            "自动化差、续期依赖人工邮件流程。(AWS 文档)"
+          ],
+          [
+            "导出私钥口令",
+            "弱 passphrase / 明文暴露",
+            "私钥导出后的保护强度下降。(AWS 文档)"
+          ],
+          [
+            "证书部署策略",
+            "证书 pinning",
+            "ACM 续期换 key 后可能导致服务中断。(AWS 文档)"
+          ],
+          [
+            "安全项",
+            "",
+            ""
+          ],
+          [
+            "配置项",
+            "安全值",
+            "原因"
+          ],
+          [
+            "证书密钥算法",
+            "EC_prime256v1、EC_secp384r1",
+            "在兼容性允许的情况下，效率和安全性都很好。(AWS 文档)"
+          ],
+          [
+            "兼容性优先算法",
+            "RSA_2048",
+            "ACM 默认值，兼容性最好。(AWS 文档)"
+          ]
+        ]
+      },
+      {
+        "sheet": "常用命令",
+        "max_row": 1,
+        "max_column": 1,
+        "non_empty_rows": 0,
+        "header_row_1_based": null,
+        "headers": [],
+        "sample_rows": []
+      }
+    ]
+  },
+  {
+    "file": "张聪艺_工作日报0427AWS Encryption SDK.xlsx",
+    "sheets": [
+      {
+        "sheet": "Sheet1",
+        "max_row": 13,
+        "max_column": 10,
+        "non_empty_rows": 10,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "配置项",
+          "可选值",
+          "风险值",
+          "安全值",
+          "对应位置",
+          "",
+          "配置项",
+          "是否有对应命令 / API",
+          "主要入口"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "Keyring 类型",
+            "KMS keyring / multi-keyring / discovery keyring / custom keyring",
+            "裸 discovery keyring",
+            "受控 KMS keyring / multi-keyring",
+            "SDK 配置",
+            "",
+            "Keyring / master key provider",
+            "有，但主要是 SDK 代码接口",
+            "各语言 SDK；AWS Encryption CLI 也支持 master key provider / KMS key 配置 (AWS 文档)"
+          ],
+          [
+            "",
+            "Wrapping keys",
+            "generator key + additional keys",
+            "key 范围过宽、标识不具体",
+            "最小必要 key，优先 key ARN",
+            "SDK 配置",
+            "",
+            "Wrapping keys（generator key / additional keys）",
+            "有，但主要是 SDK 代码接口",
+            "各语言 SDK；底层依赖 KMS API 权限 GenerateDataKey / Encrypt / Decrypt (AWS 文档)"
+          ],
+          [
+            "",
+            "Algorithm suite",
+            "默认套件 / 替代套件 / 带签名 / 不带签名",
+            "不带签名套件",
+            "默认推荐套件、带签名",
+            "SDK 加密请求或 CMM",
+            "",
+            "Algorithm suite",
+            "有，主要是 SDK 代码接口",
+            "各语言 SDK；例如 C 里可显式设置 CMM 的算法套件 (AWS 文档)"
+          ],
+          [
+            "",
+            "Commitment policy",
+            "ForbidEncryptAllowDecrypt / RequireEncryptAllowDecrypt / RequireEncryptRequireDecrypt",
+            "ForbidEncryptAllowDecrypt 长期使用",
+            "RequireEncryptRequireDecrypt",
+            "SDK 配置",
+            "",
+            "Commitment policy",
+            "有，主要是 SDK 代码接口",
+            "各语言 SDK 的 client / crypto config；不是单独 AWS 服务 API (AWS 文档)"
+          ],
+          [
+            "",
+            "Key commitment",
+            "启用 / 不启用",
+            "不启用",
+            "启用",
+            "由 policy + suite 决定",
+            "",
+            "Key commitment",
+            "间接有",
+            "通过 commitment policy + algorithm suite 控制，不是单独 API 字段 (AWS 文档)"
+          ],
+          [
+            "",
+            "Encryption context",
+            "自定义键值对",
+            "不校验；放敏感信息",
+            "配置并校验，且不放秘密",
+            "Encrypt/Decrypt 参数",
+            "",
+            "Encryption context",
+            "有，主要是 SDK 加解密参数",
+            "各语言 SDK 的 encrypt/decrypt 调用参数或 required encryption context CMM (AWS 文档)"
+          ],
+          [
+            "",
+            "Discovery filter",
+            "账户 / 分区 / 区域限制",
+            "不加 filter",
+            "严格 filter",
+            "discovery keyring 配置",
+            "",
+            "Discovery filter",
+            "有，主要是 SDK 代码接口",
+            "创建 discovery keyring 时配置 filter (AWS 文档)"
+          ],
+          [
+            "",
+            "KMS key 类型",
+            "对称 KMS key；部分实现支持非对称 RSA",
+            "误用不受支持的 key 类型",
+            "对称 KMS keyring",
+            "keyring 配置",
+            "",
+            "KMS key type / key ARN 使用方式",
+            "有，但属于 keyring 配置规则",
+            "各语言 SDK / AWS Encryption CLI；底层约束来自 KMS keyring 用法 (AWS 文档)"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "Digital signatures",
+            "间接有",
+            "通过 algorithm suite 选择“带签名”或“不带签名” (AWS 文档)"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet2",
+        "max_row": 16,
+        "max_column": 6,
+        "non_empty_rows": 15,
+        "header_row_1_based": 1,
+        "headers": [
+          "",
+          "配置项",
+          "可选值",
+          "风险值",
+          "安全值",
+          "对应命令或 API"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "Keyring 类型",
+            "AWS KMS keyring、自定义 keyring、multi-keyring、discovery keyring",
+            "裸 discovery keyring；使用范围过宽的自定义 keyring",
+            "受控的 AWS KMS keyring；按需组合的 multi-keyring",
+            "SDK 接口：各语言创建 keyring；CLI：AWS Encryption CLI；底层 KMS API：取决于 keyring 类型。AWS 文档建议使用在安全边界内保护 wrapping keys 的 keyring，例如 AWS KMS keyring。 (AWS 文档)"
+          ],
+          [
+            "",
+            "Wrapping keys / KMS keys",
+            "1 个 generator key，0 到多个 additional keys",
+            "key 范围过宽；解密侧不使用 ARN；无必要叠加过多 key",
+            "最小必要 key 集；解密严格模式优先 key ARN",
+            "SDK 接口：如 JavaScript generatorKeyId、keyIds，Python generator、kms_key_ids；底层 KMS API：kms:GenerateDataKey、kms:Encrypt、kms:Decrypt。(AWS 文档)"
+          ],
+          [
+            "",
+            "Algorithm suite",
+            "默认推荐套件；替代套件；带签名套件；不带签名套件",
+            "无明确原因改成“不带签名”套件",
+            "默认推荐套件；带签名、带 key commitment 的套件",
+            "SDK 接口：各语言加密配置；C 里可用 aws_cryptosdk_default_cmm_set_alg_id 显式设置。默认推荐套件使用 AES-GCM、key derivation、digital signatures、key commitment。(AWS 文档)"
+          ],
+          [
+            "",
+            "Commitment policy",
+            "ForbidEncryptAllowDecrypt、RequireEncryptAllowDecrypt、RequireEncryptRequireDecrypt",
+            "ForbidEncryptAllowDecrypt 长期使用",
+            "RequireEncryptRequireDecrypt",
+            "SDK 接口：各语言 client/builder 配置；JavaScript buildClient(CommitmentPolicy...)，Java withCommitmentPolicy(...) 等。RequireEncryptRequireDecrypt 是 2.x 及以后默认值。(AWS 文档)"
+          ],
+          [
+            "",
+            "Key commitment",
+            "启用 / 不启用（由 commitment policy + algorithm suite 决定）",
+            "不启用",
+            "启用",
+            "间接配置：不是独立命令，主要通过 commitment policy 和 algorithm suite 控制。AWS 文档把“encrypting and decrypting data with key commitment”列为最佳实践。(AWS 文档)"
+          ],
+          [
+            "",
+            "Digital signatures",
+            "带签名 / 不带签名（由 algorithm suite 决定）",
+            "不带签名套件",
+            "带签名套件",
+            "间接配置：通过 algorithm suite 选择。文档说明默认推荐套件包含 digital signatures，也可以改成无签名套件。(AWS 文档)"
+          ],
+          [
+            "",
+            "Encryption context",
+            "自定义键值对",
+            "不校验；把敏感信息放进去；required keys 无法复现",
+            "配置并校验关键上下文；只放非敏感认证元数据",
+            "SDK 接口：Encrypt/Decrypt 参数或 required encryption context CMM；CLI：AWS Encryption CLI 支持上下文参数。文档说明 required keys 在加密和解密时必须一致，否则无法解密。(AWS 文档)"
+          ],
+          [
+            "",
+            "Required encryption context CMM",
+            "指定一组 required keys",
+            "选了无法在解密端稳定重现的 required keys",
+            "只把稳定、可复现的关键上下文字段设为 required",
+            "SDK 接口：CreateRequiredEncryptionContextCMM 等；支持版本有限。文档明确提醒：若不能再次提供这些 required keys/value，消息无法解密。(AWS 文档)"
+          ],
+          [
+            "",
+            "Discovery filter",
+            "按 AWS account、partition，部分实现还可配 discovery region",
+            "不加 filter 直接 discovery",
+            "严格 filter，限制到账户与分区",
+            "SDK 接口：创建 discovery keyring 时配置；CLI：AWS Encryption CLI 可在 discovery 模式加 filter。文档明确说 filter 是可选的，但属于推荐的最佳实践。(AWS 文档)"
+          ],
+          [
+            "",
+            "Strict mode / Discovery mode",
+            "strict mode、discovery mode",
+            "discovery mode 无过滤",
+            "strict mode；若必须 discovery，则加严格 filter",
+            "SDK 接口：不同语言的 strict/discovery keyring builder；例如 JavaScript buildAwsKmsMrkAwareStrictMultiKeyring...。(AWS 文档)"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "张聪艺_工作日报0429Amazon_S3_Encryption_Client.xlsx",
+    "sheets": [
+      {
+        "sheet": "Sheet1",
+        "max_row": 9,
+        "max_column": 3,
+        "non_empty_rows": 8,
+        "header_row_1_based": 1,
+        "headers": [
+          "配置项",
+          "说明",
+          "典型风险点"
+        ],
+        "sample_rows": [
+          [
+            "Wrapping key",
+            "指定 data key 由什么 key 保护",
+            "直接使用 raw key 且管理不当"
+          ],
+          [
+            "Keyring",
+            "负责生成/加密/解密 data key",
+            "自定义实现缺少审计"
+          ],
+          [
+            "对象加密算法",
+            "默认 256-bit data key + AES-GCM",
+            "一般风险不在默认算法，而在偏离默认设计"
+          ],
+          [
+            "Encryption context",
+            "非秘密 AAD，明文保存在 metadata 中",
+            "放敏感信息；不一致导致解密失败"
+          ],
+          [
+            "CMM",
+            "组装密码材料，可做策略和缓存扩展",
+            "自定义后缺少策略审查"
+          ],
+          [
+            "Metadata 存储方式",
+            "对象 metadata 或 instruction files",
+            "instruction files 增加管理复杂度"
+          ],
+          [
+            "Key commitment / policy",
+            "约束密钥承诺行为",
+            "为兼容长期保持宽松策略"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet2",
+        "max_row": 13,
+        "max_column": 5,
+        "non_empty_rows": 12,
+        "header_row_1_based": 1,
+        "headers": [
+          "配置项",
+          "可选值",
+          "风险值",
+          "安全值",
+          "对应命令或 API"
+        ],
+        "sample_rows": [
+          [
+            "Wrapping key 类型",
+            "对称 AWS KMS key、Raw AES-GCM key、Raw RSA key",
+            "Raw AES-GCM / Raw RSA 在缺少成熟密钥管理时风险更高；Go 3.x 还不支持 Raw AES-GCM 或 Raw RSA",
+            "对称 AWS KMS key",
+            "SDK builder/API：Java 可用 kmsKeyId(...)、aesKey(...)、rsaKeyPair(...)；Go 侧支持 KMS wrapping key。(AWS 文档)"
+          ],
+          [
+            "Keyring",
+            "内置 keyring、自定义 keyring",
+            "自定义 keyring 缺少审计或策略约束",
+            "使用内置 KMS keyring；确有需要再自定义",
+            "SDK API：可直接传 wrapping key 让客户端自动创建 keyring，也可手动创建 KmsKeyring 并交给默认 CMM。(AWS 文档)"
+          ],
+          [
+            "Cryptographic Materials Manager (CMM)",
+            "默认 CMM、自定义 CMM",
+            "自定义 CMM 可能引入策略或缓存错误",
+            "默认 CMM",
+            "SDK API：Java 可显式传 cryptoMaterialsManager(cmm)；指定 keyring 时客户端会自动创建默认 CMM。(AWS 文档)"
+          ],
+          [
+            "对象内容加密算法",
+            "当前主线为 AES-GCM；每对象唯一 256-bit data key；12-byte IV；16-byte tag；不使用 KDF",
+            "这里没有同级别的旧算法切换入口；主要风险在偏离默认实现或兼容旧算法时",
+            "默认 AES-GCM 套件",
+            "自动/内置：不是单独 CLI 开关，属于客户端默认密码实现。(AWS 文档)"
+          ],
+          [
+            "Data key 策略",
+            "每个对象唯一 data key",
+            "复用固定 data key 的外部实现思路",
+            "每对象唯一 data key",
+            "自动/内置：客户端默认行为。(AWS 文档)"
+          ],
+          [
+            "Encryption context（仅对称 KMS wrapping key）",
+            "自定义 name-value 对；明文存入对象 metadata；同时作为 KMS AAD",
+            "放敏感信息；使用非 US-ASCII 导致可用性/兼容性问题；解密时不提供相同 context",
+            "只放非敏感认证元数据；加解密使用一致的 context；优先 US-ASCII",
+            "SDK API：Java 通过 PutObjectRequest.overrideConfiguration(...) 和 GetObject 的对应配置传入。(AWS 文档)"
+          ],
+          [
+            "加密元数据存储方式",
+            "对象 metadata、instruction files",
+            "instruction files 增加额外对象和一致性/访问控制管理面",
+            "默认对象 metadata",
+            "SDK 行为/配置概念：文档列出两种方式；instruction file 是单独 S3 对象。(AWS 文档)"
+          ],
+          [
+            "Key commitment / commitment policy",
+            "支持相关概念与策略",
+            "长期保持宽松兼容策略",
+            "启用更严格的 commitment policy",
+            "SDK 配置概念：概念页将其列为核心机制；具体实现需按语言版本配置。(AWS 文档)"
+          ],
+          [
+            "Partial RSA key pair 用法",
+            "完整 RSA key pair；仅 public key；仅 private key",
+            "完整 key pair 在不必要时扩大密钥暴露面",
+            "仅加密场景传 public key；仅解密场景传 private key",
+            "SDK builder/API：Java rsaKeyPair(...) 支持完整或部分 key pair。(AWS 文档)"
+          ],
+          [
+            "自定义 KMS 客户端",
+            "默认 KMS client、自定义 KMS client",
+            "自定义 client 配置不当",
+            "默认或受控的自定义 KMS client",
+            "SDK API：Java 可手动创建 KmsKeyring.builder().wrappingKeyId(...).kmsClient(customKmsClient)。(AWS 文档)"
+          ]
+        ]
+      },
+      {
+        "sheet": "Sheet3",
+        "max_row": 19,
+        "max_column": 9,
+        "non_empty_rows": 15,
+        "header_row_1_based": 2,
+        "headers": [
+          "配置项",
+          "风险值",
+          "原因",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "sample_rows": [
+          [
+            "Wrapping key 类型",
+            "Raw AES-GCM / Raw RSA",
+            "原始 wrapping key 的生成、存储、轮换、访问控制都由你自己负责；AWS 明确建议如果没有现成密钥管理系统，推荐用 AWS KMS。(AWS 文档)",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "Encryption context",
+            "放敏感信息；使用非 US-ASCII；加解密不一致",
+            "文档明确说 encryption context 是非秘密 AAD，且会明文保存在对象 metadata 中，并强烈建议只使用 US-ASCII。(AWS 文档)",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "加密元数据存储方式",
+            "instruction files",
+            "会引入单独的 S3 对象来保存加密元数据，增加管理复杂度。(AWS 文档)",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "CMM",
+            "不受控的自定义 CMM",
+            "CMM 是策略强制与缓存扩展点，自定义意味着更高实现风险。(AWS 文档)",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "Key pair 暴露面",
+            "在仅加密或仅解密场景仍传完整 RSA key pair",
+            "Java 文档明确支持仅公钥或仅私钥模式，用于限制密钥暴露面。(AWS 文档)",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "安全",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "配置项",
+            "安全值",
+            "原因",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "Wrapping key 类型",
+            "对称 AWS KMS key",
+            "AWS 明确推荐在没有现成密钥管理系统时使用 AWS KMS。(AWS 文档)",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "对象内容加密算法",
+            "默认 AES-GCM + 256-bit data key",
+            "文档明确给出当前主线套件：256-bit 对称 data key、AES-GCM、12-byte IV、16-byte tag。(AWS 文档)",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "Data key 策略",
+            "每对象唯一 data key",
+            "文档明确说这是默认行为，也是密码学最佳实践。(AWS 文档)",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "张聪艺_工作日报0509AWS_Payment_Cryptography.xlsx",
+    "sheets": [
+      {
+        "sheet": "Sheet1",
+        "max_row": 25,
+        "max_column": 6,
+        "non_empty_rows": 25,
+        "header_row_1_based": 1,
+        "headers": [
+          "配置项",
+          "可选值 / 典型值",
+          "风险值",
+          "安全值 / 推荐值",
+          "对应命令或 API",
+          "参考链接 / 核对依据"
+        ],
+        "sample_rows": [
+          [
+            "KeyClass 密钥类别",
+            "SYMMETRIC_KEY、ASYMMETRIC_KEY_PAIR、PUBLIC_KEY",
+            "密钥类别与用途不匹配，例如 PIN/CVV/MAC 场景误用非对称密钥，或证书/密钥交换场景类型配置错误",
+            "PIN、CVV、MAC、数据加密多用 SYMMETRIC_KEY；TR-34、RSA、ECDH、证书场景使用非对称或公钥类型",
+            "CreateKey；--key-attributes KeyClass=SYMMETRIC_KEY,…",
+            "创建 key 时需指定 key algorithm、key usage、permitted operations、是否 exportable，且创建后不可更改；有效属性组合由 AWS 文档列出。(AWS 文档)"
+          ],
+          [
+            "KeyAlgorithm 密钥算法",
+            "TDES_2KEY、TDES_3KEY、AES_128、AES_192、AES_256、RSA_2048、RSA_3072、RSA_4096、ECC 相关算法",
+            "新系统中继续优先使用 TDES，尤其是 TDES_2KEY；算法强度或算法类型与业务操作不匹配",
+            "新设计优先 AES_128/192/256 或合规强度 RSA/ECC；TDES 仅用于遗留支付网络或终端兼容",
+            "CreateKey；KeyAlgorithm=AES_256",
+            "AWS cryptographic foundations 说明支持 AES、TDEA、RSA/ECC 等支付密码算法，并说明 HSM main keys、data protection keys、TLS session keys 使用 AES-256。(AWS 文档)"
+          ],
+          [
+            "KeyUsage 密钥用途",
+            "TR-31 风格用途，如 TR31_P0_PIN_ENCRYPTION_KEY、TR31_C0_CARD_VERIFICATION_KEY、TR31_M7_HMAC_KEY、TR31_E0_EMV_MKEY_APP_CRYPTOGRAMS、TR31_B0_BASE_DERIVATION_KEY、TR31_K0_KEY_ENCRYPTION_KEY、TR31_D0_SYMMETRIC_DATA_ENCRYPTION_KEY 等",
+            "PIN、CVV、MAC、数据加密、KEK 混用；密钥用途过宽",
+            "按 TR-31 用途严格隔离，一类密钥只承担对应用途",
+            "CreateKey；KeyUsage=TR31_P0_PIN_ENCRYPTION_KEY",
+            "AWS 文档说明密钥应被适当限定作用域，只能用于允许操作，并尽量与 TR-31 modes of use 对齐。(AWS 文档)"
+          ],
+          [
+            "KeyModesOfUse 密钥允许操作",
+            "Encrypt、Decrypt、Wrap、Unwrap、Generate、Verify、DeriveKey、Sign、NoRestrictions 等",
+            "开启过多模式，例如不必要地启用 NoRestrictions、Wrap/Unwrap，或同一密钥承担过多操作",
+            "最小权限：CVV 密钥只开 Generate/Verify；MAC 密钥只开 Generate/Verify；KEK 才开 Wrap/Unwrap；派生主密钥才开 DeriveKey",
+            "CreateKey；KeyModesOfUse={Generate=true,Verify=true}",
+            "AWS 文档列出不同 KeyUsage 允许的算法与 mode 组合，并说明服务会阻止无效 key 组合。(AWS 文档)"
+          ],
+          [
+            "Exportable 密钥是否可导出",
+            "true / false",
+            "无外部 HSM、支付网络或合作方交换需求时设置为 true，扩大密钥离开服务边界的风险",
+            "默认倾向 false；只有明确需要密钥交换或跨系统迁移时才设置 true",
+            "CreateKey --exportable；CreateKey.Exportable",
+            "创建 key 时可指定是否 exportable，且创建后不可更改；导出 key 时需使用合适的 wrapping key 和标准交换机制。(AWS 文档)"
+          ],
+          [
+            "KeyOrigin 密钥来源",
+            "AWS Payment Cryptography 内部生成；外部导入；派生密钥相关来源",
+            "外部导入密钥来源不可信；导入流程未使用标准 key block 或合规 HSM 保护",
+            "优先使用服务内部生成；外部导入时使用 TR-31/TR-34/RSA unwrap/ECDH 等标准机制，并保留来源审计",
+            "CreateKey；ImportKey",
+            "AWS 文档说明支持内部创建 key，也支持通过行业标准进行密钥导入/导出。(AWS 文档)"
+          ],
+          [
+            "Enabled 密钥状态",
+            "Enabled=true/false；可启用、停用、删除",
+            "退役、疑似泄露、长期未使用的密钥仍保持启用",
+            "不再使用或疑似泄露时及时禁用；删除前先禁用并确认依赖关系",
+            "StartKeyUsage、StopKeyUsage、DeleteKey",
+            "Service Authorization Reference 列出了 StartKeyUsage、StopKeyUsage、DeleteKey 等控制面操作，可用于 IAM 权限控制。(AWS 文档)"
+          ],
+          [
+            "KeyCheckValueAlgorithm / KCV 算法",
+            "CMAC、ANSI_X9_24、HMAC、SHA_1 等，依具体导入/导出场景而定",
+            "KCV 算法与密钥类型、合作方校验规则不一致；把 KCV 误当成完整完整性保护",
+            "按密钥算法和支付网络/合作方规范选择；AES 场景优先 CMAC 语义，TDES 场景按 ANSI X9.24 兼容要求",
+            "ImportKey --key-check-value-algorithm CMAC",
+            "TranslatePinData API 返回 KCV，并说明 KCV 用于检查各方持有的 key 是否相同或是否发生变化；AWS Payment Cryptography 按 CMAC 规范计算相关 KCV。(AWS 文档)"
+          ],
+          [
+            "TR-31 工作密钥导入/导出",
+            "TR-31 key block；需要 KEK / wrapping key",
+            "使用明文 key component、纸质组件或非标准流程；未正确绑定 key usage/mode；KEK 强度低于被保护密钥",
+            "使用 ANSI X9.24 TR-31 / X9.143 key block；key block 绑定密钥用途、算法和模式；KEK 强度不低于被保护密钥",
+            "ImportKey、ExportKey",
+            "AWS 文档说明使用 ANSI X9.24 TR-31-2018 和 X9.143 交换 working keys，并满足 PCI PIN 对密钥材料与类型、用途保持密码绑定的要求。(AWS 文档)"
+          ],
+          [
+            "TR-34 / RSA unwrap / ECDH 初始密钥交换",
+            "TR-34、RSA Wrap/Unwrap、ECDH",
+            "证书链未验证；KDH/KRD 身份绑定不清；导入/导出 token 过期；参数不满足合作方或 PCI 要求",
+            "推荐 TR-34；不支持 TR-34 时使用 RSA wrap/unwrap；交换 AES-256 key 可用 ECDH；验证证书链和角色身份",
+            "GetParametersForImport、ImportKey、GetParametersForExport、ExportKey",
+            "AWS 文档推荐使用 ANSI X9.24 TR-34 作为初始 KEK/ZMK/ZCMK 交换方式；不支持 TR-34 时可用 RSA Wrap/Unwrap，需要 AES-256 key 交换时可用 ECDH。(AWS 文档)"
+          ]
+        ]
+      }
+    ]
+  },
+  {
+    "file": "张聪艺工作日报0413_NLB.xlsx",
+    "sheets": [
+      {
+        "sheet": "TLS表1",
+        "max_row": 20,
+        "max_column": 10,
+        "non_empty_rows": 20,
+        "header_row_1_based": 2,
+        "headers": [
+          "Security policies",
+          "TLS 1.3",
+          "TLS 1.2",
+          "TLS 1.1",
+          "TLS 1.0",
+          "",
+          "RFC 8996 明确规定：TLS 1.0 和 TLS 1.1 MUST NOT be used",
+          "",
+          "",
+          "相关判定为risky"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "标红"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-2021-06",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "TLS主要的表2",
+        "max_row": 185,
+        "max_column": 4,
+        "non_empty_rows": 184,
+        "header_row_1_based": 1,
+        "headers": [
+          "Security policy",
+          "Ciphers",
+          "问题",
+          "说明"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "TLS_AES_128_GCM_SHA256",
+            "",
+            "1.不含ECDHE或者TLS_，即缺乏前向安全FS的，可以认为是有风险的"
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "2.CBC 模式（非 AEAD），有相关攻击，没被攻破但不被推荐，可以认为是有风险的"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "TLS_CHACHA20_POLY1305_SHA256",
+            "",
+            "3.SHA1，有相关攻击，已被弃用，有风险"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "TLS_AES_128_GCM_SHA256",
+            "CBC",
+            ""
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "AEAD 加密：ChaCha20和GCM"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            "TLS_CHACHA20_POLY1305_SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            "标红的是有问题的密码套件，黄色高亮是推荐的安全策略"
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-SHA256",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "TLS表3",
+        "max_row": 245,
+        "max_column": 5,
+        "non_empty_rows": 244,
+        "header_row_1_based": 1,
+        "headers": [
+          "Cipher name",
+          "Security policies",
+          "Cipher suite",
+          "",
+          "和表2信息表达一样，只是主体换了（相当于转置），可以用于工程排查"
+        ],
+        "sample_rows": [
+          [
+            "OpenSSL – TLS_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "1301",
+            "",
+            "若客户端只支持某个加密套件，可以用这张表选择，支持该加密套件的安全策略"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "IANA – TLS_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "",
+            "",
+            "IANA：nternet Assigned Numbers Authority，TLS 标准官方命名（RFC定义）"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06",
+            "",
+            "",
+            "OpenSSL：实际使用最广的加密库，工程实现的名字"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-2021-06",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-2021-06",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-PQ-2025-09",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FIPS表1",
+        "max_row": 17,
+        "max_column": 11,
+        "non_empty_rows": 17,
+        "header_row_1_based": 2,
+        "headers": [
+          "Security policies",
+          "TLS 1.3",
+          "TLS 1.2",
+          "TLS 1.1",
+          "TLS 1.0",
+          "",
+          "",
+          "RFC 8996 明确规定：TLS 1.0 和 TLS 1.1 MUST NOT be used",
+          "",
+          "",
+          "相关判定为risky"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "标红"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-PQ-2025-09",
+            "Yes",
+            "No",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-2023-04",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-PQ-2025-09",
+            "Yes",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FIPS主要的表2",
+        "max_row": 109,
+        "max_column": 4,
+        "non_empty_rows": 108,
+        "header_row_1_based": 1,
+        "headers": [
+          "Security policy",
+          "Ciphers",
+          "问题",
+          "说明"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04",
+            "TLS_AES_128_GCM_SHA256",
+            "",
+            "1.不含ECDHE或者TLS_，即缺乏前向安全FS的，可以认为是有风险的"
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "2.CBC 模式（非 AEAD），有相关攻击，没被攻破但不被推荐，可以认为是有风险的"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-PQ-2025-09",
+            "",
+            "",
+            "3.SHA1，有相关攻击，已被弃用，有风险"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04",
+            "TLS_AES_128_GCM_SHA256",
+            "CBC",
+            ""
+          ],
+          [
+            "",
+            "TLS_AES_256_GCM_SHA384",
+            "",
+            "AEAD 加密：ChaCha20和GCM"
+          ],
+          [
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-SHA256",
+            "",
+            "标红的是有问题的密码套件，黄色高亮是推荐的安全策略"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FIPS表3",
+        "max_row": 185,
+        "max_column": 6,
+        "non_empty_rows": 184,
+        "header_row_1_based": 2,
+        "headers": [
+          "OpenSSL – TLS_AES_128_GCM_SHA256",
+          "ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04",
+          "1301",
+          "",
+          "",
+          "和表2信息表达一样，只是主体换了（相当于转置），可以用于工程排查"
+        ],
+        "sample_rows": [
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-PQ-2025-09",
+            "",
+            "",
+            "",
+            "若客户端只支持某个加密套件，可以用这张表选择，支持该加密套件的安全策略"
+          ],
+          [
+            "IANA – TLS_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-2023-04",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-PQ-2025-09",
+            "",
+            "",
+            "",
+            "IANA：nternet Assigned Numbers Authority，TLS 标准官方命名（RFC定义）"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "",
+            "",
+            "",
+            "OpenSSL：实际使用最广的加密库，工程实现的名字"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-PQ-2025-09",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-2023-04",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-PQ-2025-09",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Ext0-FIPS-2023-04",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FS表1",
+        "max_row": 7,
+        "max_column": 11,
+        "non_empty_rows": 6,
+        "header_row_1_based": 1,
+        "headers": [
+          "Security policies",
+          "TLS 1.3",
+          "TLS 1.2",
+          "TLS 1.1",
+          "TLS 1.0",
+          "",
+          "",
+          "RFC 8996 明确规定：TLS 1.0 和 TLS 1.1 MUST NOT be used",
+          "",
+          "",
+          "相关判定为risky"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "No",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "标红"
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "No",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-2-2019-08",
+            "No",
+            "Yes",
+            "No",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-1-2019-08",
+            "No",
+            "Yes",
+            "Yes",
+            "No",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-2018-06",
+            "No",
+            "Yes",
+            "Yes",
+            "Yes",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FS主要的表2",
+        "max_row": 50,
+        "max_column": 4,
+        "non_empty_rows": 49,
+        "header_row_1_based": 1,
+        "headers": [
+          "Security policy",
+          "Ciphers",
+          "问题",
+          "说明"
+        ],
+        "sample_rows": [
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "",
+            "1.不含ECDHE或者TLS_，即缺乏前向安全FS的，可以认为是有风险的"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            "2.CBC 模式（非 AEAD），有相关攻击，没被攻破但不被推荐，可以认为是有风险的"
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES256-GCM-SHA384",
+            "",
+            "3.SHA1，有相关攻击，已被弃用，有风险"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ],
+          [
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "ECDHE-ECDSA-AES128-GCM-SHA256",
+            "CBC",
+            "AEAD 加密：ChaCha20和GCM"
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-GCM-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES128-SHA256",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES128-SHA256",
+            "",
+            "标红的是有问题的密码套件，黄色高亮是推荐的安全策略"
+          ],
+          [
+            "",
+            "ECDHE-ECDSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ECDHE-RSA-AES256-GCM-SHA384",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "FS表3",
+        "max_row": 50,
+        "max_column": 8,
+        "non_empty_rows": 49,
+        "header_row_1_based": 1,
+        "headers": [
+          "Cipher name",
+          "Security policies",
+          "Cipher suite",
+          "",
+          "RFC 8996 明确规定：TLS 1.0 和 TLS 1.1 MUST NOT be used",
+          "",
+          "",
+          "相关判定为risky"
+        ],
+        "sample_rows": [
+          [
+            "OpenSSL – ECDHE-ECDSA-AES128-GCM-SHA256",
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "c02b",
+            "",
+            "",
+            "",
+            "",
+            "标红"
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "IANA – TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-FS-1-2-2019-08",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-1-2019-08",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-2018-06",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "OpenSSL – ECDHE-RSA-AES128-GCM-SHA256",
+            "ELBSecurityPolicy-FS-1-2-Res-2020-10",
+            "c02f",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-2-Res-2019-08",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "IANA – TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
+            "ELBSecurityPolicy-FS-1-2-2019-08",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-1-1-2019-08",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "ELBSecurityPolicy-FS-2018-06",
+            "",
+            "",
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "sheet": "总结",
+        "max_row": 65,
+        "max_column": 7,
+        "non_empty_rows": 64,
+        "header_row_1_based": 1,
+        "headers": [
+          "Public_Cloud",
+          "Service",
+          "Description",
+          "API_Endpoint",
+          "Recommended_Values",
+          "Risky_Values",
+          "References"
+        ],
+        "sample_rows": [
+          [
+            "AWS",
+            "CloudFront",
+            "AWS CDN Service",
+            "DistributionCo nfig.ViewerCer tificate.Minimu mProtocolVersi on",
+            "TLSv1. 3_2025",
+            "SSLv3",
+            "https://docs.aws.amazon.com/cli/latest/reference/cloudfront/update-distribution.html"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "TLSv1 .2_2025",
+            "TLSv1",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "TLSv1. 2_2021",
+            "TL Sv1_2016",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "TLSv1.1_2016",
+            "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-viewer-protocols-ciphers.html"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "TLSv1.2_ 2018",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "TLSv1.2_20 19",
+            ""
+          ],
+          [
+            "AWS",
+            "Elastic Load Balancing——Application Load Balancer",
+            "ELB: Managed load balancing service for distributing traffic across multiple targets.",
+            "CreateListener.SslPolicy / ModifyListener.SslPolicy",
+            "ELBSecurityPolicy-TLS13-1-3-2021-06",
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html"
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "ELBSecurityPolicy-TLS13-1-3-PQ-2025-09",
+            "ELBSecurityPolicy-TLS13-1-2-PQ-2025-09",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "",
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-2021-06",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            "官网示例：aws elbv2 describe-ssl-policies \\ --names \"ELBSecurityPolicy-TLS13-1-2-Res-2021-06\"",
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+            "ELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09",
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/describe-ssl-policies.html"
+          ]
+        ]
+      }
+    ]
+  }
+]

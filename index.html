@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AWS 云服务密码配置风险展示平台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#/">AWS 云服务密码配置风险展示平台</a>
+      <nav class="nav" aria-label="主导航">
+        <a href="#/" data-nav="home">首页</a>
+        <a href="#/risk-types" data-nav="risk-types">风险类型与分析说明</a>
+      </nav>
+    </header>
+
+    <main id="app" class="app" aria-live="polite"></main>
+
+    <template id="home-template">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">AWS Cryptography Configuration</p>
+          <h1>服务、配置项、风险值和安全建议的统一展示</h1>
+          <p class="hero-copy">
+            本平台面向 AWS 云服务中的密码相关配置进行整理与展示，覆盖 TLS/HTTPS、证书管理、密钥管理、DNSSEC、HSM、数字签名、客户端加密 SDK、支付密码等类别。
+          </p>
+        </div>
+        <div class="hero-metrics" aria-label="数据概览">
+          <div><strong data-count="services">0</strong><span>服务</span></div>
+          <div><strong data-count="items">0</strong><span>配置项</span></div>
+          <div><strong data-count="groups">0</strong><span>服务组</span></div>
+        </div>
+      </section>
+
+      <section class="filters" aria-label="服务搜索与筛选">
+        <label class="search-box">
+          <span>搜索服务</span>
+          <input id="search-input" type="search" placeholder="输入 CloudFront、ACM、TLS、客户端加密 SDK..." autocomplete="off" />
+        </label>
+        <div id="group-filters" class="chips" role="list"></div>
+      </section>
+
+      <section class="section-head">
+        <div>
+          <h2>服务总览</h2>
+          <p id="result-summary">正在加载服务卡片</p>
+        </div>
+        <a class="secondary-link" href="#/risk-types">查看风险类型与分析说明</a>
+      </section>
+      <section id="service-grid" class="service-grid" aria-label="服务卡片列表"></section>
+    </template>
+
+    <template id="detail-template">
+      <a class="back-link" href="#/">返回首页</a>
+      <section id="service-detail" class="detail"></section>
+    </template>
+
+    <template id="risk-template">
+      <section class="page-title">
+        <p class="eyebrow">Risk Taxonomy</p>
+        <h1>风险类型与分析说明</h1>
+        <p>本页面用于说明平台中的风险类型、字段含义和分析标准。风险值与安全值主要依据 AWS 官方文档、密码协议安全实践以及配置项本身的安全影响整理。</p>
+      </section>
+
+      <section class="info-band important">
+        <h2>N/A 与不可直接配置</h2>
+        <p>
+          页面中的 N/A 不一定表示数据缺失。对于 Amazon VPC、AWS PrivateLink、AWS Cloud Map 等服务，N/A 通常表示该服务本身不提供直接的密码套件、TLS policy 或密码算法选择入口。应在上层服务或应用层配置 TLS、证书、加密算法、密钥管理和访问控制策略。
+        </p>
+      </section>
+
+      <section class="accordion-section">
+        <h2>常见风险类型</h2>
+        <div id="risk-list" class="accordion-list"></div>
+      </section>
+
+      <section class="two-column">
+        <div>
+          <h2>服务组分类说明</h2>
+          <div id="group-guide" class="compact-table"></div>
+        </div>
+        <div>
+          <h2>字段说明</h2>
+          <div id="field-guide" class="compact-table"></div>
+        </div>
+      </section>
+
+      <section class="accordion-section">
+        <h2>风险值与安全值判断标准</h2>
+        <div id="standard-list" class="accordion-list"></div>
+      </section>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

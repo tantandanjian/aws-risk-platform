@@ -21,11 +21,11 @@ const groups = [
 ];
 
 const groupGuide = [
-  ["TLS / 安全策略", "涉及 TLS 版本、安全策略、HTTPS listener、Viewer TLS policy 等配置", "CloudFront、ALB、NLB"],
+  ["TLS / 安全策略", "涉及 TLS 版本、安全策略、HTTPS listener、Viewer TLS policy 等配置", "CloudFront、ALB、NLB、VPC Lattice"],
   ["DNSSEC / 完整性", "涉及 DNS 响应完整性保护", "Route 53"],
-  ["密钥管理", "涉及云端密钥创建、用途、规格、轮换和来源", "KMS"],
+  ["密钥管理", "涉及云端密钥创建、用途、规格、轮换和来源", "KMS、Secrets Manager"],
   ["HSM / 密码机制", "涉及 HSM、PKCS#11、JCE、CNG 等密码机制", "CloudHSM"],
-  ["证书管理", "涉及证书申请、导入、验证、续期和绑定", "ACM"],
+  ["证书管理", "涉及证书申请、导入、验证、续期和绑定", "ACM、Private CA"],
   ["数字签名", "涉及代码签名、签名 profile 和签名权限", "AWS Signer"],
   ["客户端加密 SDK", "涉及本地加密、keyring、algorithm suite、commitment policy", "AWS Encryption SDK、Database Encryption SDK、S3 Encryption Client"],
   ["支付密码", "涉及支付场景下的密钥、PIN、CVV、TR-31/TR-34 等密码能力", "AWS Payment Cryptography"],
@@ -289,7 +289,16 @@ function renderItemsTable(items) {
     .join("");
 
   return `
-    <table>
+    <table class="analysis-table">
+      <colgroup>
+        <col class="col-config" />
+        <col class="col-api" />
+        <col class="col-recommended" />
+        <col class="col-risky" />
+        <col class="col-level" />
+        <col class="col-reference" />
+        <col class="col-action" />
+      </colgroup>
       <thead>
         <tr>
           <th>配置项</th>

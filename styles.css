@@ -254,6 +254,8 @@ h3 {
 
 .service-card h3 {
   min-height: 44px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .meta-list {
@@ -275,6 +277,9 @@ h3 {
 
 .meta-list dd {
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .tag-row {
@@ -394,8 +399,14 @@ h3 {
   padding-left: 22px;
 }
 
+.risk-focus li,
+.kpi strong {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .analysis-table-wrap {
-  overflow: auto;
+  overflow-x: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
@@ -427,6 +438,46 @@ td {
 
 td:first-child {
   min-width: 220px;
+}
+
+.analysis-table {
+  table-layout: fixed;
+}
+
+.analysis-table .col-config {
+  width: 18%;
+}
+
+.analysis-table .col-api {
+  width: 20%;
+}
+
+.analysis-table .col-recommended,
+.analysis-table .col-risky {
+  width: 17%;
+}
+
+.analysis-table .col-level {
+  width: 10%;
+}
+
+.analysis-table .col-reference {
+  width: 10%;
+}
+
+.analysis-table .col-action {
+  width: 8%;
+}
+
+.analysis-table th,
+.analysis-table td {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.analysis-table th {
+  white-space: normal;
 }
 
 tr.detail-row td {

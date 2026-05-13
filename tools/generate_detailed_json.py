@@ -37,7 +37,7 @@ SERVICE_META = OrderedDict(
             {
                 "service": "Amazon CloudFront",
                 "aws_category": "Networking & Content Delivery",
-                "service_group": "TLS / HTTPS 安全策略",
+                "service_group": "TLS / 安全策略",
                 "crypto_category": "TLS/HTTPS; Certificate",
                 "configurable_status": "可配置",
                 "main_focus": "ViewerCertificate.MinimumProtocolVersion; viewer/origin HTTPS; certificate attachment",
@@ -50,7 +50,7 @@ SERVICE_META = OrderedDict(
             {
                 "service": "Elastic Load Balancing - Application Load Balancer (ALB)",
                 "aws_category": "Networking & Content Delivery",
-                "service_group": "TLS / HTTPS 安全策略",
+                "service_group": "TLS / 安全策略",
                 "crypto_category": "TLS/HTTPS; Certificate",
                 "configurable_status": "可配置",
                 "main_focus": "CreateListener.SslPolicy / ModifyListener.SslPolicy; listener certificates; mutual TLS",
@@ -63,7 +63,7 @@ SERVICE_META = OrderedDict(
             {
                 "service": "Elastic Load Balancing - Network Load Balancer (NLB)",
                 "aws_category": "Networking & Content Delivery",
-                "service_group": "TLS / HTTPS 安全策略",
+                "service_group": "TLS / 安全策略",
                 "crypto_category": "TLS/HTTPS; Certificate",
                 "configurable_status": "可配置",
                 "main_focus": "TLS listener security policy; listener certificate",
@@ -76,7 +76,7 @@ SERVICE_META = OrderedDict(
             {
                 "service": "Amazon VPC Lattice",
                 "aws_category": "Networking & Content Delivery",
-                "service_group": "TLS / HTTPS 安全策略",
+                "service_group": "TLS / 安全策略",
                 "crypto_category": "TLS/HTTPS; Certificate",
                 "configurable_status": "部分可配置",
                 "main_focus": "listener/custom domain/certificate related settings",
@@ -89,7 +89,7 @@ SERVICE_META = OrderedDict(
             {
                 "service": "Amazon Route 53",
                 "aws_category": "Networking & Content Delivery",
-                "service_group": "DNSSEC",
+                "service_group": "DNSSEC / 完整性",
                 "crypto_category": "DNSSEC",
                 "configurable_status": "可配置",
                 "main_focus": "EnableHostedZoneDNSSEC / CreateKeySigningKey",
@@ -141,7 +141,7 @@ SERVICE_META = OrderedDict(
             {
                 "service": "AWS Certificate Manager",
                 "aws_category": "Security, Identity, & Compliance",
-                "service_group": "证书与 TLS",
+                "service_group": "证书管理",
                 "crypto_category": "Certificate; TLS",
                 "configurable_status": "可配置",
                 "main_focus": "RequestCertificate.KeyAlgorithm; ImportCertificate; validation; export/transparency options",
@@ -154,7 +154,7 @@ SERVICE_META = OrderedDict(
             {
                 "service": "AWS Signer",
                 "aws_category": "Security, Identity, & Compliance",
-                "service_group": "代码签名",
+                "service_group": "数字签名",
                 "crypto_category": "Digital Signature; Code Signing",
                 "configurable_status": "部分可配置",
                 "main_focus": "PutSigningProfile / StartSigningJob; platformId; signing material",
@@ -206,7 +206,7 @@ SERVICE_META = OrderedDict(
             {
                 "service": "AWS Payment Cryptography",
                 "aws_category": "Financial Services",
-                "service_group": "支付密码学",
+                "service_group": "支付密码",
                 "crypto_category": "Payment Cryptography; PIN; CVV; TR-31; TR-34; HSM",
                 "configurable_status": "可配置",
                 "main_focus": "CreateKey.KeyAttributes; KeyAlgorithm; KeyUsage; KeyModesOfUse; export/import",
@@ -232,7 +232,7 @@ SERVICE_META = OrderedDict(
             {
                 "service": "AWS Private Certificate Authority",
                 "aws_category": "Security, Identity, & Compliance",
-                "service_group": "证书与 TLS",
+                "service_group": "证书管理",
                 "crypto_category": "Private PKI; Certificate; CA signing algorithm",
                 "configurable_status": "可配置",
                 "main_focus": "CA key algorithm; signing algorithm; certificate templates; revocation",
@@ -245,9 +245,9 @@ SERVICE_META = OrderedDict(
             {
                 "service": "Amazon VPC",
                 "aws_category": "Networking & Content Delivery",
-                "service_group": "无直接密码套件配置",
+                "service_group": "不可直接配置",
                 "crypto_category": "N/A",
-                "configurable_status": "无直接密码套件配置",
+                "configurable_status": "不可直接配置",
                 "main_focus": "N/A; rely on attached services such as VPN, PrivateLink, TLS endpoints",
                 "typical_risks": "误把网络隔离替代传输层加密；未在上层服务配置 TLS、KMS 或证书",
                 "service_intro": "VPC 本身不提供 TLS/cipher 选择项，密码风险通常来自挂载的 VPN、负载均衡、PrivateLink、终端服务或应用层 TLS 配置。",
@@ -258,9 +258,9 @@ SERVICE_META = OrderedDict(
             {
                 "service": "AWS PrivateLink",
                 "aws_category": "Networking & Content Delivery",
-                "service_group": "无直接密码套件配置",
+                "service_group": "不可直接配置",
                 "crypto_category": "N/A",
-                "configurable_status": "无直接密码套件配置",
+                "configurable_status": "不可直接配置",
                 "main_focus": "N/A; service endpoint and consumer/provider access controls",
                 "typical_risks": "把私网连接等同于端到端加密；endpoint policy/服务权限过宽",
                 "service_intro": "PrivateLink 主要提供私网连通性，不直接暴露密码套件配置。应结合服务端 HTTPS/TLS、证书和访问控制检查。",
@@ -271,9 +271,9 @@ SERVICE_META = OrderedDict(
             {
                 "service": "AWS Cloud Map",
                 "aws_category": "Networking & Content Delivery",
-                "service_group": "无直接密码套件配置",
+                "service_group": "不可直接配置",
                 "crypto_category": "N/A",
-                "configurable_status": "无直接密码套件配置",
+                "configurable_status": "不可直接配置",
                 "main_focus": "N/A; service discovery records",
                 "typical_risks": "服务发现配置不等于传输加密；实际通信仍需依赖应用或负载均衡 TLS",
                 "service_intro": "Cloud Map 负责服务发现，不直接配置密码算法、TLS policy 或证书。风险平台中应标为非直接配置项，并提示检查被发现服务自身的 TLS/KMS 设置。",
@@ -709,6 +709,308 @@ def add_manual_items(items: OrderedDict):
         add_item(items, sid, config, api, rec, risky, REFS.get(sid, ""))
 
 
+def is_generic_value(value: str) -> bool:
+    value = text(value)
+    return (
+        not value
+        or value.startswith("按业务场景选择 AWS 当前支持的现代安全值")
+        or value.startswith("未配置、配置过宽、使用旧兼容值")
+    )
+
+
+def merge_field(old: str, new: str, limit: int = 520) -> str:
+    old = text(old)
+    new = text(new)
+    if not new:
+        return old
+    if not old or is_generic_value(old):
+        return new
+    if is_generic_value(new) or new in old:
+        return old
+    parts = []
+    for part in re.split(r";|；", f"{old}; {new}"):
+        part = text(part)
+        if part and part not in parts:
+            parts.append(part)
+    merged = "; ".join(parts)
+    return merged[:limit].rstrip(" ;")
+
+
+def canonical_config(service_id: str, config: str) -> str | None:
+    raw = text(config)
+    lower = raw.lower()
+
+    if not raw:
+        return None
+    if raw.startswith("TLS security policy:"):
+        return raw
+    if raw in {"安全", "Mode"}:
+        return None
+    if "（可选值：" in raw:
+        raw = re.sub(r"（可选值：.*?）", "", raw).strip()
+        lower = raw.lower()
+
+    if service_id == "cloudfront":
+        if "minimumprotocolversion" in lower or "minimum viewer tls" in lower:
+            return "DistributionConfig.ViewerCertificate.MinimumProtocolVersion"
+        if "viewer certificate" in lower:
+            return "DistributionConfig.ViewerCertificate"
+
+    if service_id == "acm":
+        if "passphrase" in lower or "口令" in raw:
+            return "ExportCertificate.Passphrase"
+        if "keyalgorithm" in lower or "key algorithm" in lower or "证书密钥算法" in raw:
+            return "RequestCertificate.KeyAlgorithm"
+        if "importcertificate" in lower or "imported certificate" in lower or "导入证书" in raw:
+            return "ImportCertificate / imported certificate lifecycle"
+        if "validationmethod" in lower or "域名验证" in raw:
+            return "ValidationMethod"
+        if "certificatetransparency" in lower or "透明度日志" in raw or "ct 日志" in lower:
+            return "CertificateTransparencyLoggingPreference"
+        if "pinning" in lower or "固定" in raw:
+            return "Certificate pinning"
+        if "subject alternative" in lower or "san" in lower or "wildcard" in lower or "域名范围" in raw:
+            return "Subject Alternative Names / wildcard"
+        if "options.export" in lower or "证书导出" in raw or raw == "证书导出 Export":
+            return "Options.Export"
+        if "private ca" in lower or "certificateauthorityarn" in lower or "私有 ca" in raw or "私有证书" in raw:
+            return "CertificateAuthorityArn / private CA"
+        if "tls policy" in lower or "集成服务 tls" in lower:
+            return "Integrated service TLS policy"
+        if "renewal" in lower or "自动续期" in raw:
+            return "Managed renewal"
+        if raw in {"标签 Tags", "访问控制 / KMS grant 限制", "ACM 与集成服务 TLS 策略边界"}:
+            return None
+
+    if service_id == "encryption-sdk":
+        if "commitment policy" in lower:
+            return "Commitment policy"
+        if "key commitment" in lower:
+            return "Key commitment"
+        if "discovery filter" in lower:
+            return "Discovery filter"
+        if "keyring" in lower:
+            return "Keyring configuration"
+        if "wrapping key" in lower or "generator key" in lower:
+            return "Wrapping keys / KMS keys"
+        if "kms key 类型" in raw or "kms key type" in lower:
+            return "KMS key type"
+        if "kms key 标识" in raw:
+            return "KMS key identifier"
+        if "encryption context" in lower:
+            return "Encryption context"
+        if "algorithm suite" in lower:
+            return "Algorithm suite"
+        if "digital signatures" in lower or "签名" in raw:
+            return "Digital signatures"
+        if "strict mode" in lower or "discovery mode" in lower:
+            return "Strict mode / discovery mode"
+        if raw == "是否使用 AWS KMS keyring":
+            return "Keyring configuration"
+
+    if service_id == "database-encryption-sdk":
+        if "discovery filter" in lower:
+            return "Discovery filter"
+        if "strict" in lower or "discovery mode" in lower:
+            return "Strict mode / discovery mode"
+        if "keyring" in lower or "branch key cache" in lower:
+            return "Keyring configuration"
+        if "wrapping key" in lower:
+            return "Wrapping key type"
+        if "cryptographic actions" in lower or "field actions" in lower or "attribute actions" in lower or "字段级动作" in raw:
+            return "Cryptographic actions / field actions"
+        if "beacon" in lower or "searchable encryption" in lower:
+            return "Searchable encryption / beacons"
+        if "encryption context" in lower or "material description" in lower:
+            return "Encryption context / material description"
+        if "digital signatures" in lower or "algorithm suite" in lower or "默认/实际 algorithm" in raw:
+            return "Algorithm suite / digital signatures"
+        if "multi" in lower or "多租户" in raw:
+            return "Multi-tenant key isolation"
+        if "raw key" in lower:
+            return "Raw keyring namespace/name"
+
+    if service_id == "s3-encryption-client":
+        if raw in {"Client-side object encryption for S3"}:
+            return None
+        if "cmm" == lower or "cryptographic materials manager" in lower:
+            return "Cryptographic Materials Manager (CMM)"
+        if "data key" in lower:
+            return "Data key policy"
+        if "encryption context" in lower:
+            return "Encryption context"
+        if "key commitment" in lower:
+            return "Key commitment / commitment policy"
+        if "keyring" in lower and "wrapping" not in lower:
+            return "Keyring"
+        if "wrapping key" in lower:
+            return "Wrapping key"
+        if "partial rsa" in lower or "key pair" in lower:
+            return "Partial RSA key pair"
+        if "metadata" in lower or "instruction files" in lower:
+            return "Encryption metadata storage"
+        if "对象内容加密算法" in raw or "对象加密算法" in raw:
+            return "Object encryption algorithm"
+
+    if service_id == "kms":
+        if "external key store" in lower or "外部密钥库" in raw:
+            return "External key store"
+        if raw in {"KeySpec 密钥规格", "KeySpec：对称密钥", "对称加密 KeySpec"}:
+            return "KeySpec: symmetric/default key"
+        if raw in {"Origin", "密钥材料来源 Origin"}:
+            return "Origin"
+        if raw in {"导入密钥材料的过期时间", "Imported key material expiration 导入密钥材料过期策略"}:
+            return "Imported key material expiration"
+        if raw in {"按需轮换", "自动密钥轮换", "Automatic key rotation", "EnableKeyRotation"}:
+            return "Key rotation"
+
+    if service_id == "signer":
+        if "platformid" in lower:
+            return "platformId"
+        if "signaturevalidityperiod" in lower:
+            return "signatureValidityPeriod"
+        if "signingmaterial.certificatearn" in lower:
+            return "signingMaterial.certificateArn"
+
+    return raw
+
+
+def curate_config_items(items: list[dict]) -> list[dict]:
+    curated: OrderedDict[tuple[str, str], dict] = OrderedDict()
+    for item in items:
+        sid = item["service_id"]
+        canonical = canonical_config(sid, item["configuration_item"])
+        if canonical is None:
+            continue
+        if (
+            text(item["recommended_values"]) == text(item["configuration_item"])
+            and text(item["risky_values"]) == text(item["configuration_item"])
+        ):
+            continue
+
+        key = (sid, canonical)
+        next_item = dict(item)
+        next_item["configuration_item"] = canonical
+        next_item["item_id"] = f"{sid}_{slug(canonical)}"
+
+        if key not in curated:
+            curated[key] = next_item
+            continue
+
+        existing = curated[key]
+        for field in ["api_endpoint", "recommended_values", "risky_values", "risk_reason", "security_value_reason", "references"]:
+            existing[field] = merge_field(existing.get(field, ""), next_item.get(field, ""))
+        if existing.get("risk_level") != "高" and next_item.get("risk_level") == "高":
+            existing["risk_level"] = "高"
+
+    # Corrections from AWS official docs cross-checks.
+    for item in curated.values():
+        sid = item["service_id"]
+        config = item["configuration_item"]
+        if sid == "payment-cryptography" and config.startswith("KeyClass"):
+            item["recommended_values"] = "SYMMETRIC_KEY 用于 PIN/CVV/MAC/数据加密等对称场景；ASYMMETRIC_KEY_PAIR、PRIVATE_KEY、PUBLIC_KEY 用于 TR-34、RSA/ECC、证书和密钥交换场景"
+            item["risky_values"] = "KeyClass 与 KeyUsage/KeyAlgorithm 不匹配；忽略 PRIVATE_KEY/PUBLIC_KEY 等导入或证书场景所需类别"
+            item["references"] = REFS["payment-cryptography"]
+        if sid == "cloudfront" and config == "DistributionConfig.ViewerCertificate.MinimumProtocolVersion":
+            item["api_endpoint"] = "UpdateDistribution / DistributionConfig.ViewerCertificate.MinimumProtocolVersion"
+            item["recommended_values"] = "TLSv1.3_2025、TLSv1.2_2025、TLSv1.2_2021；按客户端兼容性选择尽可能新的 CloudFront security policy"
+            item["risky_values"] = "SSLv3、TLSv1、TLSv1_2016、TLSv1.1_2016；TLSv1.2_2018/TLSv1.2_2019 仅作兼容回退"
+            item["risk_reason"] = "该字段控制 viewer 到 CloudFront 的最低 TLS 协议版本和对应安全策略。旧值会允许过时协议或旧 cipher 组合，增加降级、兼容遗留弱客户端和合规风险。"
+            item["security_value_reason"] = "TLSv1.3_2025、TLSv1.2_2025、TLSv1.2_2021 是当前更适合现代客户端的 CloudFront viewer security policy 选择；仍需结合客户端兼容性做灰度。"
+            item["references"] = REFS["cloudfront"]
+        if sid == "cloudfront" and config == "DistributionConfig.ViewerCertificate":
+            item["api_endpoint"] = "DistributionConfig.ViewerCertificate.ACMCertificateArn / IAMCertificateId / CloudFrontDefaultCertificate"
+            item["recommended_values"] = "自定义域名优先使用 ACM 证书；证书链、算法和域名匹配目标客户端；证书生命周期有续期和监控流程"
+            item["risky_values"] = "自定义域名依赖默认证书、证书过期、导入证书无人管理、证书链或域名不匹配"
+            item["risk_reason"] = "ViewerCertificate 决定 viewer HTTPS 使用的证书。证书来源、域名覆盖、链完整性和续期流程不当会导致连接失败、身份验证风险或私钥治理风险。"
+            item["security_value_reason"] = "ACM 证书能与 CloudFront 集成并简化证书部署和续期治理；导入证书或 IAM 证书应只在明确需求下使用。"
+            item["references"] = REFS["cloudfront"]
+        if sid == "acm" and config == "RequestCertificate.KeyAlgorithm":
+            item["recommended_values"] = "ACM 新申请证书支持 RSA_2048、EC_prime256v1、EC_secp384r1；默认 RSA_2048；ECDSA 需确认客户端兼容"
+            item["risky_values"] = "把 RSA_1024、RSA_3072、RSA_4096、EC_secp521r1 当作 ACM 新申请证书可选项；它们属于导入证书相关算法范围"
+            item["references"] = REFS["acm"]
+        if sid == "acm" and config == "ValidationMethod":
+            item["recommended_values"] = "DNS 验证；保留 ACM 创建的 CNAME 记录以支持自动续期"
+            item["risky_values"] = "EMAIL 验证更依赖人工邮箱流程；误删 DNS 验证记录会影响续期"
+        if sid == "acm" and config == "ExportCertificate.Passphrase":
+            item["recommended_values"] = "使用强口令，并通过 fileb:// 文件传入导出私钥口令"
+            item["risky_values"] = "弱口令、命令行明文传参、写入 shell 历史或口令管理薄弱"
+        if sid == "acm" and config == "Options.Export":
+            item["recommended_values"] = "默认 DISABLED；仅在确需跨平台部署证书私钥时启用导出"
+            item["risky_values"] = "无业务必要时 ENABLED，会扩大私钥离开 ACM 边界后的暴露面"
+        if sid == "acm" and config == "ImportCertificate / imported certificate lifecycle":
+            item["recommended_values"] = "导入证书使用完整链、现代算法和受控私钥；建立过期监控与手动续期流程；可托管场景优先 ACM 签发证书"
+            item["risky_values"] = "过期或弱算法导入证书、链不完整、私钥来源不明、误以为导入证书可由 ACM 自动续期"
+        if sid == "acm" and config == "证书来源 / 证书类型":
+            item["recommended_values"] = "公网证书优先 ACM 公有证书；内部 PKI 使用 ACM Private CA；外部 CA 证书仅在跨平台或既有信任链要求下导入"
+            item["risky_values"] = "不区分 AMAZON_ISSUED、PRIVATE、IMPORTED 的生命周期差异；导入证书私钥和续期流程无人负责"
+        if sid == "s3-encryption-client" and config == "Encryption context":
+            item["recommended_values"] = "仅放非敏感、稳定、可审计的 name-value 对；使用对称 KMS wrapping key 时作为 KMS AAD；优先 US-ASCII 并在解密时保持一致"
+            item["risky_values"] = "放入敏感信息；使用非 US-ASCII 导致可用性/兼容性问题；加解密 encryption context 不一致"
+            item["references"] = REFS["s3-encryption-client"]
+        if sid == "s3-encryption-client" and config == "Data key policy":
+            item["recommended_values"] = "每个 S3 对象使用唯一 256-bit data key，由客户端生成和保护"
+            item["risky_values"] = "外部实现复用固定 data key，或绕过客户端默认的每对象唯一 data key 设计"
+            item["references"] = REFS["s3-encryption-client"]
+        if sid == "s3-encryption-client" and config == "Wrapping key":
+            item["recommended_values"] = "优先使用 AWS KMS wrapping key；确需 Raw AES-GCM/Raw RSA 时必须有成熟密钥管理和轮换流程"
+            item["risky_values"] = "Raw AES-GCM/Raw RSA 自管不当；wrapping key 丢失或访问控制过宽；Go 3.x 场景误用不支持的 raw wrapping key"
+            item["references"] = REFS["s3-encryption-client"]
+        if sid == "s3-encryption-client" and config == "Encryption metadata storage":
+            item["recommended_values"] = "默认使用对象 metadata 保存加密材料描述；若用 instruction files，需同步管理额外对象的权限、一致性和生命周期"
+            item["risky_values"] = "instruction files 权限或生命周期与对象不一致；加密 metadata 丢失导致对象不可解密"
+            item["references"] = REFS["s3-encryption-client"]
+        if sid == "s3-encryption-client" and config == "Keyring":
+            item["recommended_values"] = "使用内置 KMS keyring 或经过审计的自定义 keyring；keyring 应明确 wrapping keys"
+            item["risky_values"] = "自定义 keyring 缺少审计、策略约束或 wrapping key 标识不清"
+            item["references"] = REFS["s3-encryption-client"]
+        if sid == "database-encryption-sdk" and config == "Searchable encryption / beacons":
+            item["recommended_values"] = "仅在完成威胁建模后启用；标准 beacon 用于等值搜索，compound beacon 用于更复杂查询；为每个 beacon 配置二级索引"
+            item["risky_values"] = "对既有数据直接启用并期望回填；用 DO_NOTHING 字段构建 beacon；忽略 beacon 泄露搜索模式和频率"
+            item["references"] = REFS["database-encryption-sdk"]
+        if sid == "database-encryption-sdk" and config == "Discovery filter":
+            item["recommended_values"] = "discovery mode 下使用 account ID + partition 等严格 filter 限制可解密 key 范围"
+            item["risky_values"] = "discovery mode 不加 filter，导致 SDK 可尝试任意能解开数据键的 KMS key"
+            item["references"] = REFS["database-encryption-sdk"]
+        if sid == "database-encryption-sdk" and config == "Keyring configuration":
+            item["recommended_values"] = "优先 AWS KMS keyring；需要降低 KMS 调用时使用 AWS KMS Hierarchical keyring，并控制 branch key cache 生命周期"
+            item["risky_values"] = "裸 discovery mode、raw keyring 管理不当、branch key cache 生命周期过宽或多租户材料隔离不足"
+            item["references"] = REFS["database-encryption-sdk"]
+        if sid == "database-encryption-sdk" and config == "Cryptographic actions / field actions":
+            item["recommended_values"] = "敏感字段 ENCRYPT_AND_SIGN；需要明文索引的字段按需 SIGN_ONLY 或 SIGN_AND_INCLUDE_IN_ENCRYPTION_CONTEXT"
+            item["risky_values"] = "敏感字段 DO_NOTHING；关键字段不签名；应保密字段只做 SIGN_ONLY"
+            item["references"] = REFS["database-encryption-sdk"]
+        if sid == "database-encryption-sdk" and config == "Strict mode / discovery mode":
+            item["recommended_values"] = "优先 strict mode 并明确 KMS key ARN；必须 discovery mode 时加 discovery filter"
+            item["risky_values"] = "无过滤 discovery mode；严格模式下 key 标识不具体导致解密范围或可用性问题"
+            item["references"] = REFS["database-encryption-sdk"]
+        if sid == "encryption-sdk" and config == "Commitment policy":
+            item["recommended_values"] = "生产基线优先 RequireEncryptRequireDecrypt；迁移期可短期使用 RequireEncryptAllowDecrypt 并完成兼容性测试"
+            item["risky_values"] = "长期使用 ForbidEncryptAllowDecrypt 或允许非 key commitment 算法套件"
+            item["references"] = REFS["encryption-sdk"]
+        if sid == "encryption-sdk" and config == "Keyring configuration":
+            item["recommended_values"] = "优先 AWS KMS keyring；multi-keyring 只加入必要 wrapping keys；解密严格模式使用 key ARN"
+            item["risky_values"] = "裸 discovery keyring、raw keyring 缺少治理、multi-keyring 范围过宽或接受过多解密 key"
+            item["references"] = REFS["encryption-sdk"]
+        if sid == "encryption-sdk" and config == "Encryption context":
+            item["recommended_values"] = "放入非敏感、稳定、能在解密端重现的业务标识，例如 tenant、table、object type、purpose、version"
+            item["risky_values"] = "放入敏感信息；上下文缺失领域隔离；解密端不校验关键 encryption context"
+            item["references"] = REFS["encryption-sdk"]
+        if sid in {"alb", "nlb"} and config in {"Listener SSL security policy", "TLS listener SSL security policy", "Listener.SslPolicy"}:
+            item["recommended_values"] = "优先 ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09；合规场景考虑 FIPS/PQ；按客户端能力逐步收紧"
+            item["risky_values"] = "ELBSecurityPolicy-2016-08 或支持 TLS 1.0/1.1、CBC、非 FS cipher 的旧策略；CLI/CloudFormation/CDK 未显式指定导致默认旧策略"
+            item["references"] = REFS[sid]
+
+    result = sorted(curated.values(), key=lambda x: (x["service_id"], x["configuration_item"]))
+    seen: dict[str, int] = {}
+    for item in result:
+        base = f"{item['service_id']}_{slug(item['configuration_item'])}"
+        count = seen.get(base, 0)
+        seen[base] = count + 1
+        item["item_id"] = base if count == 0 else f"{base}-{count + 1}"
+    return result
+
+
 def main():
     services = []
     for service_id, meta in SERVICE_META.items():
@@ -734,7 +1036,7 @@ def main():
     extract_cloudhsm_mechanisms(items)
     add_manual_items(items)
 
-    config_items = sorted(items.values(), key=lambda x: (x["service_id"], x["configuration_item"]))
+    config_items = curate_config_items(list(items.values()))
     for path, data in [
         (DATA_DIR / "services.json", services),
         (DATA_DIR / "risk_types.json", risk_types),

@@ -1,0 +1,298 @@
+[
+  {
+    "service_id": "cloudfront",
+    "service": "Amazon CloudFront",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "TLS / \u5b89\u5168\u7b56\u7565",
+    "crypto_category": "TLS/HTTPS; Certificate",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "Viewer TLS security policy; viewer/origin HTTPS; ACM/IAM certificate binding",
+    "typical_risks": "\u4f7f\u7528 SSLv3\u3001TLSv1\u3001TLSv1.1 \u7b49\u65e7 viewer security policy; viewer \u6216 origin \u94fe\u8def\u5141\u8bb8 HTTP; \u6e90\u7ad9 TLS \u7248\u672c\u8fc7\u4f4e; \u8bc1\u4e66\u8fc7\u671f\u3001\u57df\u540d\u4e0d\u5339\u914d\u6216\u94fe\u4e0d\u5b8c\u6574",
+    "service_intro": "CloudFront \u7684\u5bc6\u7801\u76f8\u5173\u914d\u7f6e\u4e3b\u8981\u96c6\u4e2d\u5728 viewer \u5230\u8fb9\u7f18\u8282\u70b9\u3001\u8fb9\u7f18\u8282\u70b9\u5230\u6e90\u7ad9\u4e24\u6bb5 TLS/HTTPS \u94fe\u8def\uff0c\u4ee5\u53ca\u81ea\u5b9a\u4e49\u57df\u540d\u8bc1\u4e66\u6cbb\u7406\u3002\u98ce\u9669\u5173\u6ce8\u53ef\u6982\u62ec\u4e3a\u65e7 TLS \u7b56\u7565\u3001HTTP \u660e\u6587\u94fe\u8def\u3001\u6e90\u7ad9 TLS \u914d\u7f6e\u4e0d\u8db3\u548c\u8bc1\u4e66\u751f\u547d\u5468\u671f\u95ee\u9898\u3002",
+    "detail_path": "#/services/cloudfront",
+    "recommended_values": [
+      "TLSv1.3_2025",
+      "TLSv1.2_2025",
+      "TLSv1.2_2021"
+    ],
+    "api_endpoint_focus": "UpdateDistribution.DistributionConfig.ViewerCertificate.MinimumProtocolVersion"
+  },
+  {
+    "service_id": "alb",
+    "service": "Elastic Load Balancing - Application Load Balancer (ALB)",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "TLS / \u5b89\u5168\u7b56\u7565",
+    "crypto_category": "TLS/HTTPS; Certificate; PQC/PQ TLS",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "HTTPS listener SslPolicy; listener certificate; SNI certificate list; mutual TLS",
+    "typical_risks": "\u4f7f\u7528 ELBSecurityPolicy-2016-08 \u7b49\u65e7\u7b56\u7565\uff1b\u4f7f\u7528\u652f\u6301 CBC\u3001\u4e0d\u652f\u6301\u524d\u5411\u4fdd\u5bc6\u6216\u542b\u6709\u98ce\u9669\u5bc6\u7801\u7b97\u6cd5\u5982 SHA \u7684\u517c\u5bb9\u7b56\u7565\uff1b\u4e3a\u517c\u5bb9\u542f\u7528 TLS 1.0\u62161.1\uff1bFIPS legacy \u7b56\u7565\u8bef\u7528\uff1b\u8bc1\u4e66\u6cbb\u7406\u4e0d\u5f53",
+    "service_intro": "ALB \u7684\u5bc6\u7801\u76f8\u5173\u914d\u7f6e\u6838\u5fc3\u662f HTTPS listener \u7684 SslPolicy\u3001\u8bc1\u4e66\u548c\u53ef\u9009 mTLS\u3002\u98ce\u9669\u5173\u6ce8\u53ef\u6982\u62ec\u4e3a\u65e7 TLS \u7b56\u7565\u3001\u5f31\u6216\u517c\u5bb9\u578b cipher\u3001FIPS legacy \u7b56\u7565\u8bef\u7528\u3001\u81ea\u52a8\u5316\u521b\u5efa\u65f6\u672a\u663e\u5f0f\u6307\u5b9a SslPolicy\uff0c\u4ee5\u53ca\u8bc1\u4e66\u548c\u5ba2\u6237\u7aef\u8bc1\u4e66\u4fe1\u4efb\u6cbb\u7406\u95ee\u9898\u3002",
+    "detail_path": "#/services/alb",
+    "recommended_values": [
+      "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+      "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09"
+    ],
+    "api_endpoint_focus": "CreateListener.SslPolicy / ModifyListener.SslPolicy / DescribeSSLPolicies"
+  },
+  {
+    "service_id": "nlb",
+    "service": "Elastic Load Balancing - Network Load Balancer (NLB)",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "TLS / \u5b89\u5168\u7b56\u7565",
+    "crypto_category": "TLS/HTTPS; Certificate; PQC/PQ TLS",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "TLS listener SslPolicy; listener certificate; ALPN policy; TLS offload versus TCP pass-through",
+    "typical_risks": "\u4f7f\u7528 ELBSecurityPolicy-2015-05\u3001ELBSecurityPolicy-2016-08 \u7b49\u65e7\u7b56\u7565\uff1b\u4f7f\u7528\u652f\u6301 CBC\u3001\u4e0d\u652f\u6301\u524d\u5411\u4fdd\u5bc6\u6216\u542b\u98ce\u9669 SHA \u7684\u517c\u5bb9\u7b56\u7565\uff1b\u5c06 TCP \u76d1\u542c\u8bef\u8ba4\u4e3a\u4f1a\u7ec8\u6b62 TLS\uff1bTLS offload \u4e0e\u7aef\u5230\u7aef\u52a0\u5bc6\u8981\u6c42\u4e0d\u5339\u914d\uff1b\u8bc1\u4e66\u6cbb\u7406\u4e0d\u5f53",
+    "service_intro": "NLB \u7684\u5bc6\u7801\u76f8\u5173\u914d\u7f6e\u96c6\u4e2d\u5728 TLS listener \u7684 SslPolicy\u3001\u8bc1\u4e66\u3001ALPN\uff0c\u4ee5\u53ca\u9009\u62e9 TLS offload \u8fd8\u662f TCP pass-through\u3002\u98ce\u9669\u5173\u6ce8\u53ef\u6982\u62ec\u4e3a\u65e7 TLS \u7b56\u7565\u3001\u5f31\u6216\u517c\u5bb9\u578b cipher\u3001\u8bc1\u4e66\u4e0d\u53d7\u63a7\u3001\u534f\u8bae\u6a21\u5f0f\u7406\u89e3\u9519\u8bef\u548c\u4e0e\u7aef\u5230\u7aef\u52a0\u5bc6\u8981\u6c42\u4e0d\u4e00\u81f4\u3002",
+    "detail_path": "#/services/nlb",
+    "recommended_values": [
+      "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+      "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09"
+    ],
+    "api_endpoint_focus": "CreateListener.SslPolicy / ModifyListener.SslPolicy / DescribeSSLPolicies"
+  },
+  {
+    "service_id": "vpc",
+    "service": "Amazon VPC",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "\u7f51\u7edc\u8fde\u63a5\u5b89\u5168",
+    "crypto_category": "In-transit encryption; Network encryption governance",
+    "configurable_status": "\u90e8\u5206\u53ef\u914d\u7f6e",
+    "main_focus": "VPC Encryption Controls; Flow Logs encryption-status; Transit Gateway encryption support; encryption exclusions",
+    "typical_risks": "\u672a\u542f\u7528 VPC Encryption Controls; \u7f3a\u5c11 encryption-status \u53ef\u89c2\u6d4b\u6027; \u660e\u6587\u6d41\u91cf\u957f\u671f\u5904\u4e8e monitor \u4f46\u672a\u6cbb\u7406; enforce \u524d\u672a\u5b8c\u6210\u517c\u5bb9\u6027\u6392\u67e5; \u4f8b\u5916\u8d44\u6e90\u7f3a\u5c11\u8865\u507f\u63a7\u5236",
+    "service_intro": "Amazon VPC \u672c\u8eab\u4e0d\u662f TLS policy \u6216 cipher suite \u914d\u7f6e\u5165\u53e3\uff0c\u4f46\u53ef\u4ee5\u901a\u8fc7 VPC Encryption Controls\u3001Flow Logs \u548c Transit Gateway encryption support \u505a\u4f20\u8f93\u52a0\u5bc6\u6cbb\u7406\u3002\u98ce\u9669\u5173\u6ce8\u53ef\u6982\u62ec\u4e3a\u4e0d\u53ef\u89c2\u6d4b\u3001\u672a\u5f3a\u5236\u3001\u4f8b\u5916\u5931\u63a7\u548c\u8865\u507f\u63a7\u5236\u4e0d\u8db3\u3002",
+    "detail_path": "#/services/vpc",
+    "recommended_values": [
+      "monitor mode before enforcement",
+      "enforce mode after remediation"
+    ],
+    "api_endpoint_focus": "CreateVpcEncryptionControl / ModifyVpcEncryptionControl / CreateFlowLogs"
+  },
+  {
+    "service_id": "route-53",
+    "service": "Amazon Route 53",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "DNSSEC / \u5b8c\u6574\u6027",
+    "crypto_category": "DNSSEC; KMS; Digital signature",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "DNSSEC signing; key-signing key (KSK); AWS KMS asymmetric key; DS chain of trust; Resolver DNSSEC validation",
+    "typical_risks": "\u516c\u7f51\u5173\u952e hosted zone \u672a\u542f\u7528 DNSSEC\uff1bkey-signing key (KSK) / KMS key \u533a\u57df\u3001\u7b97\u6cd5\u6216 key policy \u914d\u7f6e\u9519\u8bef\uff1bDS \u4fe1\u4efb\u94fe\u7f3a\u5931\u6216\u9519\u8bef\uff1bKSK \u5904\u4e8e ACTION_NEEDED \u72b6\u6001\u4f46\u672a\u5904\u7406\uff1bDNSSEC \u544a\u8b66\u7f3a\u5931",
+    "service_intro": "Route 53 \u7684\u5bc6\u7801\u76f8\u5173\u914d\u7f6e\u4e3b\u8981\u662f DNSSEC\uff0c\u800c\u4e0d\u662f TLS cipher\u3002\u8fd9\u91cc\u7684 KSK \u6307 key-signing key\uff0c\u7528\u4e8e\u548c KMS \u975e\u5bf9\u79f0\u5bc6\u94a5\u914d\u5408\u7b7e\u540d DNSSEC \u4fe1\u4efb\u94fe\u3002\u98ce\u9669\u5173\u6ce8\u53ef\u6982\u62ec\u4e3a DNS \u54cd\u5e94\u5b8c\u6574\u6027\u7f3a\u5931\u3001KSK/KMS \u7b7e\u540d\u94fe\u8def\u9519\u8bef\u3001DS \u4fe1\u4efb\u94fe\u9519\u8bef\u548c DNSSEC \u8fd0\u7ef4\u76d1\u63a7\u4e0d\u8db3\u3002",
+    "detail_path": "#/services/route-53",
+    "recommended_values": [
+      "DNSSEC enabled for critical public zones",
+      "KMS ECC_NIST_P256 key in us-east-1"
+    ],
+    "api_endpoint_focus": "EnableHostedZoneDNSSEC / CreateKeySigningKey / GetDNSSEC"
+  },
+  {
+    "service_id": "site-to-site-vpn",
+    "service": "AWS Virtual Private Network - AWS Site-to-Site VPN",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "VPN",
+    "crypto_category": "IKE/IPsec; Encryption; Integrity; DH; PSK/Certificate",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "IKEVersions; Phase1/Phase2 encryption algorithms; Phase1/Phase2 integrity algorithms; DH groups; PSK or private certificate authentication",
+    "typical_risks": "\u4fdd\u7559 IKEv1 \u6216\u4f4e\u5f3a\u5ea6 DH group\uff1b\u4f7f\u7528 SHA1 \u6216\u975e GCM \u52a0\u5bc6\u7b97\u6cd5\u4f5c\u4e3a\u957f\u671f\u517c\u5bb9\u9009\u9879\uff1bPSK \u76f4\u63a5\u5b58\u50a8\u4e14\u8f6e\u6362\u4e0d\u8db3\uff1b\u8bc1\u4e66\u94fe\u6216\u5ba2\u6237\u7f51\u5173\u8bc1\u4e66\u6821\u9a8c\u4e0d\u5f53",
+    "service_intro": "Site-to-Site VPN \u7684\u5bc6\u7801\u914d\u7f6e\u4e3b\u8981\u5728 IKE/IPsec tunnel options\u3002\u98ce\u9669\u5173\u6ce8\u53ef\u6982\u62ec\u4e3a\u65e7 IKE \u7248\u672c\u3001\u5f31 DH group\u3001SHA1 \u5b8c\u6574\u6027\u7b97\u6cd5\u3001\u975e AEAD \u52a0\u5bc6\u7684\u957f\u671f\u517c\u5bb9\u4f7f\u7528\uff0c\u4ee5\u53ca PSK \u6216\u8bc1\u4e66\u8ba4\u8bc1\u6cbb\u7406\u4e0d\u5f53\u3002",
+    "detail_path": "#/services/site-to-site-vpn",
+    "recommended_values": [
+      "ikev2",
+      "AES128-GCM-16 / AES256-GCM-16",
+      "SHA2-256 / SHA2-384 / SHA2-512",
+      "DH group 14+; prefer 19/20/21",
+      "PSK in Secrets Manager or private certificate authentication"
+    ],
+    "api_endpoint_focus": "ModifyVpnTunnelOptions / CreateVpnConnection.Options.TunnelOptions"
+  },
+  {
+    "service_id": "client-vpn",
+    "service": "AWS Virtual Private Network - AWS Client VPN",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "VPN",
+    "crypto_category": "TLS; Certificate; VPN authentication",
+    "configurable_status": "\u90e8\u5206\u53ef\u914d\u7f6e",
+    "main_focus": "TLS 1.2+ managed VPN transport; server certificate in ACM; mutual authentication client certificate; CRL lifecycle",
+    "typical_risks": "\u8bc1\u4e66\u8fc7\u671f\u6216\u94fe\u4e0d\u5b8c\u6574\uff1b\u4f7f\u7528 1024-bit RSA \u8bc1\u4e66\u4f5c\u4e3a\u957f\u671f\u57fa\u7ebf\uff1b\u5ba2\u6237\u7aef\u8bc1\u4e66\u6216\u79c1\u94a5\u5206\u53d1\u4e0d\u53d7\u63a7\uff1bCRL \u8fc7\u671f\u5bfc\u81f4 TLS \u63e1\u624b\u5931\u8d25\uff1b\u8ba4\u8bc1\u65b9\u5f0f\u6216\u6388\u6743\u89c4\u5219\u914d\u7f6e\u4e0d\u5f53",
+    "service_intro": "Client VPN \u4f7f\u7528 TLS 1.2 \u6216\u66f4\u9ad8\u7248\u672c\u5efa\u7acb\u8fdc\u7a0b\u63a5\u5165 VPN \u8fde\u63a5\uff0c\u7528\u6237\u4e3b\u8981\u53ef\u914d\u7f6e\u8bc1\u4e66\u3001\u4e92\u76f8\u8ba4\u8bc1\u548c\u6388\u6743\u89c4\u5219\uff0c\u800c\u4e0d\u662f\u50cf ELB \u4e00\u6837\u76f4\u63a5\u9009\u62e9 TLS security policy\u3002",
+    "detail_path": "#/services/client-vpn",
+    "recommended_values": [
+      "TLS 1.2 or later",
+      "ACM server certificate",
+      "mutual authentication where certificate-based client identity is required",
+      "valid CRL when revocation is used"
+    ],
+    "api_endpoint_focus": "CreateClientVpnEndpoint.ServerCertificateArn / AuthenticationOptions / ClientCertificateArn"
+  },
+  {
+    "service_id": "cloud-map",
+    "service": "AWS Cloud Map",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "\u7f51\u7edc\u8fde\u63a5\u5b89\u5168",
+    "crypto_category": "N/A; relies on API TLS and downstream service encryption",
+    "configurable_status": "\u4e0d\u53ef\u914d\u7f6e",
+    "main_focus": "No direct TLS/cipher/key configuration; namespace discovery type; Route 53 DNS integration for DNS namespaces",
+    "typical_risks": "\u5c06 Cloud Map \u8bef\u8ba4\u4e3a\u52a0\u5bc6\u6216 TLS \u7ec8\u6b62\u8fb9\u754c\uff1b\u516c\u5171 DNS namespace \u7684\u5b8c\u6574\u6027\u9700\u6c42\u672a\u8f6c\u5230 Route 53 DNSSEC \u6cbb\u7406\uff1b\u670d\u52a1\u5b9e\u4f8b\u5c5e\u6027\u6216\u6807\u7b7e\u5199\u5165\u654f\u611f\u4fe1\u606f\uff1b\u4e0b\u6e38\u5b9e\u9645\u670d\u52a1\u672a\u542f\u7528 TLS",
+    "service_intro": "Cloud Map \u662f\u670d\u52a1\u53d1\u73b0\u670d\u52a1\uff0c\u672c\u8eab\u4e0d\u63d0\u4f9b\u53ef\u7531\u7528\u6237\u9009\u62e9\u7684\u5bc6\u7801\u5957\u4ef6\u3001TLS policy \u6216 KMS key \u914d\u7f6e\u3002\u5bc6\u7801\u98ce\u9669\u4e3b\u8981\u662f\u8fb9\u754c\u8bef\u89e3\uff0c\u9700\u5728 API \u8bbf\u95ee\u3001Route 53 DNS \u5b8c\u6574\u6027\u548c\u4e0b\u6e38\u670d\u52a1 TLS \u4e2d\u843d\u5b9e\u63a7\u5236\u3002",
+    "detail_path": "#/services/cloud-map",
+    "recommended_values": [
+      "Use HTTPS/TLS for AWS API access",
+      "Use private DNS namespace for internal discovery where appropriate",
+      "Apply Route 53 DNSSEC controls for public DNS integrity needs",
+      "Enable TLS on downstream service endpoints"
+    ],
+    "api_endpoint_focus": "CreateHttpNamespace / CreatePrivateDnsNamespace / CreatePublicDnsNamespace / DiscoverInstances"
+  },
+  {
+    "service_id": "kms",
+    "service": "AWS Key Management Service (AWS KMS)",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "\u5bc6\u94a5\u7ba1\u7406",
+    "crypto_category": "KMS; KeySpec; KeyUsage; PQC/ML-DSA",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "CreateKey.KeySpec; KeyUsage; Origin; MultiRegion; key rotation; key policy; ML-DSA post-quantum signing keys",
+    "typical_risks": "KeySpec \u548c KeyUsage \u4e0e\u4e1a\u52a1\u573a\u666f\u4e0d\u5339\u914d\uff1b\u5bf9 AWS \u96c6\u6210\u670d\u52a1\u8bef\u7528\u975e\u5bf9\u79f0\u6216 HMAC key\uff1b\u4f7f\u7528 RSAES_OAEP_SHA_1 \u7b49\u65e7\u7b97\u6cd5\uff1b\u8f6e\u6362\u7b56\u7565\u7f3a\u5931\uff1b\u5bfc\u5165\u5bc6\u94a5\u6750\u6599\u6216 custom key store \u7f3a\u5c11\u53ef\u7528\u6027\u4e0e\u8f6e\u6362\u6cbb\u7406\uff1bkey policy \u8fc7\u5bbd\u6216\u9501\u5b9a\u98ce\u9669",
+    "service_intro": "KMS \u662f AWS \u6838\u5fc3\u5bc6\u94a5\u7ba1\u7406\u670d\u52a1\uff0c\u53ef\u914d\u7f6e\u7684\u5bc6\u7801\u8981\u7d20\u5305\u62ec KeySpec\u3001KeyUsage\u3001Origin\u3001MultiRegion\u3001\u8f6e\u6362\u548c key policy\u3002\u98ce\u9669\u5173\u6ce8\u53ef\u6982\u62ec\u4e3a\u5bc6\u94a5\u7c7b\u578b\u9009\u9519\u3001\u7528\u9014\u6df7\u7528\u3001\u65e7\u7b97\u6cd5\u4f7f\u7528\u3001\u8f6e\u6362\u7f3a\u5931\u3001\u5bc6\u94a5\u6765\u6e90\u6cbb\u7406\u4e0d\u5f53\u548c\u6743\u9650\u8fb9\u754c\u8fc7\u5bbd\u3002",
+    "detail_path": "#/services/kms",
+    "recommended_values": [
+      "SYMMETRIC_DEFAULT for AWS service encryption",
+      "KeyUsage aligned to one purpose",
+      "ML_DSA_44/65/87 for PQ signing use cases",
+      "automatic rotation for eligible symmetric AWS_KMS keys",
+      "manual rotation plan for asymmetric/HMAC/imported/custom-store keys"
+    ],
+    "api_endpoint_focus": "CreateKey.KeySpec / KeyUsage / Origin / MultiRegion; EnableKeyRotation; PutKeyPolicy"
+  },
+  {
+    "service_id": "cloudhsm",
+    "service": "AWS CloudHSM",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "HSM / \u786c\u4ef6\u5bc6\u7801\u6a21\u5757",
+    "crypto_category": "HSM; PKCS#11; JCE; CNG/KSP; FIPS",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "Cluster mode; HSM type; PKCS#11/JCE/CNG mechanisms; key attributes; crypto user ownership",
+    "typical_risks": "\u4f7f\u7528 DES3\u3001SHA1\u3001RSA-PKCS \u7b49\u65e7\u673a\u5236\u4f5c\u4e3a\u957f\u671f\u57fa\u7ebf\uff1b\u5bc6\u94a5\u5c5e\u6027\u8fc7\u5bbd\u5bfc\u81f4\u53ef\u5bfc\u51fa\u6216\u8fc7\u5ea6\u4f7f\u7528\uff1bCU \u8d26\u6237\u548c\u5bc6\u94a5\u6240\u6709\u6743\u6cbb\u7406\u4e0d\u5f53\uff1b\u5408\u89c4\u573a\u666f\u8bef\u9009 non-FIPS cluster",
+    "service_intro": "CloudHSM \u662f\u7528\u6237\u53ef\u63a7\u7684\u4e13\u7528 HSM \u670d\u52a1\uff0c\u5bc6\u7801\u98ce\u9669\u4e3b\u8981\u5728 Client SDK \u673a\u5236\u9009\u62e9\u3001\u5bc6\u94a5\u5c5e\u6027\u3001CU \u6743\u9650\u6cbb\u7406\u548c cluster mode\u3002\u5206\u6790\u65f6\u5e94\u4f18\u5148\u8bc6\u522b DES3\u3001SHA1\u3001RSA-PKCS \u7b49\u65e7\u673a\u5236\u662f\u5426\u88ab\u5f53\u6210\u957f\u671f\u57fa\u7ebf\u3002",
+    "detail_path": "#/services/cloudhsm",
+    "recommended_values": [
+      "FIPS mode where compliance requires it",
+      "AES-GCM/AES Key Wrap/RSA-OAEP/ECDSA/HMAC with SHA2+",
+      "least-privilege key attributes",
+      "controlled CU ownership"
+    ],
+    "api_endpoint_focus": "CreateCluster.Mode / Client SDK mechanisms / key attributes"
+  },
+  {
+    "service_id": "acm",
+    "service": "AWS Certificate Manager",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "\u8bc1\u4e66\u7ba1\u7406",
+    "crypto_category": "Certificate; TLS",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "RequestCertificate.KeyAlgorithm; CertificateTransparencyLoggingPreference; ExportCertificate.Passphrase; ImportCertificate lifecycle",
+    "typical_risks": "RSA_1024 \u6216\u8fc7\u65e7\u8bc1\u4e66\u7b97\u6cd5\u7528\u4f5c\u65b0\u5efa\u57fa\u7ebf\uff1b\u5bfc\u5165\u8bc1\u4e66\u65e0\u6258\u7ba1\u7eed\u671f\uff1b\u8bc1\u4e66\u94fe\u4e0d\u5b8c\u6574\u6216\u79c1\u94a5\u4e0d\u5339\u914d\uff1b\u53ef\u5bfc\u51fa\u8bc1\u4e66\u7684\u79c1\u94a5\u4fdd\u62a4\u4e0d\u5f53\uff1b\u5173\u95ed CT logging \u964d\u4f4e\u9519\u53d1\u8bc1\u4e66\u53ef\u89c1\u6027",
+    "service_intro": "ACM \u7684\u5bc6\u7801\u914d\u7f6e\u56f4\u7ed5 TLS \u8bc1\u4e66\u7b97\u6cd5\u3001\u8bc1\u4e66\u900f\u660e\u65e5\u5fd7\u3001\u8bc1\u4e66\u5bfc\u5165/\u5bfc\u51fa\u548c\u7eed\u671f\u6cbb\u7406\u3002\u4e0e TLS policy \u4e0d\u540c\uff0cACM \u4e3b\u8981\u662f\u8bc1\u4e66\u751f\u547d\u5468\u671f\u548c\u79c1\u94a5\u8fb9\u754c\u98ce\u9669\u3002",
+    "detail_path": "#/services/acm",
+    "recommended_values": [
+      "RSA_2048",
+      "EC_prime256v1",
+      "EC_secp384r1",
+      "CertificateTransparencyLoggingPreference=ENABLED",
+      "ACM managed renewal where possible"
+    ],
+    "api_endpoint_focus": "RequestCertificate.KeyAlgorithm / Options / ImportCertificate / ExportCertificate"
+  },
+  {
+    "service_id": "signer",
+    "service": "AWS Signer",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "\u4ee3\u7801\u7b7e\u540d",
+    "crypto_category": "Digital signature; Code signing",
+    "configurable_status": "\u90e8\u5206\u53ef\u914d\u7f6e",
+    "main_focus": "PutSigningProfile.platformId; signature algorithm family; signing profile validity; signing material for IoT workflows",
+    "typical_risks": "\u4f7f\u7528 SHA1-RSA \u5e73\u53f0\u4f5c\u4e3a\u65b0\u5efa\u57fa\u7ebf\uff1b\u7b7e\u540d profile \u6743\u9650\u8fc7\u5bbd\uff1b\u7b7e\u540d\u6709\u6548\u671f\u8fc7\u957f\u4e14\u7f3a\u5c11\u64a4\u9500/\u66ff\u6362\u6d41\u7a0b\uff1bIoT \u5de5\u4f5c\u6d41\u4e2d\u5bfc\u5165 ACM \u7684\u7b7e\u540d\u8bc1\u4e66\u6cbb\u7406\u4e0d\u5f53",
+    "service_intro": "Signer \u7684\u5bc6\u7801\u914d\u7f6e\u4e3b\u8981\u662f signing profile \u6240\u9009 platformId \u5bf9\u5e94\u7684\u7b7e\u540d\u7b97\u6cd5\u548c\u683c\u5f0f\u3002AWS \u6258\u7ba1 Lambda \u548c container image \u5de5\u4f5c\u6d41\u7684\u7b7e\u540d\u6750\u6599\uff0cIoT \u5de5\u4f5c\u6d41\u53ef\u80fd\u9700\u8981\u7528\u6237\u5bfc\u5165 ACM \u8bc1\u4e66\u3002",
+    "detail_path": "#/services/signer",
+    "recommended_values": [
+      "AWSLambda-SHA384-ECDSA",
+      "Notation-OCI-SHA384-ECDSA",
+      "AWSIoTDeviceManagement-SHA256-ECDSA",
+      "AmazonFreeRTOS-Default"
+    ],
+    "api_endpoint_focus": "PutSigningProfile.platformId / StartSigningJob.profileName"
+  },
+  {
+    "service_id": "aws-encryption-sdk",
+    "service": "AWS Encryption SDK",
+    "aws_category": "Developer Tools",
+    "service_group": "\u5ba2\u6237\u7aef\u52a0\u5bc6 SDK",
+    "crypto_category": "Client-side encryption SDK; Keyring; Commitment policy",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "commitment policy; AWS KMS keyrings; discovery keyring and discovery filter; encryption context",
+    "typical_risks": "\u4f7f\u7528\u4e0d\u542b key commitment \u7684\u7b97\u6cd5\u5957\u4ef6\u4f5c\u4e3a\u65b0\u5efa\u52a0\u5bc6\u57fa\u7ebf\uff1bKMS discovery keyring \u7f3a\u5c11 discovery filter\uff1braw keyring \u7f3a\u5c11 KMS/HSM \u7ea7\u522b\u5bc6\u94a5\u4fdd\u62a4\uff1bencryption context \u7f3a\u5c11\u4e1a\u52a1\u7ed1\u5b9a\u8bed\u4e49",
+    "service_intro": "AWS Encryption SDK \u662f\u901a\u7528\u5ba2\u6237\u7aef\u52a0\u5bc6 SDK\uff0c\u5206\u6790\u91cd\u70b9\u662f commitment policy\u3001keyring\u3001discovery filter \u548c encryption context\u3002\u98ce\u9669\u5173\u6ce8\u53ef\u6982\u62ec\u4e3a\u672a\u5f3a\u5236 key commitment\u3001\u89e3\u5bc6\u53d1\u73b0\u8303\u56f4\u8fc7\u5bbd\u548c\u5bc6\u94a5\u5305\u88c5\u8fb9\u754c\u4e0d\u6e05\u6670\u3002",
+    "detail_path": "#/services/aws-encryption-sdk",
+    "recommended_values": [
+      "RequireEncryptRequireDecrypt",
+      "AWS KMS keyring with explicit KMS key identifiers",
+      "discovery filter when discovery keyring is required"
+    ],
+    "api_endpoint_focus": "SDK client configuration: commitmentPolicy / keyring / discoveryFilter"
+  },
+  {
+    "service_id": "aws-database-encryption-sdk",
+    "service": "AWS Database Encryption SDK",
+    "aws_category": "Developer Tools",
+    "service_group": "\u5ba2\u6237\u7aef\u52a0\u5bc6 SDK",
+    "crypto_category": "Client-side encryption SDK; Searchable encryption; Keyring",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "cryptographic actions; AWS KMS hierarchical keyring; beacons; searchable encryption planning",
+    "typical_risks": "\u5b57\u6bb5\u52a0\u5bc6\u52a8\u4f5c\u8bef\u7528 DO_NOTHING\uff1b\u5df2\u6709\u6570\u636e\u5b57\u6bb5\u7684 cryptographic actions \u4e0d\u53ef\u9006\u53d8\u66f4\uff1bbeacon \u8bbe\u8ba1\u6cc4\u9732\u9762\u8fc7\u5927\uff1b\u672a\u4f7f\u7528 KMS hierarchical keyring \u5c31\u89c4\u5212 searchable encryption",
+    "service_intro": "AWS Database Encryption SDK \u9762\u5411\u6570\u636e\u5e93\u5b57\u6bb5\u7ea7\u5ba2\u6237\u7aef\u52a0\u5bc6\uff0c\u5206\u6790\u91cd\u70b9\u662f cryptographic actions\u3001KMS hierarchical keyring \u548c beacon \u6cc4\u9732\u9762\u3002\u5b83\u4e0e\u901a\u7528 Encryption SDK \u4e0d\u540c\uff0c\u5e94\u5355\u72ec\u5c55\u793a\u3002",
+    "detail_path": "#/services/aws-database-encryption-sdk",
+    "recommended_values": [
+      "ENCRYPT_AND_SIGN for sensitive fields",
+      "AWS KMS Hierarchical keyring for searchable encryption",
+      "beacon design before production data"
+    ],
+    "api_endpoint_focus": "table encryption config / cryptographic actions / beacon configuration / KMS hierarchical keyring"
+  },
+  {
+    "service_id": "s3-encryption-client",
+    "service": "Amazon S3 Encryption Client",
+    "aws_category": "Storage",
+    "service_group": "\u5ba2\u6237\u7aef\u52a0\u5bc6 SDK",
+    "crypto_category": "Client-side encryption SDK; Keyring; Wrapping key",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "keyring; wrapping key; commitment policy; legacy wrapping algorithms; encryption context",
+    "typical_risks": "legacy wrapping algorithms \u7528\u4e8e\u65b0\u52a0\u5bc6\u57fa\u7ebf\uff1braw AES/RSA wrapping key \u7f3a\u5c11 KMS/HSM \u7ea7\u522b\u4fdd\u62a4\uff1bcommitment policy \u5141\u8bb8\u975e\u627f\u8bfa\u52a0\u5bc6\u4f5c\u4e3a\u957f\u671f\u72b6\u6001\uff1binstruction file \u6216\u52a0\u5bc6\u4e0a\u4e0b\u6587\u6cbb\u7406\u4e0d\u5f53",
+    "service_intro": "Amazon S3 Encryption Client \u4e13\u6ce8 S3 \u5bf9\u8c61\u7684\u5ba2\u6237\u7aef envelope encryption\uff0c\u5206\u6790\u91cd\u70b9\u662f data key\u3001wrapping key\u3001keyring\u3001commitment policy \u548c legacy wrapping algorithms\u3002\u5b83\u7684\u98ce\u9669\u6a21\u578b\u548c Database Encryption SDK \u4e0d\u540c\uff0c\u5e94\u5355\u72ec\u5c55\u793a\u3002",
+    "detail_path": "#/services/s3-encryption-client",
+    "recommended_values": [
+      "AWS KMS wrapping key where possible",
+      "current fully supported wrapping algorithms",
+      "RequireEncryptRequireDecrypt or migration-appropriate require policy"
+    ],
+    "api_endpoint_focus": "S3EncryptionClient builder keyring / wrapping key / commitmentPolicy"
+  },
+  {
+    "service_id": "payment-cryptography",
+    "service": "AWS Payment Cryptography",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "\u652f\u4ed8\u5bc6\u7801",
+    "crypto_category": "Payment cryptography; PIN; CVV; MAC; TR-31/TR-34; HSM",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "CreateKey.KeyAttributes: KeyAlgorithm, KeyUsage, KeyModesOfUse; TR-31/TR-34/RSA/ECDH key import and export; PIN/CVV/MAC/data encryption operations",
+    "typical_risks": "KeyUsage \u548c KeyModesOfUse \u8fc7\u5bbd\u6216\u4e0e\u4e1a\u52a1\u76ee\u7684\u4e0d\u5339\u914d\uff1b\u4f7f\u7528 TDES_2KEY \u4f5c\u4e3a\u65b0\u5efa\u57fa\u7ebf\uff1bNoRestrictions \u8fc7\u5ea6\u4f7f\u7528\uff1bTR-31/TR-34/RSA/ECDH \u5bc6\u94a5\u4ea4\u6362\u8def\u5f84\u4e0e\u5408\u89c4\u8981\u6c42\u4e0d\u5339\u914d\uff1bexportable key \u6216 KEK \u8f6e\u6362\u6cbb\u7406\u4e0d\u5f53",
+    "service_intro": "AWS Payment Cryptography \u9762\u5411\u652f\u4ed8\u4ea4\u6613\u573a\u666f\u7684\u4e13\u7528\u5bc6\u7801\u670d\u52a1\uff0c\u652f\u6301 PIN\u3001CVV\u3001MAC\u3001DUKPT\u3001TR-31/TR-34 \u7b49\u652f\u4ed8\u5bc6\u7801\u80fd\u529b\u3002\u5206\u6790\u65f6\u8981\u628a key algorithm\u3001key usage\u3001modes of use \u548c\u5bc6\u94a5\u5bfc\u5165/\u5bfc\u51fa\u8fb9\u754c\u8054\u5408\u8bc4\u4f30\uff0c\u4e0d\u80fd\u4ec5\u770b\u7b97\u6cd5\u540d\u79f0\u3002",
+    "detail_path": "#/services/payment-cryptography",
+    "recommended_values": [
+      "AES_128/AES_192/AES_256 where supported by the payment use case",
+      "TDES_3KEY when TDES is required for legacy payment interoperability",
+      "least-privilege KeyModesOfUse",
+      "TR-34 or ECDH for KEK exchange where supported",
+      "TR-31 for working key exchange after KEK establishment"
+    ],
+    "api_endpoint_focus": "CreateKey.KeyAttributes / ImportKey / ExportKey / GetParametersForImport / GetParametersForExport"
+  }
+]

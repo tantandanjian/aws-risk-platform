@@ -2,22 +2,30 @@ const state = {
   services: [],
   items: [],
   riskTypes: [],
-  activeGroup: "全部",
+  activeGroup: "\u5168\u90e8",
+  activeStatus: "\u5168\u90e8",
   query: "",
 };
 
 const groups = [
-  "全部",
-  "TLS / 安全策略",
-  "DNSSEC / 完整性",
-  "密钥管理",
-  "HSM / 密码机制",
-  "证书管理",
-  "数字签名",
-  "客户端加密 SDK",
-  "支付密码",
-  "VPN / IPsec",
-  "不可直接配置",
+  "\u5168\u90e8",
+  "TLS / \u5b89\u5168\u7b56\u7565",
+  "DNSSEC / \u5b8c\u6574\u6027",
+  "\u7f51\u7edc\u8fde\u63a5\u5b89\u5168",
+  "VPN",
+  "\u5bc6\u94a5\u7ba1\u7406",
+  "HSM / \u786c\u4ef6\u5bc6\u7801\u6a21\u5757",
+  "\u8bc1\u4e66\u7ba1\u7406",
+  "\u4ee3\u7801\u7b7e\u540d",
+  "\u5ba2\u6237\u7aef\u52a0\u5bc6 SDK",
+  "\u652f\u4ed8\u5bc6\u7801",
+];
+
+const statuses = [
+  "\u5168\u90e8",
+  "\u53ef\u914d\u7f6e",
+  "\u90e8\u5206\u53ef\u914d\u7f6e",
+  "\u4e0d\u53ef\u914d\u7f6e",
 ];
 
 const groupGuide = [
@@ -55,9 +63,9 @@ const standards = [
 
 async function loadData() {
   const [services, items, riskTypes] = await Promise.all([
-    fetch("./data/services.json").then((res) => res.json()),
-    fetch("./data/config_items.json").then((res) => res.json()),
-    fetch("./data/risk_types.json").then((res) => res.json()),
+    fetch("./data/new_services.json").then((res) => res.json()),
+    fetch("./data/new_config_items.json").then((res) => res.json()),
+    fetch("./data/new_risk_types.json").then((res) => res.json()),
   ]);
   state.services = services;
   state.items = items;
@@ -84,7 +92,7 @@ function compact(value, fallback = "N/A") {
 
 function splitParts(value) {
   return compact(value, "")
-    .split(/;|；|\/|\n/)
+    .split(/;|；|\n/)   // 移除了 \/，斜杠现在被视为普通字符
     .map((part) => part.trim())
     .filter(Boolean)
     .slice(0, 6);
@@ -97,6 +105,9 @@ function statusClass(status) {
 }
 
 function riskLevelClass(level) {
+  if (level === "high") return "high";
+  if (level === "medium") return "medium";
+  if (level === "low") return "low";
   if (level === "高") return "high";
   if (level === "中") return "medium";
   if (level === "低") return "low";
@@ -138,6 +149,15 @@ function renderHome() {
     updateHomeResults();
   });
 
+  const statusWrap = $("#status-filters");
+  statusWrap.innerHTML = statuses.map((status) => `<button class="chip" type="button" data-status="${escapeHtml(status)}">${escapeHtml(status)}</button>`).join("");
+  statusWrap.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-status]");
+    if (!button) return;
+    state.activeStatus = button.dataset.status;
+    updateHomeResults();
+  });
+
   const input = $("#search-input");
   input.value = state.query;
   input.addEventListener("input", (event) => {
@@ -152,10 +172,14 @@ function updateHomeResults() {
   document.querySelectorAll("[data-group]").forEach((button) => {
     button.classList.toggle("active", button.dataset.group === state.activeGroup);
   });
+  document.querySelectorAll("[data-status]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.status === state.activeStatus);
+  });
 
   const query = state.query.toLowerCase();
   const filtered = state.services.filter((service) => {
-    const groupMatches = state.activeGroup === "全部" || service.service_group === state.activeGroup;
+    const groupMatches = state.activeGroup === "\u5168\u90e8" || service.service_group === state.activeGroup;
+    const statusMatches = state.activeStatus === "\u5168\u90e8" || service.configurable_status === state.activeStatus;
     const haystack = [
       service.service_id,
       service.service,
@@ -165,7 +189,7 @@ function updateHomeResults() {
       service.main_focus,
       service.typical_risks,
     ].join(" ").toLowerCase();
-    return groupMatches && (!query || haystack.includes(query));
+    return groupMatches && statusMatches && (!query || haystack.includes(query));
   });
 
   $("#result-summary").textContent = `共 ${filtered.length} 个服务匹配当前条件`;

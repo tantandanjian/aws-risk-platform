@@ -38,7 +38,14 @@
           <span>搜索服务</span>
           <input id="search-input" type="search" placeholder="输入 CloudFront、ACM、TLS、客户端加密 SDK..." autocomplete="off" />
         </label>
-        <div id="group-filters" class="chips" role="list"></div>
+        <div class="filter-block">
+          <span class="filter-label">服务分类</span>
+          <div id="group-filters" class="chips" role="list"></div>
+        </div>
+        <div class="filter-block">
+          <span class="filter-label">配置可控性</span>
+          <div id="status-filters" class="chips" role="list"></div>
+        </div>
       </section>
 
       <section class="section-head">

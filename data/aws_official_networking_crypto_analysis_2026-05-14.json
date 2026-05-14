@@ -1,0 +1,864 @@
+{
+  "metadata": {
+    "title": "AWS 官方文档口径 - Networking & Content Delivery 密码模块配置分析",
+    "generated_at": "2026-05-14",
+    "source_policy": "仅参考 AWS 官方公开页面和 AWS Docs，不使用工作区内既有 Excel/Word 作为事实来源。",
+    "scope": [
+      "Amazon CloudFront",
+      "Elastic Load Balancing - Application Load Balancer (ALB)",
+      "Elastic Load Balancing - Network Load Balancer (NLB)",
+      "Amazon VPC",
+      "Amazon Route 53"
+    ],
+    "display_hint": "该文件为新增分析数据，可作为网页展示数据源；未覆盖现有 data/services.json、data/config_items.json 或历史数据。"
+  },
+  "field_schema": [
+    {
+      "field": "service_name",
+      "label": "服务名称",
+      "description": "AWS 服务或服务子类型。"
+    },
+    {
+      "field": "crypto_surface",
+      "label": "密码能力面",
+      "description": "该服务中和 TLS、证书、DNSSEC、KMS、传输加密、FIPS/PQ 策略等相关的控制面。"
+    },
+    {
+      "field": "crypto_modules",
+      "label": "涉及的密码模块",
+      "description": "基于 AWS 文档可确认的密码模块、加密实现或密钥/证书边界；无法确认模块名时标注为服务托管或依赖下游服务。"
+    },
+    {
+      "field": "configuration_items",
+      "label": "配置项",
+      "description": "可审计或可配置的密码相关字段。"
+    },
+    {
+      "field": "recommended_configuration",
+      "label": "推荐配置",
+      "description": "面向安全基线、网页展示和后续规则化检查的推荐取值。"
+    },
+    {
+      "field": "risky_configuration",
+      "label": "风险配置",
+      "description": "容易造成弱协议、弱证书、明文链路、DNSSEC 失效或合规偏差的取值。"
+    },
+    {
+      "field": "risk_level",
+      "label": "风险级别",
+      "description": "高 / 中 / 低 / 信息，按对机密性、完整性、可用性和合规性的综合影响评估。"
+    },
+    {
+      "field": "web_display_tags",
+      "label": "展示标签",
+      "description": "用于前端筛选、分组或徽标展示。"
+    }
+  ],
+  "services": [
+    {
+      "service_id": "cloudfront",
+      "service_name": "Amazon CloudFront",
+      "aws_category": "Networking & Content Delivery",
+      "crypto_surface": [
+        "Viewer 到 CloudFront 的 TLS/HTTPS",
+        "CloudFront 到 Origin 的 HTTPS/TLS",
+        "自定义域名证书",
+        "Field-level encryption",
+        "CloudFront API FIPS endpoint"
+      ],
+      "crypto_modules": [
+        {
+          "module": "CloudFront viewer/origin TLS implementation",
+          "usage": "用于边缘节点和客户端、源站之间的 TLS 协商；AWS 文档公开了安全策略、协议和 cipher 列表。"
+        },
+        {
+          "module": "AWS Encryption SDK",
+          "usage": "CloudFront field-level encryption 用于对指定敏感字段加密。"
+        },
+        {
+          "module": "FIPS endpoint cryptographic libraries",
+          "usage": "访问 CloudFront API 且要求 FIPS 140-3 验证密码模块时，使用 cloudfront-fips.amazonaws.com。"
+        }
+      ],
+      "summary": "CloudFront 的主要密码风险集中在 viewer TLS 策略、源站 HTTPS 策略、证书算法/链路完整性以及是否对敏感字段做额外加密。TLS 策略应优先采用 AWS 当前支持的新策略，避免 SSLv3/TLS 1.0/1.1 或弱 cipher。",
+      "configuration_items": [
+        {
+          "item_id": "cloudfront_minimum_protocol_version",
+          "configuration_item": "ViewerCertificate.MinimumProtocolVersion",
+          "api_or_console_path": "CloudFront Distribution > Viewer certificate > Security policy / MinimumProtocolVersion",
+          "optional_values": [
+            "SSLv3",
+            "TLSv1",
+            "TLSv1_2016",
+            "TLSv1.1_2016",
+            "TLSv1.2_2018",
+            "TLSv1.2_2019",
+            "TLSv1.2_2021",
+            "TLSv1.2_2025",
+            "TLSv1.3_2025"
+          ],
+          "recommended_configuration": "优先使用 TLSv1.3_2025；如需兼容旧客户端，至少使用 TLSv1.2_2021 或 TLSv1.2_2025，并配合监控客户端兼容性。",
+          "risky_configuration": "SSLv3、TLSv1、TLSv1_2016、TLSv1.1_2016；这些策略允许过旧协议，容易触发合规和降级攻击风险。",
+          "risk_level": "高",
+          "risk_reason": "CloudFront 官方协议/cipher 表显示旧策略仍支持 SSLv3、TLS 1.0 或 TLS 1.1；这些协议不应作为互联网入口默认基线。",
+          "security_value_reason": "TLS 1.2/1.3 策略减少弱协议和弱 cipher 暴露，TLSv1.3_2025 还提供更现代的握手和 cipher 组合。",
+          "web_display_tags": [
+            "TLS",
+            "Viewer",
+            "SecurityPolicy"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-viewer-protocols-ciphers.html"
+          ]
+        },
+        {
+          "item_id": "cloudfront_viewer_protocol_policy",
+          "configuration_item": "ViewerProtocolPolicy",
+          "api_or_console_path": "Cache behavior > Viewer protocol policy",
+          "optional_values": [
+            "allow-all",
+            "redirect-to-https",
+            "https-only"
+          ],
+          "recommended_configuration": "对登录、API、动态或敏感内容使用 https-only；对公开静态资源至少使用 redirect-to-https。",
+          "risky_configuration": "allow-all，尤其是包含认证 Cookie、Token、表单、API 请求或用户数据时。",
+          "risk_level": "高",
+          "risk_reason": "允许 HTTP 会暴露明文传输和中间人篡改风险；即使后端启用 HTTPS，viewer 到 CloudFront 仍可能是明文。",
+          "security_value_reason": "强制 HTTPS 能保证客户端到边缘节点的传输加密，并减少凭证、会话和敏感参数泄漏。",
+          "web_display_tags": [
+            "HTTPS",
+            "Viewer",
+            "CacheBehavior"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-viewers-to-cloudfront.html",
+            "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/HTTPandHTTPSRequests.html"
+          ]
+        },
+        {
+          "item_id": "cloudfront_origin_protocol_policy",
+          "configuration_item": "OriginProtocolPolicy / OriginSslProtocols",
+          "api_or_console_path": "Origin settings > Protocol policy and Origin SSL protocols",
+          "optional_values": [
+            "http-only",
+            "match-viewer",
+            "https-only",
+            "TLSv1",
+            "TLSv1.1",
+            "TLSv1.2"
+          ],
+          "recommended_configuration": "对自定义源站使用 https-only，并限制 OriginSslProtocols 为 TLSv1.2；源站证书 CN/SAN 应匹配域名并保持有效。",
+          "risky_configuration": "http-only、match-viewer 且允许 viewer HTTP、OriginSslProtocols 包含 TLSv1/TLSv1.1、源站证书过期或名称不匹配。",
+          "risk_level": "高",
+          "risk_reason": "CloudFront 到源站链路如果使用 HTTP 或过旧 TLS，会让边缘到源站的敏感流量暴露在未加密或弱加密链路中。",
+          "security_value_reason": "源站 HTTPS-only 与 TLSv1.2 可补齐端到端传输加密，避免只保护客户端到边缘的一半链路。",
+          "web_display_tags": [
+            "TLS",
+            "Origin",
+            "EndToEndEncryption"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/DownloadDistValuesOrigin.html",
+            "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-ciphers-cloudfront-to-origin.html"
+          ]
+        },
+        {
+          "item_id": "cloudfront_certificate_requirements",
+          "configuration_item": "ViewerCertificate / ACM certificate",
+          "api_or_console_path": "Distribution aliases and custom SSL certificate",
+          "optional_values": [
+            "ACM certificate in us-east-1",
+            "IAM server certificate",
+            "RSA certificate",
+            "ECDSA certificate"
+          ],
+          "recommended_configuration": "使用 ACM 管理的有效证书，证书域名覆盖所有 Alternate domain names；优先采用现代 RSA/ECDSA 算法和自动续期能力。",
+          "risky_configuration": "证书域名与分配别名不匹配、证书过期、链不完整、继续依赖手工续期且无告警。",
+          "risk_level": "高",
+          "risk_reason": "证书错误会导致 TLS 握手失败、浏览器不信任或业务中断；手工管理证书也容易产生过期风险。",
+          "security_value_reason": "ACM 托管证书和域名匹配检查能降低证书生命周期风险，提升 HTTPS 可用性。",
+          "web_display_tags": [
+            "Certificate",
+            "ACM",
+            "Availability"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cnames-and-https-requirements.html"
+          ]
+        },
+        {
+          "item_id": "cloudfront_field_level_encryption",
+          "configuration_item": "Field-level encryption configuration",
+          "api_or_console_path": "CloudFront field-level encryption profile and public key",
+          "optional_values": [
+            "enabled for selected fields",
+            "not enabled"
+          ],
+          "recommended_configuration": "对必须经过中间层但不希望源站外组件读取的字段启用 field-level encryption；私钥存放在离线安全位置或 HSM，公钥交给 CloudFront 使用。",
+          "risky_configuration": "敏感字段仅依赖传输层 TLS，且在多个中间组件、日志或应用层路径中可见；私钥在线存放或权限过宽。",
+          "risk_level": "中",
+          "risk_reason": "TLS 只保护传输链路，不阻止请求到达后被中间系统或日志处理链路读取字段。",
+          "security_value_reason": "字段级加密使用 AWS Encryption SDK，可为指定字段提供应用层加密边界。",
+          "web_display_tags": [
+            "FieldLevelEncryption",
+            "AWS Encryption SDK",
+            "SensitiveData"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/field-level-encryption.html"
+          ]
+        }
+      ],
+      "references": [
+        "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-viewer-protocols-ciphers.html",
+        "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-ciphers-cloudfront-to-origin.html",
+        "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-viewers-to-cloudfront.html",
+        "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/data-protection-summary.html"
+      ]
+    },
+    {
+      "service_id": "alb",
+      "service_name": "Elastic Load Balancing - Application Load Balancer (ALB)",
+      "aws_category": "Networking & Content Delivery",
+      "crypto_surface": [
+        "HTTPS listener TLS termination",
+        "Security policy / SslPolicy",
+        "Server certificate and SNI certificate list",
+        "Mutual TLS",
+        "FIPS / PQ TLS policy"
+      ],
+      "crypto_modules": [
+        {
+          "module": "AWS-LC FIPS validated cryptographic module",
+          "usage": "ALB FIPS security policies use AWS-LC FIPS validated cryptographic module for TLS termination."
+        },
+        {
+          "module": "ACM / IAM server certificate storage",
+          "usage": "用于 ALB HTTPS listener 的 X.509 服务器证书管理、续期和绑定。"
+        }
+      ],
+      "summary": "ALB 的主要密码配置是 HTTPS listener 的 SslPolicy、证书、SNI 列表和 mTLS。需要特别注意：控制台创建 HTTPS listener 的默认策略已是 PQ TLS 策略，但 CLI/CloudFormation/CDK 未指定时默认可能是 ELBSecurityPolicy-2016-08。",
+      "configuration_items": [
+        {
+          "item_id": "alb_ssl_policy",
+          "configuration_item": "Listener.SslPolicy",
+          "api_or_console_path": "CreateListener / ModifyListener / AWS::ElasticLoadBalancingV2::Listener.SslPolicy",
+          "optional_values": [
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06",
+            "ELBSecurityPolicy-TLS13-1-1-2021-06",
+            "ELBSecurityPolicy-TLS13-1-0-2021-06",
+            "ELBSecurityPolicy-2016-08"
+          ],
+          "recommended_configuration": "通用公网入口优先 ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09；需要 FIPS 时使用 ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09 或同等级 FIPS TLS 1.2/1.3 策略。",
+          "risky_configuration": "ELBSecurityPolicy-2016-08、TLS13-1-1、TLS13-1-0 或任何允许 TLS 1.0/1.1 的策略；自动化创建 listener 时未显式指定 SslPolicy。",
+          "risk_level": "高",
+          "risk_reason": "AWS 文档显示 ALB 通过非控制台方式创建 HTTPS listener 且未指定策略时默认是 ELBSecurityPolicy-2016-08；该策略包含旧协议/旧 cipher 风险。",
+          "security_value_reason": "TLS 1.2/1.3、Res/PQ 或 FIPS 策略可降低协议降级、弱 cipher 和后量子迁移风险。",
+          "web_display_tags": [
+            "ALB",
+            "TLS",
+            "SslPolicy",
+            "PQ"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/describe-ssl-policies.html"
+          ]
+        },
+        {
+          "item_id": "alb_fips_policy",
+          "configuration_item": "FIPS-enabled TLS security policy",
+          "api_or_console_path": "Listener.SslPolicy with FIPS policy name",
+          "optional_values": [
+            "ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04",
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04",
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "ELBSecurityPolicy-TLS13-1-1-FIPS-2023-04",
+            "ELBSecurityPolicy-TLS13-1-0-FIPS-2023-04"
+          ],
+          "recommended_configuration": "合规场景选择 TLS 1.2/1.3 的 FIPS 或 FIPS-PQ 策略；避免为了兼容而启用 1.0/1.1 FIPS 策略。",
+          "risky_configuration": "ELBSecurityPolicy-TLS13-1-1-FIPS-2023-04、ELBSecurityPolicy-TLS13-1-0-FIPS-2023-04；AWS 文档标注它们仅为 legacy compatibility。",
+          "risk_level": "中",
+          "risk_reason": "即使使用 FIPS 密码模块，允许 TLS 1.0/1.1 仍可能不符合最新 TLS 配置指引。",
+          "security_value_reason": "FIPS 策略使用 AWS-LC FIPS validated cryptographic module，适合有 FIPS 140 要求的工作负载。",
+          "web_display_tags": [
+            "FIPS",
+            "AWS-LC",
+            "Compliance"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/describe-ssl-policies.html",
+            "https://aws.amazon.com/compliance/fips/"
+          ]
+        },
+        {
+          "item_id": "alb_listener_certificate",
+          "configuration_item": "Listener.Certificates / default certificate / certificate list",
+          "api_or_console_path": "HTTPS listener certificate settings",
+          "optional_values": [
+            "ACM certificate",
+            "IAM server certificate",
+            "RSA 2048/3072/4096",
+            "ECDSA certificate"
+          ],
+          "recommended_configuration": "使用 ACM 管理证书；证书域名匹配业务 FQDN；为多域名使用 SNI certificate list；监控并自动续期。",
+          "risky_configuration": "证书过期、域名不匹配、证书链不完整、仍使用 MD5/SHA1 签名证书、手工导入证书但无到期告警。",
+          "risk_level": "高",
+          "risk_reason": "ALB HTTPS listener 必须至少配置一个 X.509 证书；证书错误会导致 TLS 验证失败或连接中断。",
+          "security_value_reason": "ACM 与 ELB 集成，可部署和自动续期证书；ALB SNI 智能选择会优先更强、更有效的证书。",
+          "web_display_tags": [
+            "Certificate",
+            "ACM",
+            "SNI"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/https-listener-certificates.html",
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/create-https-listener.html"
+          ]
+        },
+        {
+          "item_id": "alb_mutual_tls",
+          "configuration_item": "MutualAuthentication",
+          "api_or_console_path": "HTTPS listener > Mutual authentication",
+          "optional_values": [
+            "off",
+            "passthrough",
+            "verify"
+          ],
+          "recommended_configuration": "对 B2B、内部 API、设备接入等强身份场景使用 verify mode，并维护 trust store、CA bundle 和 CRL；仅需应用侧自定义验证时使用 passthrough。",
+          "risky_configuration": "需要客户端证书认证但未启用 mTLS；verify mode 下 trust store 长期不更新；CRL 缺失或未维护。",
+          "risk_level": "中",
+          "risk_reason": "缺少客户端证书校验会把调用者身份完全交给应用层或其他凭证体系，增加凭证泄漏后的滥用面。",
+          "security_value_reason": "ALB mTLS verify mode 可在 TLS 协商时完成 X.509 客户端证书认证。",
+          "web_display_tags": [
+            "mTLS",
+            "ClientCertificate",
+            "TrustStore"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/configuring-mtls-with-elb.html",
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/mutual-authentication.html"
+          ]
+        }
+      ],
+      "references": [
+        "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/describe-ssl-policies.html",
+        "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/https-listener-certificates.html",
+        "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/configuring-mtls-with-elb.html"
+      ]
+    },
+    {
+      "service_id": "nlb",
+      "service_name": "Elastic Load Balancing - Network Load Balancer (NLB)",
+      "aws_category": "Networking & Content Delivery",
+      "crypto_surface": [
+        "TLS listener TLS termination",
+        "Security policy / SslPolicy",
+        "Server certificate and SNI certificate list",
+        "ALPN policy",
+        "TCP pass-through TLS"
+      ],
+      "crypto_modules": [
+        {
+          "module": "AWS-LC FIPS validated cryptographic module",
+          "usage": "NLB FIPS security policies use AWS-LC FIPS validated cryptographic module for TLS termination."
+        },
+        {
+          "module": "ACM / IAM server certificate storage",
+          "usage": "用于 NLB TLS listener 的 X.509 服务器证书管理、续期和绑定。"
+        }
+      ],
+      "summary": "NLB 可使用 TLS listener 做 TLS 终止，也可用 TCP 443 让目标端自行解密。密码风险集中在 listener 的 SslPolicy、证书算法与来源、ALPN 策略，以及在 VPC Encryption Controls enforce 模式下是否选择了合适的端到端加密方式。",
+      "configuration_items": [
+        {
+          "item_id": "nlb_ssl_policy",
+          "configuration_item": "TLS Listener.SslPolicy",
+          "api_or_console_path": "CreateListener / ModifyListener / AWS::ElasticLoadBalancingV2::Listener.SslPolicy",
+          "optional_values": [
+            "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+            "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09",
+            "ELBSecurityPolicy-TLS13-1-2-2021-06",
+            "ELBSecurityPolicy-TLS13-1-2-Res-2021-06",
+            "ELBSecurityPolicy-TLS13-1-1-2021-06",
+            "ELBSecurityPolicy-TLS13-1-0-2021-06",
+            "ELBSecurityPolicy-2016-08"
+          ],
+          "recommended_configuration": "优先使用 ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09；有 FIPS 要求时使用 ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09。",
+          "risky_configuration": "ELBSecurityPolicy-2016-08、允许 TLS 1.0/1.1 的策略；通过 CLI/CloudFormation/CDK 创建 TLS listener 时不显式指定 SslPolicy。",
+          "risk_level": "高",
+          "risk_reason": "AWS 文档显示 NLB TLS listener 控制台默认是 ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09，但其他创建方式未指定时默认是 ELBSecurityPolicy-2016-08。",
+          "security_value_reason": "PQ/Res/FIPS 策略可减少旧协议风险，并为后量子 TLS 迁移提供兼容路径。",
+          "web_display_tags": [
+            "NLB",
+            "TLS",
+            "SslPolicy",
+            "PQ"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/describe-ssl-policies.html"
+          ]
+        },
+        {
+          "item_id": "nlb_listener_certificate",
+          "configuration_item": "TLS Listener.Certificates / certificate list",
+          "api_or_console_path": "TLS listener certificate settings",
+          "optional_values": [
+            "ACM certificate",
+            "IAM server certificate",
+            "RSA 1024",
+            "RSA 2048",
+            "RSA 3072",
+            "ECDSA 256",
+            "ECDSA 384",
+            "ECDSA 521"
+          ],
+          "recommended_configuration": "使用 ACM 证书；RSA 优先 2048/3072 或 ECDSA；证书域名与业务域名匹配；启用续期监控。",
+          "risky_configuration": "IAM 导入证书使用 NLB 不支持的 key size，例如 RSA 4096；RSA 1024；证书过期、域名不匹配或链不完整。",
+          "risk_level": "高",
+          "risk_reason": "AWS 文档指出 IAM 导入证书绑定到 NLB TLS listener 时，key size/algorithm 不会在绑定时同步校验，异步发现不支持时 listener 可能进入非功能状态。",
+          "security_value_reason": "ACM 在绑定时可对不支持的 key size 提供即时反馈，降低生产 listener 异常风险。",
+          "web_display_tags": [
+            "Certificate",
+            "ACM",
+            "IAM",
+            "Availability"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/tls-listener-certificates.html"
+          ]
+        },
+        {
+          "item_id": "nlb_tls_vs_tcp_listener",
+          "configuration_item": "Listener.Protocol",
+          "api_or_console_path": "NLB listener protocol",
+          "optional_values": [
+            "TCP",
+            "TLS",
+            "UDP",
+            "TCP_UDP",
+            "QUIC",
+            "TCP_QUIC"
+          ],
+          "recommended_configuration": "需要负载均衡器统一终止 TLS 时使用 TLS listener；需要目标端执行证书校验、mTLS 或端到端加密时使用 TCP 443 pass-through 并在目标端配置 TLS。",
+          "risky_configuration": "误以为 TCP 443 自动提供 TLS 终止；使用 TLS listener 终止后到目标端为明文且无补充控制；VPC Encryption Controls enforce 场景下仍依赖 NLB TLS offload。",
+          "risk_level": "中",
+          "risk_reason": "NLB TLS listener 会在负载均衡器终止并解密请求；TCP listener 仅透传，不会替应用配置 TLS。",
+          "security_value_reason": "根据威胁模型选择 TLS offload 或 TCP pass-through，可避免解密边界与合规边界错配。",
+          "web_display_tags": [
+            "TLSOffload",
+            "TCPPassthrough",
+            "Architecture"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html",
+            "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-encryption-controls.html"
+          ]
+        },
+        {
+          "item_id": "nlb_alpn_policy",
+          "configuration_item": "AlpnPolicy",
+          "api_or_console_path": "TLS listener ALPN policy",
+          "optional_values": [
+            "None",
+            "HTTP1Only",
+            "HTTP2Only",
+            "HTTP2Optional",
+            "HTTP2Preferred"
+          ],
+          "recommended_configuration": "对需要 HTTP/2 的 TLS 服务使用 HTTP2Preferred 或 HTTP2Only；不需要 ALPN 时保持 None，避免无意改变客户端协议协商。",
+          "risky_configuration": "HTTP2Optional/Preferred 与后端或客户端能力不一致；生产变更未验证协议协商结果。",
+          "risk_level": "低",
+          "risk_reason": "ALPN 是 TLS 扩展，错误策略通常表现为兼容性或协议协商异常，而不是直接弱加密。",
+          "security_value_reason": "明确 ALPN 策略可让应用层协议协商可预测，降低 TLS 层与应用层协议错配。",
+          "web_display_tags": [
+            "ALPN",
+            "HTTP2",
+            "Compatibility"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html"
+          ]
+        }
+      ],
+      "references": [
+        "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/describe-ssl-policies.html",
+        "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/tls-listener-certificates.html",
+        "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html"
+      ]
+    },
+    {
+      "service_id": "vpc",
+      "service_name": "Amazon VPC",
+      "aws_category": "Networking & Content Delivery",
+      "crypto_surface": [
+        "VPC Encryption Controls",
+        "Nitro hardware encryption in transit",
+        "Application-layer encryption enforcement",
+        "VPC Flow Logs encryption-status",
+        "Transit Gateway encryption support"
+      ],
+      "crypto_modules": [
+        {
+          "module": "AWS Nitro Networking",
+          "usage": "VPC Encryption Controls 可利用 Nitro 系统硬件内建的传输中加密能力。"
+        },
+        {
+          "module": "Application-layer TLS / service-managed encryption",
+          "usage": "PrivateLink 和部分 AWS 服务通过应用层加密满足 VPC Encryption Controls 的合规判断。"
+        }
+      ],
+      "summary": "Amazon VPC 本身不是传统 TLS 终止服务，但 VPC Encryption Controls 已成为传输加密治理入口，可监控和强制 VPC 内及跨 VPC 流量加密状态。配置分析应关注 monitor/enforce 模式、Flow Logs 的 encryption-status 字段、例外资源和 Transit Gateway 加密支持。",
+      "configuration_items": [
+        {
+          "item_id": "vpc_encryption_controls_mode",
+          "configuration_item": "VPC Encryption Controls mode",
+          "api_or_console_path": "CreateVpcEncryptionControl / ModifyVpcEncryptionControl",
+          "optional_values": [
+            "off",
+            "monitor",
+            "enforce"
+          ],
+          "recommended_configuration": "既有 VPC 先开启 monitor mode，分析明文流量和阻塞资源；新建高合规 VPC 可直接 enforce；迁移完成后切换 enforce。",
+          "risky_configuration": "长期关闭；只开 monitor 但不处理明文流量；既有 VPC 未完成资源排查就强切 enforce 导致资源创建或连接失败。",
+          "risk_level": "高",
+          "risk_reason": "关闭或只监控不治理会让明文通信长期存在；强制模式切换不当则可能影响可用性。",
+          "security_value_reason": "VPC Encryption Controls 为区域内 VPC 流量提供集中监控和强制加密机制。",
+          "web_display_tags": [
+            "VPC",
+            "EncryptionControls",
+            "InTransit"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-encryption-controls.html"
+          ]
+        },
+        {
+          "item_id": "vpc_flow_logs_encryption_status",
+          "configuration_item": "VPC Flow Logs encryption-status field",
+          "api_or_console_path": "CreateFlowLogs --log-format '${encryption-status} ...'",
+          "optional_values": [
+            "0 = not encrypted",
+            "1 = nitro-encrypted",
+            "2 = application-encrypted",
+            "3 = both nitro and application encrypted",
+            "- = unknown or encryption controls off"
+          ],
+          "recommended_configuration": "为启用 Encryption Controls 的 VPC 新建包含 encryption-status、traffic-path、flow-direction 的 Flow Logs，并建立查询/告警。",
+          "risky_configuration": "沿用旧 Flow Logs 导致没有 encryption-status；看到 0 或 '-' 不处理；未区分端口 443 推断加密和真实应用层加密。",
+          "risk_level": "中",
+          "risk_reason": "AWS 文档说明 encryption-status 不会自动添加到现有 Flow Logs；缺少该字段会让加密状态不可观测。",
+          "security_value_reason": "encryption-status 能把传输加密状态变成可审计数据，支撑网页展示、风险筛选和治理闭环。",
+          "web_display_tags": [
+            "FlowLogs",
+            "Monitoring",
+            "EncryptionStatus"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-encryption-controls.html",
+            "https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html"
+          ]
+        },
+        {
+          "item_id": "vpc_encryption_exclusions",
+          "configuration_item": "VPC Encryption Controls exclusions",
+          "api_or_console_path": "ModifyVpcEncryptionControl exclusions",
+          "optional_values": [
+            "Internet Gateway",
+            "NAT Gateway",
+            "Egress-only Internet Gateway",
+            "VPC peering to non-enforced VPC",
+            "Virtual Private Gateway",
+            "Lambda functions inside VPC",
+            "VPC Lattice",
+            "Elastic File System"
+          ],
+          "recommended_configuration": "只为无法纳入 enforce 的资源创建可审计例外，并明确由应用层 TLS、VPN/IPsec 或其他机制承担端到端加密责任。",
+          "risky_configuration": "大范围创建例外；例外资源没有应用层加密或补偿控制；例外缺少负责人、到期时间和复核记录。",
+          "risk_level": "中",
+          "risk_reason": "例外表示该资源可能允许 AWS 网络边界外或非强制加密路径，客户需要自行保证端到端加密。",
+          "security_value_reason": "受控例外能在兼顾可用性的同时保留审计证据和补偿控制要求。",
+          "web_display_tags": [
+            "Exception",
+            "Governance",
+            "CompensatingControl"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-encryption-controls.html"
+          ]
+        },
+        {
+          "item_id": "vpc_transit_gateway_encryption",
+          "configuration_item": "Transit Gateway encryption support",
+          "api_or_console_path": "Transit Gateway encryption support / modify-transit-gateway",
+          "optional_values": [
+            "enabled",
+            "disabled"
+          ],
+          "recommended_configuration": "连接加密强制 VPC 与其他 VPC 时，显式启用 Transit Gateway encryption support；跨 VPC 场景结合两端 VPC mode 判断加密边界。",
+          "risky_configuration": "以为 Transit Gateway 默认保证全路径加密；加密强制 VPC 连接到非强制 VPC 时未评估 Transit Gateway 之后的链路。",
+          "risk_level": "中",
+          "risk_reason": "AWS 文档说明到非强制 VPC 的后续链路是否加密取决于目标资源，不能保证全路径加密。",
+          "security_value_reason": "显式启用 Transit Gateway 加密可确保加密强制 VPC 内及到 TGW 的链路满足加密要求。",
+          "web_display_tags": [
+            "TransitGateway",
+            "InterVPC",
+            "Encryption"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/vpc/latest/tgw/tgw-encryption-support.html",
+            "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-encryption-controls.html"
+          ]
+        }
+      ],
+      "references": [
+        "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-encryption-controls.html",
+        "https://docs.aws.amazon.com/vpc/latest/tgw/tgw-encryption-support.html",
+        "https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Security.html"
+      ]
+    },
+    {
+      "service_id": "route-53",
+      "service_name": "Amazon Route 53",
+      "aws_category": "Networking & Content Delivery",
+      "crypto_surface": [
+        "DNSSEC signing",
+        "Key-signing key (KSK)",
+        "AWS KMS asymmetric customer managed key",
+        "Delegation Signer (DS) chain of trust",
+        "DNSSEC validation for VPC resolver"
+      ],
+      "crypto_modules": [
+        {
+          "module": "AWS KMS asymmetric customer managed key",
+          "usage": "Route 53 DNSSEC KSK 基于客户拥有的 KMS 非对称密钥，Route 53 调用 KMS Sign 生成 DNSKEY RRset 的 RRSIG。"
+        },
+        {
+          "module": "Route 53 managed ZSK",
+          "usage": "Route 53 负责 ZSK 管理；客户主要负责 KSK、KMS key policy、DS 链路和故障监控。"
+        }
+      ],
+      "summary": "Route 53 的核心密码能力是 DNSSEC。风险不在 TLS cipher，而在是否启用 DNSSEC signing、KSK/KMS key 是否满足要求、是否建立 DS 信任链，以及 KSK 状态异常时是否有监控和快速回滚能力。",
+      "configuration_items": [
+        {
+          "item_id": "route53_dnssec_signing",
+          "configuration_item": "EnableHostedZoneDNSSEC",
+          "api_or_console_path": "Hosted zone > DNSSEC signing / EnableHostedZoneDNSSEC API",
+          "optional_values": [
+            "enabled",
+            "disabled"
+          ],
+          "recommended_configuration": "对公网关键域名启用 DNSSEC signing；启用前降低 TTL、配置监控，启用后确认 INSYNC。",
+          "risky_configuration": "关键公网域名未启用 DNSSEC；启用后未建立 DS 信任链；启用过程没有 TTL/监控/回滚计划。",
+          "risk_level": "高",
+          "risk_reason": "未启用 DNSSEC 时，解析器无法通过签名验证 Route 53 响应未被篡改；启用但 DS 链配置错误可能造成域名不可用。",
+          "security_value_reason": "DNSSEC 使用公钥密码学签名 DNS 响应，帮助防止 DNS spoofing 和中间人篡改。",
+          "web_display_tags": [
+            "DNSSEC",
+            "PublicHostedZone",
+            "Integrity"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec.html",
+            "https://docs.aws.amazon.com/Route53/latest/APIReference/API_EnableHostedZoneDNSSEC.html"
+          ]
+        },
+        {
+          "item_id": "route53_ksk_kms_key_requirements",
+          "configuration_item": "CreateKeySigningKey.KeyManagementServiceArn",
+          "api_or_console_path": "CreateKeySigningKey / KMS customer managed key",
+          "optional_values": [
+            "KMS asymmetric customer managed key",
+            "KeySpec ECC_NIST_P256",
+            "Region us-east-1"
+          ],
+          "recommended_configuration": "KMS key 必须位于 us-east-1，使用 asymmetric customer managed key，KeySpec 为 ECC_NIST_P256，并配置 Route 53 所需 key policy。",
+          "risky_configuration": "KMS key 区域错误、KeySpec 非 ECC_NIST_P256、key policy 未授权 Route 53、KSK 长期处于 ACTION_NEEDED。",
+          "risk_level": "高",
+          "risk_reason": "KSK 依赖 KMS key 签名；KMS key 不满足要求或无法访问会影响 DNSSEC 签名和 ZSK 轮换。",
+          "security_value_reason": "符合要求的 KMS 非对称密钥可支撑 Route 53 KSK 签名边界，并让客户掌握 KSK 管理责任。",
+          "web_display_tags": [
+            "KMS",
+            "KSK",
+            "ECC_NIST_P256"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec-cmk-requirements.html",
+            "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec-zsk-management.html"
+          ]
+        },
+        {
+          "item_id": "route53_ds_chain_of_trust",
+          "configuration_item": "Delegation Signer (DS) record / chain of trust",
+          "api_or_console_path": "GetDNSSEC / Registrar DNSSEC keys / Parent hosted zone DS record",
+          "optional_values": [
+            "ECDSAP256SHA256 / type 13",
+            "SHA-256 digest / type 2",
+            "DS TTL 300 seconds during onboarding"
+          ],
+          "recommended_configuration": "启用 DNSSEC signing 后在父区或注册商处创建 DS 记录；算法使用 ECDSAP256SHA256(type 13)，摘要使用 SHA-256(type 2)；上线前设置较低 DS TTL。",
+          "risky_configuration": "只在子 hosted zone 启用签名但不插入 DS；DS 值复制错误；算法/摘要类型错误；未等待 TTL 传播即切换。",
+          "risk_level": "高",
+          "risk_reason": "DNSSEC 信任链错误会让验证解析器认为域名签名无效，可能直接导致解析失败。",
+          "security_value_reason": "正确 DS 链路让父区到子区形成可验证的信任链，完成 DNSSEC 保护闭环。",
+          "web_display_tags": [
+            "DSRecord",
+            "ChainOfTrust",
+            "Registrar"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec-enable-signing.html"
+          ]
+        },
+        {
+          "item_id": "route53_dnssec_monitoring",
+          "configuration_item": "DNSSEC CloudWatch alarms",
+          "api_or_console_path": "CloudWatch alarms for DNSSECInternalFailure / DNSSECKeySigningKeysNeedingAction",
+          "optional_values": [
+            "alarm configured",
+            "alarm missing"
+          ],
+          "recommended_configuration": "为 DNSSECInternalFailure 和 DNSSECKeySigningKeysNeedingAction 配置 CloudWatch 告警，并建立 KSK ACTION_NEEDED 处理流程。",
+          "risky_configuration": "DNSSEC 启用后没有告警；KSK 异常状态无人处理；DNSSEC onboarding 后没有 2 周观察期。",
+          "risk_level": "中",
+          "risk_reason": "AWS 文档强烈建议启用相关告警；DNSSEC 错误需要快速处理以避免域名不可用。",
+          "security_value_reason": "告警和观察期能降低 DNSSEC 运维错误对可用性的冲击。",
+          "web_display_tags": [
+            "Monitoring",
+            "CloudWatch",
+            "Availability"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec.html",
+            "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec-enable-signing.html"
+          ]
+        },
+        {
+          "item_id": "route53_resolver_dnssec_validation",
+          "configuration_item": "DNSSEC validation for VPC",
+          "api_or_console_path": "Route 53 Resolver DNSSEC validation for VPC",
+          "optional_values": [
+            "enabled",
+            "disabled"
+          ],
+          "recommended_configuration": "对需要验证外部 DNS 响应完整性的 VPC 启用 DNSSEC validation，并测试依赖域名是否正确签名。",
+          "risky_configuration": "对安全敏感工作负载禁用 DNSSEC validation；启用前未验证关键依赖域名的 DNSSEC 状态导致解析异常。",
+          "risk_level": "中",
+          "risk_reason": "禁用验证无法发现被篡改或签名错误的 DNS 响应；启用前不测试则可能暴露第三方域名配置问题。",
+          "security_value_reason": "DNSSEC validation 会对 DNSSEC 签名进行密码学检查，提升 VPC 内解析完整性。",
+          "web_display_tags": [
+            "Resolver",
+            "DNSSECValidation",
+            "VPC"
+          ],
+          "references": [
+            "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-dnssec-validation.html"
+          ]
+        }
+      ],
+      "references": [
+        "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec.html",
+        "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec-cmk-requirements.html",
+        "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec-enable-signing.html",
+        "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-dnssec-validation.html"
+      ]
+    }
+  ],
+  "cross_service_observations": [
+    {
+      "title": "显式指定 TLS policy",
+      "observation": "ALB 和 NLB 通过控制台创建时默认安全策略较新，但 CLI、CloudFormation、CDK 等自动化路径未指定策略时可能落到 ELBSecurityPolicy-2016-08。建议把 SslPolicy 作为 IaC 必填字段。"
+    },
+    {
+      "title": "证书优先 ACM 管理",
+      "observation": "CloudFront、ALB、NLB 都依赖 X.509 证书完成 HTTPS/TLS 入口保护。ACM 托管证书可降低续期和绑定校验风险；NLB 尤其应避免 IAM 导入不支持 key size 的证书。"
+    },
+    {
+      "title": "FIPS 不等于强 TLS 配置",
+      "observation": "ALB/NLB 的 FIPS 策略使用 AWS-LC FIPS validated cryptographic module，但包含 TLS 1.0/1.1 的 legacy FIPS 策略仍不适合作为默认安全基线。"
+    },
+    {
+      "title": "VPC 加密治理需要可观测性先行",
+      "observation": "VPC Encryption Controls 的 monitor mode 和 Flow Logs encryption-status 是治理入口；没有该字段时，网页展示难以证明流量是否加密。"
+    },
+    {
+      "title": "Route 53 DNSSEC 的主要风险是运维链路",
+      "observation": "DNSSEC 的密码算法由 KSK/KMS/DS 链路支撑，但风险常来自 key policy、DS 记录、TTL、告警和 KSK 状态处理。"
+    }
+  ],
+  "source_index": [
+    {
+      "name": "CloudFront supported viewer protocols and ciphers",
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-viewer-protocols-ciphers.html"
+    },
+    {
+      "name": "CloudFront supported origin protocols and ciphers",
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-ciphers-cloudfront-to-origin.html"
+    },
+    {
+      "name": "CloudFront require HTTPS between viewers and CloudFront",
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-viewers-to-cloudfront.html"
+    },
+    {
+      "name": "CloudFront field-level encryption",
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/field-level-encryption.html"
+    },
+    {
+      "name": "CloudFront data protection",
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/data-protection-summary.html"
+    },
+    {
+      "name": "ALB security policies",
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/describe-ssl-policies.html"
+    },
+    {
+      "name": "ALB SSL certificates",
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/https-listener-certificates.html"
+    },
+    {
+      "name": "ALB mutual TLS",
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/configuring-mtls-with-elb.html"
+    },
+    {
+      "name": "NLB security policies",
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/describe-ssl-policies.html"
+    },
+    {
+      "name": "NLB server certificates",
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/tls-listener-certificates.html"
+    },
+    {
+      "name": "NLB listeners and ALPN",
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html"
+    },
+    {
+      "name": "Amazon VPC Encryption Controls",
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-encryption-controls.html"
+    },
+    {
+      "name": "Transit Gateway encryption support",
+      "url": "https://docs.aws.amazon.com/vpc/latest/tgw/tgw-encryption-support.html"
+    },
+    {
+      "name": "Route 53 DNSSEC signing",
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec.html"
+    },
+    {
+      "name": "Route 53 customer managed keys for DNSSEC",
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec-cmk-requirements.html"
+    },
+    {
+      "name": "Route 53 DNSSEC enable signing and chain of trust",
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec-enable-signing.html"
+    },
+    {
+      "name": "Route 53 Resolver DNSSEC validation",
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-dnssec-validation.html"
+    },
+    {
+      "name": "AWS FIPS 140-3 overview",
+      "url": "https://aws.amazon.com/compliance/fips/"
+    }
+  ]
+}

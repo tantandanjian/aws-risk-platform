@@ -3,133 +3,179 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>AWS 云服务密码配置风险展示平台</title>
+    <title>AWS 密码学配置风险展示平台</title>
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <header class="topbar">
-      <a class="brand" href="#/">AWS 云服务密码配置风险展示平台</a>
-      <nav class="nav" aria-label="主导航">
-        <a href="#/" data-nav="home">首页</a>
-        <a href="#/risk-types" data-nav="risk-types">风险类型与分析说明</a>
-      </nav>
+      <a class="brand" href="#/">AWS 密码学配置风险展示平台</a>
+      <div class="topbar-actions">
+        <nav class="nav" aria-label="导航"></nav>
+        <div class="language-switcher" role="group" aria-label="Language">
+          <a href="./index-en.html" data-lang-page="en">English</a>
+          <a href="./index.html" data-lang-page="zh">中文</a>
+        </div>
+      </div>
     </header>
 
     <main id="app" class="app" aria-live="polite"></main>
 
-    <template id="cover-template">
-      <section class="cover-page">
-        <div class="cover-panel">
-          <p class="eyebrow">AWS Cryptography Configuration</p>
-          <h1>AWS &#x4e91;&#x670d;&#x52a1;&#x5bc6;&#x7801;&#x5b66;&#x914d;&#x7f6e;&#x98ce;&#x9669;&#x5c55;&#x793a;&#x5e73;&#x53f0;</h1>
-          <p class="cover-copy">
-            &#x805a;&#x5408; TLS / HTTPS&#x3001;DNSSEC&#x3001;&#x5bc6;&#x94a5;&#x7ba1;&#x7406;&#x3001;HSM&#x3001;&#x8bc1;&#x4e66;&#x3001;&#x4ee3;&#x7801;&#x7b7e;&#x540d;&#x4e0e;&#x5ba2;&#x6237;&#x7aef;&#x52a0;&#x5bc6; SDK &#x7b49;&#x5206;&#x6790;&#x7ed3;&#x679c;&#xff0c;&#x7528;&#x4e8e;&#x5feb;&#x901f;&#x5448;&#x73b0;&#x5404;&#x7c7b; AWS &#x670d;&#x52a1;&#x7684;&#x5bc6;&#x7801;&#x5b66;&#x914d;&#x7f6e;&#x98ce;&#x9669;&#x4e0e;&#x5b89;&#x5168;&#x5efa;&#x8bae;&#x3002;
-          </p>
-          <div class="cover-actions">
-            <a class="primary-button" href="#/dashboard">&#x8fdb;&#x5165;&#x98ce;&#x9669;&#x770b;&#x677f;</a>
-            <a class="secondary-link" href="#/risk-types">&#x67e5;&#x770b;&#x98ce;&#x9669;&#x7c7b;&#x578b;</a>
-          </div>
-        </div>
-        <div class="cover-visual" aria-label="AWS cryptography risk cover graphic">
-          <div class="risk-orbit">
-            <span class="node node-main">AWS</span>
-            <span class="node node-a">TLS</span>
-            <span class="node node-b">KMS</span>
-            <span class="node node-c">HSM</span>
-            <span class="node node-d">SDK</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="cover-stats" aria-label="Platform summary">
-        <div><strong data-cover-count="services">0</strong><span>&#x8986;&#x76d6;&#x670d;&#x52a1;</span></div>
-        <div><strong data-cover-count="items">0</strong><span>&#x914d;&#x7f6e;&#x9879;</span></div>
-        <div><strong data-cover-count="groups">0</strong><span>&#x670d;&#x52a1;&#x5206;&#x7ec4;</span></div>
-      </section>
-    </template>
-
-    <template id="home-template">
-      <section class="hero">
-        <div>
-          <p class="eyebrow">AWS Cryptography Configuration</p>
-          <h1>服务、配置项、风险值和安全建议的统一展示</h1>
-          <p class="hero-copy">
-            本平台面向 AWS 云服务中的密码相关配置进行整理与展示，覆盖 TLS/HTTPS、证书管理、密钥管理、DNSSEC、HSM、数字签名、客户端加密 SDK、支付密码等类别。
-          </p>
-        </div>
-        <div class="hero-metrics" aria-label="数据概览">
-          <div><strong data-count="services">0</strong><span>服务</span></div>
-          <div><strong data-count="items">0</strong><span>配置项</span></div>
-          <div><strong data-count="groups">0</strong><span>服务组</span></div>
-        </div>
-      </section>
-
-      <section class="filters" aria-label="服务搜索与筛选">
-        <label class="search-box">
-          <span>搜索服务</span>
-          <input id="search-input" type="search" placeholder="输入 CloudFront、ACM、TLS、客户端加密 SDK..." autocomplete="off" />
-        </label>
-        <div class="filter-block">
-          <span class="filter-label">服务分类</span>
-          <div id="group-filters" class="chips" role="list"></div>
-        </div>
-        <div class="filter-block">
-          <span class="filter-label">配置可控性</span>
-          <div id="status-filters" class="chips" role="list"></div>
-        </div>
-      </section>
-
-      <section class="section-head">
-        <div>
-          <h2>服务总览</h2>
-          <p id="result-summary">正在加载服务卡片</p>
-        </div>
-        <a class="secondary-link" href="#/risk-types">查看风险类型与分析说明</a>
-      </section>
-      <section id="service-grid" class="service-grid" aria-label="服务卡片列表"></section>
-    </template>
-
-    <template id="detail-template">
-      <a class="back-link" href="#/">返回首页</a>
-      <section id="service-detail" class="detail"></section>
-    </template>
-
-    <template id="risk-template">
-      <section class="page-title">
-        <p class="eyebrow">Risk Taxonomy</p>
-        <h1>风险类型与分析说明</h1>
-        <p>本页面用于说明平台中的风险类型、字段含义和分析标准。风险值与安全值主要依据 AWS 官方文档、密码协议安全实践以及配置项本身的安全影响整理。</p>
-      </section>
-
-      <section class="info-band important">
-        <h2>N/A 与不可直接配置</h2>
-        <p>
-          页面中的 N/A 不一定表示数据缺失。对于 Amazon VPC、AWS PrivateLink、AWS Cloud Map 等服务，N/A 通常表示该服务本身不提供直接的密码套件、TLS policy 或密码算法选择入口。应在上层服务或应用层配置 TLS、证书、加密算法、密钥管理和访问控制策略。
-        </p>
-      </section>
-
-      <section class="accordion-section">
-        <h2>常见风险类型</h2>
-        <div id="risk-list" class="accordion-list"></div>
-      </section>
-
-      <section class="two-column">
-        <div>
-          <h2>服务组分类说明</h2>
-          <div id="group-guide" class="compact-table"></div>
-        </div>
-        <div>
-          <h2>字段说明</h2>
-          <div id="field-guide" class="compact-table"></div>
-        </div>
-      </section>
-
-      <section class="accordion-section">
-        <h2>风险值与安全值判断标准</h2>
-        <div id="standard-list" class="accordion-list"></div>
-      </section>
-    </template>
-
+    <script>
+      window.APP_CONFIG = {
+        lang: "zh-CN",
+        langKey: "zh",
+        title: "AWS 密码学配置风险展示平台",
+        languagePages: {
+          en: "./index-en.html",
+          zh: "./index.html",
+        },
+        data: {
+          services: "./data/new_services.json",
+          items: "./data/new_config_items.json",
+          riskTypes: "./data/new_risk_types.json",
+        },
+        categoryOverrides: {
+          kms: "Cryptography & PKI",
+          cloudhsm: "Cryptography & PKI",
+          "aws-encryption-sdk": "Cryptography & PKI",
+          "aws-database-encryption-sdk": "Cryptography & PKI",
+          "s3-encryption-client": "Cryptography & PKI",
+          signer: "Security, Identity, & Compliance",
+          acm: "Security, Identity, & Compliance",
+          "payment-cryptography": "Security, Identity, & Compliance",
+        },
+        filters: {
+          awsCategories: [
+            { value: "all", label: "全部" },
+            { value: "Networking & Content Delivery", label: "Networking & Content Delivery" },
+            { value: "Cryptography & PKI", label: "Cryptography & PKI" },
+            { value: "Security, Identity, & Compliance", label: "Security, Identity, & Compliance" },
+          ],
+          cryptoGroups: [
+            { value: "all", label: "全部" },
+            { value: "TLS / 安全策略", label: "TLS / 安全策略" },
+            { value: "DNSSEC / 完整性", label: "DNSSEC / 完整性" },
+            { value: "网络连接安全", label: "网络连接安全" },
+            { value: "VPN", label: "VPN" },
+            { value: "密钥管理", label: "密钥管理" },
+            { value: "HSM / 硬件密码模块", label: "HSM / 硬件密码模块" },
+            { value: "证书管理", label: "证书管理" },
+            { value: "代码签名", label: "代码签名" },
+            { value: "客户端加密 SDK", label: "客户端加密 SDK" },
+            { value: "支付密码", label: "支付密码" },
+          ],
+          statuses: [
+            { value: "all", label: "全部" },
+            { value: "可配置", label: "可配置" },
+            { value: "部分可配置", label: "部分可配置" },
+            { value: "不可配置", label: "不可配置" },
+          ],
+        },
+        labels: {
+          navCover: "首页",
+          navDashboard: "风险看板",
+          navRiskTypes: "风险类型说明",
+          coverEyebrow: "AWS 密码学配置",
+          coverTitle: "AWS 云服务密码学配置风险展示平台",
+          coverCopy: "聚合 TLS/HTTPS、DNSSEC、密钥管理、HSM、证书、代码签名、客户端加密 SDK 和支付密码等分析结果，用于快速呈现 AWS 服务的密码学配置风险与安全建议。",
+          enterDashboard: "进入风险看板",
+          viewRiskTypes: "查看风险类型",
+          servicesCovered: "覆盖服务",
+          configItems: "配置项",
+          officialCategories: "AWS 官方分类",
+          dashboardTitle: "按 AWS 官方分类组织的密码学配置风险看板",
+          dashboardCopy: "以 AWS 官方服务分类作为一级分组，同时保留 TLS、DNSSEC、密钥管理、HSM、证书、代码签名和客户端加密 SDK 等密码学维度。",
+          services: "服务",
+          awsServiceCategory: "AWS 服务分类",
+          cryptoDimension: "密码学维度",
+          controllability: "配置可控性",
+          searchLabel: "搜索服务 / 密码学维度",
+          searchPlaceholder: "输入 CloudFront、ACM、TLS、KMS、客户端加密 SDK...",
+          serviceOverview: "服务风险总览",
+          matchingSummary: (count, page, pages) => `共 ${count} 个服务匹配当前条件，当前第 ${page} / ${pages} 页。`,
+          emptyResults: "没有匹配的服务。可以清空搜索词，或切换到“全部”分类。",
+          previous: "上一页",
+          next: "下一页",
+          paginationLabel: "服务列表分页",
+          viewDetails: "查看详情",
+          backDashboard: "返回风险看板",
+          serviceNotFound: (id) => `未找到 service_id 为 ${id} 的服务。`,
+          riskFocus: "主要风险关注点",
+          noConfigRisk: "该服务暂无配置项风险，属于说明性展示。",
+          awsCategory: "AWS 服务分类",
+          cryptoCategory: "密码学类别",
+          mainFocus: "主要关注",
+          configurationItems: "配置项",
+          configurationItem: "配置项",
+          apiEndpoint: "API / 端点",
+          recommendedValues: "推荐值",
+          riskyValues: "风险值",
+          riskLevel: "风险级别",
+          riskLevel_high: "高",
+          riskLevel_medium: "中",
+          riskLevel_low: "低",
+          references: "参考文档",
+          action: "操作",
+          expand: "展开",
+          collapse: "收起",
+          riskReason: "风险原因",
+          securityValueReason: "安全价值原因",
+          noItems: "该服务当前没有列出直接由用户配置的密码学配置项，属于说明性条目；应在相关 API TLS、DNSSEC 或下游服务加密控制中落实治理。",
+          referenceLink: "AWS 官方文档",
+          riskTaxonomyTitle: "风险类型说明",
+          riskTaxonomyCopy: "汇总密码学配置风险类型、相关 AWS 服务、典型风险值和推荐整改方向。",
+          naTitle: "如何理解 N/A 和不可配置服务",
+          naCopy: "部分服务本身不提供 TLS policy、cipher suite 或 KMS key 配置入口，例如 Cloud Map。平台仍保留这些服务，用于澄清加密边界，并提示应关注 API TLS、Route 53 DNSSEC、PrivateLink 或下游服务 TLS 等相邻控制。",
+          riskTypeList: "支持的风险类型",
+          relatedServices: "相关服务：",
+          typicalRiskyValues: "典型风险值：",
+          recommendedDirection: "推荐方向：",
+          groupGuide: "服务分组说明",
+          fieldGuide: "数据字段说明",
+          standardGuide: "风险判断说明",
+          showMore: (count) => `展开 ${count}`,
+          showLess: "收起",
+          loadError: "加载数据失败。请通过本地 HTTP 服务运行项目，以便浏览器读取 JSON 文件。",
+          coverGraphicLabel: "AWS 密码学风险封面图",
+          platformSummaryLabel: "平台汇总",
+          platformMetricsLabel: "平台指标",
+          serviceFiltersLabel: "服务筛选",
+          serviceCardsLabel: "服务卡片",
+          riskTaxonomyEyebrow: "风险类型",
+        },
+        guides: {
+          groupHeaders: ["密码学维度", "说明", "相关服务"],
+          groupRows: [
+            ["TLS / 安全策略", "TLS 协议版本、HTTPS listener、viewer security policy 与 TLS 终止点。", "CloudFront、ALB、NLB、VPC Lattice"],
+            ["DNSSEC / 完整性", "DNS 响应完整性与信任链。", "Route 53"],
+            ["网络连接安全", "传输加密可观测性、强制策略和服务发现边界。", "VPC、PrivateLink、Cloud Map"],
+            ["VPN / IPsec", "IKE、IPsec、Phase 1/2 算法、DH group 和隧道认证。", "Site-to-Site VPN、Client VPN"],
+            ["密钥管理", "KMS 密钥类型、用途、来源、轮换和策略治理。", "AWS KMS"],
+            ["HSM / 硬件密码模块", "HSM 模式、机制、密钥属性和 CU 所有权。", "CloudHSM"],
+            ["证书管理", "证书申请、导入、导出、透明日志、续期和私钥边界。", "ACM、Private CA"],
+            ["代码签名", "签名 profile、签名算法、有效期和签名权限。", "AWS Signer"],
+            ["客户端加密 SDK", "commitment policy、keyring、字段加密动作和搜索加密泄露面。", "AWS Encryption SDK、Database Encryption SDK、S3 Encryption Client"],
+            ["支付密码", "支付密钥属性、PIN/CVV/MAC/data 操作和密钥导入导出。", "AWS Payment Cryptography"],
+          ],
+          fieldHeaders: ["字段", "含义", "说明"],
+          fieldRows: [
+            ["Service", "AWS 服务名称", "服务展示名称。"],
+            ["Service_Group", "密码学维度", "看板中的密码学分组。"],
+            ["Crypto_Category", "密码学类别", "更细的协议、密钥、证书或 SDK 分类。"],
+            ["Configurable_Status", "配置可控性", "该密码学控制是否由客户直接配置。"],
+            ["Configuration_Item", "配置项", "被评估的设置、策略、API 参数或 SDK 选项。"],
+            ["API_Endpoint", "API / 端点", "配置项所在的 API、CLI、SDK 或配置入口。"],
+            ["Recommended_Values", "推荐值", "推荐值或控制方向。"],
+            ["Risky_Values", "风险值", "应避免、整改或作为兼容例外说明的值。"],
+          ],
+          standardRows: [
+            ["风险值判断", "启用废弃协议、弱 cipher、缺少前向保密、错误密钥用途、不受控密钥导出或模糊加密边界的值，会被视为风险值。"],
+            ["推荐值判断", "推荐值优先考虑 TLS 1.2/1.3、AEAD 与前向保密、DNSSEC 信任链、最小权限密钥用途、证书生命周期治理和新版 SDK 密码学基线。"],
+            ["不可配置服务", "N/A 不代表没有安全关注点，而是该服务没有直接密码学配置字段，需要通过相邻服务和架构控制落实。"],
+          ],
+        },
+      };
+    </script>
     <script src="./app.js"></script>
   </body>
 </html>

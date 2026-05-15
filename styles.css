@@ -58,9 +58,48 @@ input {
   font-weight: 760;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
 .nav {
   display: flex;
   gap: 8px;
+}
+
+.language-switcher {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.language-switcher button,
+.language-switcher a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 720;
+}
+
+.language-switcher button.active,
+.language-switcher button:hover,
+.language-switcher a.active,
+.language-switcher a:hover {
+  background: var(--surface-strong);
+  color: var(--accent);
 }
 
 .nav a,
@@ -598,6 +637,22 @@ h3 {
   background: var(--surface);
 }
 
+.detail-header .kpi {
+  min-height: 84px;
+  padding: 14px;
+}
+
+.detail-header .kpi span {
+  margin-top: 0;
+  font-size: 12px;
+}
+
+.detail-header .kpi strong {
+  margin-top: 8px;
+  font-size: 17px;
+  line-height: 1.28;
+}
+
 .risk-focus,
 .analysis-table-wrap,
 .info-band,
@@ -813,6 +868,17 @@ details .panel {
     align-items: flex-start;
     flex-direction: column;
     padding: 14px 18px;
+  }
+
+  .topbar-actions {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .nav {
+    flex-wrap: wrap;
   }
 
   .app {

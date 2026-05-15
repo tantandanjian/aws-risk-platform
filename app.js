@@ -1,108 +1,31 @@
+const pageSize = 9;
+const collapsedFilterLimit = 6;
+const config = window.APP_CONFIG;
+
 const state = {
   services: [],
   items: [],
   riskTypes: [],
-  activeAwsCategory: "\u5168\u90e8",
-  activeGroup: "\u5168\u90e8",
-  activeStatus: "\u5168\u90e8",
+  activeAwsCategory: "all",
+  activeGroup: "all",
+  activeStatus: "all",
   query: "",
   page: 1,
   expandedFilters: {},
 };
 
-const pageSize = 9;
-const collapsedFilterLimit = 6;
-
-const awsCategories = [
-  "\u5168\u90e8",
-  "Networking & Content Delivery",
-  "Cryptography & PKI",
-  "Security, Identity, & Compliance",
-];
-
-const cryptoGroups = [
-  "\u5168\u90e8",
-  "TLS / \u5b89\u5168\u7b56\u7565",
-  "DNSSEC / \u5b8c\u6574\u6027",
-  "\u7f51\u7edc\u8fde\u63a5\u5b89\u5168",
-  "VPN",
-  "\u5bc6\u94a5\u7ba1\u7406",
-  "HSM / \u786c\u4ef6\u5bc6\u7801\u6a21\u5757",
-  "\u8bc1\u4e66\u7ba1\u7406",
-  "\u4ee3\u7801\u7b7e\u540d",
-  "\u5ba2\u6237\u7aef\u52a0\u5bc6 SDK",
-  "\u652f\u4ed8\u5bc6\u7801",
-];
-
-const statuses = [
-  "\u5168\u90e8",
-  "\u53ef\u914d\u7f6e",
-  "\u90e8\u5206\u53ef\u914d\u7f6e",
-  "\u4e0d\u53ef\u914d\u7f6e",
-];
-
-const groupGuide = [
-  ["TLS / 安全策略", "涉及 TLS 版本、安全策略、HTTPS listener、Viewer TLS policy 等配置", "CloudFront、ALB、NLB、VPC Lattice"],
-  ["DNSSEC / 完整性", "涉及 DNS 响应完整性保护", "Route 53"],
-  ["密钥管理", "涉及云端密钥创建、用途、规格、轮换和来源", "KMS、Secrets Manager"],
-  ["HSM / 密码机制", "涉及 HSM、PKCS#11、JCE、CNG 等密码机制", "CloudHSM"],
-  ["证书管理", "涉及证书申请、导入、验证、续期和绑定", "ACM、Private CA"],
-  ["数字签名", "涉及代码签名、签名 profile 和签名权限", "AWS Signer"],
-  ["客户端加密 SDK", "涉及本地加密、keyring、algorithm suite、commitment policy", "AWS Encryption SDK、Database Encryption SDK、S3 Encryption Client"],
-  ["支付密码", "涉及支付场景下的密钥、PIN、CVV、TR-31/TR-34 等密码能力", "AWS Payment Cryptography"],
-  ["VPN / IPsec", "涉及 IKE、IPsec、Phase 1/2 加密与完整性算法、DH 组", "AWS Site-to-Site VPN"],
-  ["不可直接配置", "服务本身不暴露直接密码配置入口", "VPC、PrivateLink、Cloud Map"],
-];
-
-const fieldGuide = [
-  ["Service", "服务名称", "AWS 服务名称"],
-  ["Service_Group", "服务组", "页面中用于组织服务的分类"],
-  ["Crypto_Category", "密码类别", "该服务涉及的密码机制类型"],
-  ["Configurable_Status", "配置可控性", "用户是否能直接配置密码相关参数"],
-  ["Configuration_Item", "配置项", "具体的密码相关配置参数"],
-  ["API_Endpoint", "API / 参数", "对应 API、CLI、SDK 或配置字段"],
-  ["Recommended_Values", "推荐值", "推荐采用的安全配置"],
-  ["Risky_Values", "风险值", "不推荐或存在风险的配置"],
-  ["Risk_Reason", "风险原因", "为什么该配置存在风险"],
-  ["Security_Value_Reason", "安全原因", "为什么推荐该安全配置"],
-  ["References", "参考文档", "官方文档或标准依据"],
-];
-
-const standards = [
-  ["风险值判断标准", "协议过旧、安全策略过旧、密码套件过旧、证书管理不当、DNS 完整性保护缺失、密钥用途不匹配、生命周期管理不足、SDK 策略不当、上下文绑定不足、搜索加密泄露面过大。"],
-  ["安全值判断标准", "使用现代 TLS 策略、有效证书、DNSSEC 完整性保护、合理 KeySpec / KeyUsage、密钥轮换、推荐 SDK 策略、业务语义明确的 encryption context，并控制可搜索加密泄露面。"],
-  ["不可直接配置判断", "不将 N/A 直接视为风险值；这类服务应通过上层服务、应用层或关联资源配置 TLS、证书、加密算法、密钥管理和访问控制。"],
-];
-
-async function loadData() {
-  const [services, items, riskTypes] = await Promise.all([
-    fetch("./data/new_services.json").then((res) => res.json()),
-    fetch("./data/new_config_items.json").then((res) => res.json()),
-    fetch("./data/new_risk_types.json").then((res) => res.json()),
-  ]);
-  state.services = services;
-  state.items = items;
-  state.riskTypes = riskTypes;
-}
-
 function $(selector, root = document) {
   return root.querySelector(selector);
 }
 
-function normalizeChrome() {
-  document.title = "AWS Cryptography Risk Platform";
-  const brand = $(".brand");
-  if (brand) brand.textContent = "AWS Cryptography Risk Platform";
+function label(key, ...args) {
+  const value = config.labels[key];
+  return typeof value === "function" ? value(...args) : value;
+}
 
-  const nav = $(".nav");
-  if (nav) {
-    nav.setAttribute("aria-label", "Navigation");
-    nav.innerHTML = `
-      <a href="#/" data-nav="cover">\u9996\u9875</a>
-      <a href="#/dashboard" data-nav="dashboard">\u98ce\u9669\u770b\u677f</a>
-      <a href="#/risk-types" data-nav="risk-types">\u98ce\u9669\u7c7b\u578b\u8bf4\u660e</a>
-    `;
-  }
+function compact(value, fallback = "N/A") {
+  const text = String(value ?? "").trim();
+  return text || fallback;
 }
 
 function escapeHtml(value) {
@@ -114,48 +37,39 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
-function compact(value, fallback = "N/A") {
-  const text = String(value ?? "").trim();
-  return text || fallback;
+function findOption(options, value) {
+  return options.find((option) => option.value === value);
+}
+
+function optionLabel(options, value) {
+  return findOption(options, value)?.label || value;
+}
+
+function serviceGroupLabel(value) {
+  return optionLabel(config.filters.cryptoGroups, value);
+}
+
+function serviceStatusLabel(value) {
+  return optionLabel(config.filters.statuses, value);
 }
 
 function displayAwsCategory(service) {
-  const serviceGroup = compact(service.service_group, "");
-  const serviceId = compact(service.service_id, "");
-  if (
-    serviceGroup.includes("\u5bc6\u94a5") ||
-    serviceGroup.includes("HSM") ||
-    serviceGroup.includes("\u5ba2\u6237\u7aef\u52a0\u5bc6") ||
-    serviceId.includes("encryption-sdk") ||
-    serviceId.includes("encryption-client") ||
-    serviceId === "kms" ||
-    serviceId === "cloudhsm"
-  ) {
-    return "Cryptography & PKI";
-  }
-  if (
-    serviceId === "signer" ||
-    serviceId === "acm" ||
-    serviceId === "payment-cryptography" ||
-    serviceGroup.includes("\u8bc1\u4e66") ||
-    serviceGroup.includes("\u652f\u4ed8\u5bc6\u7801")
-  ) {
-    return "Security, Identity, & Compliance";
-  }
-  return compact(service.aws_category, "Security, Identity, & Compliance");
+  if (service.display_aws_category) return service.display_aws_category;
+  const id = compact(service.service_id, "");
+  return config.categoryOverrides?.[id] || compact(service.aws_category);
 }
 
 function splitParts(value) {
   return compact(value, "")
-    .split(/;|；|\n/)   // 移除了 \/，斜杠现在被视为普通字符
+    .split(/;|\n|；/)
     .map((part) => part.trim())
     .filter(Boolean)
-    .slice(0, 6);
+    .slice(0, 8);
 }
 
 function statusClass(status) {
-  if (status.includes("不可")) return "none";
-  if (status.includes("部分")) return "partial";
+  if (status === "not_configurable" || status === "不可配置") return "none";
+  if (status === "partially_configurable" || status === "部分可配置") return "partial";
   return "";
 }
 
@@ -163,10 +77,24 @@ function riskLevelClass(level) {
   if (level === "high") return "high";
   if (level === "medium") return "medium";
   if (level === "low") return "low";
-  if (level === "高") return "high";
-  if (level === "中") return "medium";
-  if (level === "低") return "low";
   return "info";
+}
+
+function updateChrome() {
+  document.documentElement.lang = config.lang;
+  document.title = config.title;
+  $(".brand").textContent = config.title;
+  $(".nav").innerHTML = `
+    <a href="#/" data-nav="cover">${escapeHtml(label("navCover"))}</a>
+    <a href="#/dashboard" data-nav="dashboard">${escapeHtml(label("navDashboard"))}</a>
+    <a href="#/risk-types" data-nav="risk-types">${escapeHtml(label("navRiskTypes"))}</a>
+  `;
+  document.querySelectorAll("[data-lang-page]").forEach((link) => {
+    link.classList.toggle("active", link.dataset.langPage === config.langKey);
+    if (config.languagePages?.[link.dataset.langPage]) {
+      link.href = `${config.languagePages[link.dataset.langPage]}${location.hash || ""}`;
+    }
+  });
 }
 
 function setActiveNav(route) {
@@ -175,18 +103,21 @@ function setActiveNav(route) {
   });
 }
 
-function renderFilterOptions(container, options, config) {
-  const expanded = Boolean(state.expandedFilters[config.key]);
+function renderFilterOptions(container, options, settings) {
+  const expanded = Boolean(state.expandedFilters[settings.key]);
   const shouldCollapse = options.length > collapsedFilterLimit;
   let visibleOptions = shouldCollapse && !expanded ? options.slice(0, collapsedFilterLimit) : options;
-  const activeValue = config.activeValue?.();
-  if (shouldCollapse && !expanded && activeValue && !visibleOptions.includes(activeValue) && options.includes(activeValue)) {
-    visibleOptions = [...visibleOptions, activeValue];
+  const activeValue = settings.activeValue?.();
+  if (shouldCollapse && !expanded && activeValue && !visibleOptions.some((option) => option.value === activeValue)) {
+    const activeOption = findOption(options, activeValue);
+    if (activeOption) visibleOptions = [...visibleOptions, activeOption];
   }
   const hiddenCount = options.length - visibleOptions.length;
   container.innerHTML = `
-    ${visibleOptions.map((option) => `<button class="chip" type="button" ${config.attribute}="${escapeHtml(option)}">${escapeHtml(option)}</button>`).join("")}
-    ${shouldCollapse ? `<button class="chip chip-toggle" type="button" data-filter-toggle="${config.key}" aria-expanded="${expanded}">${expanded ? "\u6536\u8d77" : `\u5c55\u5f00 ${hiddenCount}`}</button>` : ""}
+    ${visibleOptions
+      .map((option) => `<button class="chip" type="button" ${settings.attribute}="${escapeHtml(option.value)}">${escapeHtml(option.label)}</button>`)
+      .join("")}
+    ${shouldCollapse ? `<button class="chip chip-toggle" type="button" data-filter-toggle="${settings.key}" aria-expanded="${expanded}">${expanded ? escapeHtml(label("showLess")) : escapeHtml(label("showMore", hiddenCount))}</button>` : ""}
   `;
 }
 
@@ -205,114 +136,115 @@ function render() {
 
 function renderCover() {
   setActiveNav("cover");
-  const app = $("#app");
-  app.innerHTML = $("#cover-template").innerHTML;
-
-  $("[data-cover-count='services']").textContent = state.services.length;
-  $("[data-cover-count='items']").textContent = state.items.length;
-  $("[data-cover-count='groups']").textContent = new Set(state.services.map(displayAwsCategory)).size;
-  const coverLabels = document.querySelectorAll(".cover-stats span");
-  ["\u8986\u76d6\u670d\u52a1", "\u914d\u7f6e\u9879", "AWS \u5b98\u65b9\u5206\u7c7b"].forEach((label, index) => {
-    if (coverLabels[index]) coverLabels[index].textContent = label;
-  });
+  $("#app").innerHTML = `
+    <section class="cover-page">
+      <div class="cover-panel">
+        <p class="eyebrow">${escapeHtml(label("coverEyebrow"))}</p>
+        <h1>${escapeHtml(label("coverTitle"))}</h1>
+        <p class="cover-copy">${escapeHtml(label("coverCopy"))}</p>
+        <div class="cover-actions">
+          <a class="primary-button" href="#/dashboard">${escapeHtml(label("enterDashboard"))}</a>
+          <a class="secondary-link" href="#/risk-types">${escapeHtml(label("viewRiskTypes"))}</a>
+        </div>
+      </div>
+      <div class="cover-visual" aria-label="${escapeHtml(label("coverGraphicLabel"))}">
+        <div class="risk-orbit">
+          <span class="node node-main">AWS</span>
+          <span class="node node-a">TLS</span>
+          <span class="node node-b">KMS</span>
+          <span class="node node-c">HSM</span>
+          <span class="node node-d">SDK</span>
+        </div>
+      </div>
+    </section>
+    <section class="cover-stats" aria-label="${escapeHtml(label("platformSummaryLabel"))}">
+      ${renderStat(state.services.length, label("servicesCovered"))}
+      ${renderStat(state.items.length, label("configItems"))}
+      ${renderStat(new Set(state.services.map(displayAwsCategory)).size, label("officialCategories"))}
+    </section>
+  `;
 }
 
-function normalizeDashboardLabels() {
-  const heroTitle = $(".hero h1");
-  if (heroTitle) heroTitle.textContent = "\u6309 AWS \u5b98\u65b9\u5206\u7c7b\u7ec4\u7ec7\u7684\u5bc6\u7801\u5b66\u914d\u7f6e\u98ce\u9669\u770b\u677f";
-  const heroCopy = $(".hero-copy");
-  if (heroCopy) {
-    heroCopy.textContent = "\u4ee5 Networking & Content Delivery\u3001Cryptography & PKI\u3001Security, Identity, & Compliance \u4f5c\u4e3a\u4e00\u7ea7\u670d\u52a1\u5206\u7c7b\uff0c\u540c\u65f6\u4fdd\u7559 TLS\u3001DNSSEC\u3001\u5bc6\u94a5\u7ba1\u7406\u3001HSM\u3001\u8bc1\u4e66\u548c\u5ba2\u6237\u7aef\u52a0\u5bc6 SDK \u7b49\u5bc6\u7801\u5b66\u7ef4\u5ea6\u3002";
-  }
-
-  const metricLabels = document.querySelectorAll(".hero-metrics span");
-  ["\u670d\u52a1", "\u914d\u7f6e\u9879", "AWS \u5b98\u65b9\u5206\u7c7b"].forEach((label, index) => {
-    if (metricLabels[index]) metricLabels[index].textContent = label;
-  });
-
-  const filterLabels = document.querySelectorAll(".filter-label");
-  if (filterLabels[0]) filterLabels[0].textContent = "AWS \u670d\u52a1\u5206\u7c7b";
-  if (filterLabels[1]) filterLabels[1].textContent = "\u914d\u7f6e\u53ef\u63a7\u6027";
-
-  const groupBlock = $("#group-filters")?.closest(".filter-block");
-  if (groupBlock && !$("#crypto-filters")) {
-    const cryptoBlock = document.createElement("div");
-    cryptoBlock.className = "filter-block";
-    cryptoBlock.innerHTML = `
-      <span class="filter-label">\u5bc6\u7801\u5b66\u7ef4\u5ea6</span>
-      <div id="crypto-filters" class="chips" role="list"></div>
-    `;
-    groupBlock.insertAdjacentElement("afterend", cryptoBlock);
-  }
-
-  const searchLabel = $(".search-box span");
-  if (searchLabel) searchLabel.textContent = "\u641c\u7d22\u670d\u52a1 / \u5bc6\u7801\u7ef4\u5ea6";
-  const searchInput = $("#search-input");
-  if (searchInput) searchInput.placeholder = "\u8f93\u5165 CloudFront\u3001ACM\u3001TLS\u3001KMS\u3001\u5ba2\u6237\u7aef\u52a0\u5bc6 SDK...";
-
-  const sectionTitle = $(".section-head h2");
-  if (sectionTitle) sectionTitle.textContent = "\u670d\u52a1\u98ce\u9669\u603b\u89c8";
+function renderStat(value, title) {
+  return `<div><strong>${escapeHtml(value)}</strong><span>${escapeHtml(title)}</span></div>`;
 }
 
 function renderHome() {
   setActiveNav("dashboard");
-  const app = $("#app");
-  app.innerHTML = $("#home-template").innerHTML;
-  normalizeDashboardLabels();
+  $("#app").innerHTML = `
+    <section class="hero">
+      <div>
+        <p class="eyebrow">${escapeHtml(label("coverEyebrow"))}</p>
+        <h1>${escapeHtml(label("dashboardTitle"))}</h1>
+        <p class="hero-copy">${escapeHtml(label("dashboardCopy"))}</p>
+      </div>
+      <div class="hero-metrics" aria-label="${escapeHtml(label("platformMetricsLabel"))}">
+        ${renderStat(state.services.length, label("services"))}
+        ${renderStat(state.items.length, label("configItems"))}
+        ${renderStat(new Set(state.services.map(displayAwsCategory)).size, label("officialCategories"))}
+      </div>
+    </section>
+    <section class="filters" aria-label="${escapeHtml(label("serviceFiltersLabel"))}">
+      <label class="search-box">
+        <span>${escapeHtml(label("searchLabel"))}</span>
+        <input id="search-input" type="search" placeholder="${escapeHtml(label("searchPlaceholder"))}" autocomplete="off" />
+      </label>
+      <div class="filter-block">
+        <span class="filter-label">${escapeHtml(label("awsServiceCategory"))}</span>
+        <div id="group-filters" class="chips" role="list"></div>
+      </div>
+      <div class="filter-block">
+        <span class="filter-label">${escapeHtml(label("cryptoDimension"))}</span>
+        <div id="crypto-filters" class="chips" role="list"></div>
+      </div>
+      <div class="filter-block">
+        <span class="filter-label">${escapeHtml(label("controllability"))}</span>
+        <div id="status-filters" class="chips" role="list"></div>
+      </div>
+    </section>
+    <section class="section-head">
+      <div>
+        <h2>${escapeHtml(label("serviceOverview"))}</h2>
+        <p id="result-summary"></p>
+      </div>
+      <a class="secondary-link" href="#/risk-types">${escapeHtml(label("viewRiskTypes"))}</a>
+    </section>
+    <section id="service-grid" class="service-grid" aria-label="${escapeHtml(label("serviceCardsLabel"))}"></section>
+  `;
 
-  $("[data-count='services']").textContent = state.services.length;
-  $("[data-count='items']").textContent = state.items.length;
-  $("[data-count='groups']").textContent = new Set(state.services.map(displayAwsCategory)).size;
+  wireHomeFilters();
+  updateHomeResults();
+}
 
-  const filterWrap = $("#group-filters");
-  renderFilterOptions(filterWrap, awsCategories, { key: "awsCategory", attribute: "data-aws-category", activeValue: () => state.activeAwsCategory });
-  filterWrap.addEventListener("click", (event) => {
-    const toggle = event.target.closest("[data-filter-toggle]");
-    if (toggle) {
-      state.expandedFilters[toggle.dataset.filterToggle] = !state.expandedFilters[toggle.dataset.filterToggle];
-      renderFilterOptions(filterWrap, awsCategories, { key: "awsCategory", attribute: "data-aws-category", activeValue: () => state.activeAwsCategory });
-      updateHomeResults();
-      return;
-    }
-    const button = event.target.closest("[data-aws-category]");
-    if (!button) return;
-    state.activeAwsCategory = button.dataset.awsCategory;
-    state.page = 1;
-    updateHomeResults();
+function wireHomeFilters() {
+  const categoryWrap = $("#group-filters");
+  renderFilterOptions(categoryWrap, config.filters.awsCategories, {
+    key: "awsCategory",
+    attribute: "data-aws-category",
+    activeValue: () => state.activeAwsCategory,
+  });
+  categoryWrap.addEventListener("click", (event) => {
+    handleFilterClick(event, categoryWrap, config.filters.awsCategories, "awsCategory", "data-aws-category", "activeAwsCategory");
   });
 
   const cryptoWrap = $("#crypto-filters");
-  renderFilterOptions(cryptoWrap, cryptoGroups, { key: "cryptoGroup", attribute: "data-group", activeValue: () => state.activeGroup });
+  renderFilterOptions(cryptoWrap, config.filters.cryptoGroups, {
+    key: "cryptoGroup",
+    attribute: "data-group",
+    activeValue: () => state.activeGroup,
+  });
   cryptoWrap.addEventListener("click", (event) => {
-    const toggle = event.target.closest("[data-filter-toggle]");
-    if (toggle) {
-      state.expandedFilters[toggle.dataset.filterToggle] = !state.expandedFilters[toggle.dataset.filterToggle];
-      renderFilterOptions(cryptoWrap, cryptoGroups, { key: "cryptoGroup", attribute: "data-group", activeValue: () => state.activeGroup });
-      updateHomeResults();
-      return;
-    }
-    const button = event.target.closest("[data-group]");
-    if (!button) return;
-    state.activeGroup = button.dataset.group;
-    state.page = 1;
-    updateHomeResults();
+    handleFilterClick(event, cryptoWrap, config.filters.cryptoGroups, "cryptoGroup", "data-group", "activeGroup");
   });
 
   const statusWrap = $("#status-filters");
-  renderFilterOptions(statusWrap, statuses, { key: "status", attribute: "data-status", activeValue: () => state.activeStatus });
+  renderFilterOptions(statusWrap, config.filters.statuses, {
+    key: "status",
+    attribute: "data-status",
+    activeValue: () => state.activeStatus,
+  });
   statusWrap.addEventListener("click", (event) => {
-    const toggle = event.target.closest("[data-filter-toggle]");
-    if (toggle) {
-      state.expandedFilters[toggle.dataset.filterToggle] = !state.expandedFilters[toggle.dataset.filterToggle];
-      renderFilterOptions(statusWrap, statuses, { key: "status", attribute: "data-status", activeValue: () => state.activeStatus });
-      updateHomeResults();
-      return;
-    }
-    const button = event.target.closest("[data-status]");
-    if (!button) return;
-    state.activeStatus = button.dataset.status;
-    state.page = 1;
-    updateHomeResults();
+    handleFilterClick(event, statusWrap, config.filters.statuses, "status", "data-status", "activeStatus");
   });
 
   const input = $("#search-input");
@@ -322,7 +254,20 @@ function renderHome() {
     state.page = 1;
     updateHomeResults();
   });
+}
 
+function handleFilterClick(event, container, options, key, attribute, stateKey) {
+  const toggle = event.target.closest("[data-filter-toggle]");
+  if (toggle) {
+    state.expandedFilters[toggle.dataset.filterToggle] = !state.expandedFilters[toggle.dataset.filterToggle];
+    renderFilterOptions(container, options, { key, attribute, activeValue: () => state[stateKey] });
+    updateHomeResults();
+    return;
+  }
+  const button = event.target.closest(`[${attribute}]`);
+  if (!button) return;
+  state[stateKey] = button.getAttribute(attribute);
+  state.page = 1;
   updateHomeResults();
 }
 
@@ -340,20 +285,24 @@ function updateHomeResults() {
   const query = state.query.toLowerCase();
   const filtered = state.services.filter((service) => {
     const awsCategory = displayAwsCategory(service);
-    const awsCategoryMatches = state.activeAwsCategory === "\u5168\u90e8" || awsCategory === state.activeAwsCategory;
-    const groupMatches = state.activeGroup === "\u5168\u90e8" || service.service_group === state.activeGroup;
-    const statusMatches = state.activeStatus === "\u5168\u90e8" || service.configurable_status === state.activeStatus;
+    const awsCategoryMatches = state.activeAwsCategory === "all" || awsCategory === state.activeAwsCategory;
+    const groupMatches = state.activeGroup === "all" || service.service_group === state.activeGroup;
+    const statusMatches = state.activeStatus === "all" || service.configurable_status === state.activeStatus;
     const haystack = [
       service.service_id,
       service.service,
       awsCategory,
       service.aws_category,
       service.service_group,
+      serviceGroupLabel(service.service_group),
       service.crypto_category,
       service.configurable_status,
+      serviceStatusLabel(service.configurable_status),
       service.main_focus,
       service.typical_risks,
-    ].join(" ").toLowerCase();
+    ]
+      .join(" ")
+      .toLowerCase();
     return awsCategoryMatches && groupMatches && statusMatches && (!query || haystack.includes(query));
   });
 
@@ -362,10 +311,10 @@ function updateHomeResults() {
   const startIndex = (state.page - 1) * pageSize;
   const pageItems = filtered.slice(startIndex, startIndex + pageSize);
 
-  $("#result-summary").textContent = `\u5171 ${filtered.length} \u4e2a\u670d\u52a1\u5339\u914d\u5f53\u524d\u6761\u4ef6\uff0c\u5f53\u524d\u7b2c ${state.page} / ${totalPages} \u9875`;
+  $("#result-summary").textContent = label("matchingSummary", filtered.length, state.page, totalPages);
   const grid = $("#service-grid");
   if (!filtered.length) {
-    grid.innerHTML = `<div class="empty-state">\u6ca1\u6709\u5339\u914d\u7684\u670d\u52a1\u3002\u53ef\u4ee5\u6e05\u7a7a\u641c\u7d22\u8bcd\uff0c\u6216\u5207\u6362\u5230\u201c\u5168\u90e8\u201d\u5206\u7c7b\u3002</div>`;
+    grid.innerHTML = `<div class="empty-state">${escapeHtml(label("emptyResults"))}</div>`;
     renderPagination(0, 1);
     return;
   }
@@ -379,7 +328,7 @@ function renderPagination(totalItems, totalPages) {
     pagination = document.createElement("nav");
     pagination.id = "pagination";
     pagination.className = "pagination";
-    pagination.setAttribute("aria-label", "\u670d\u52a1\u5217\u8868\u5206\u9875");
+    pagination.setAttribute("aria-label", label("paginationLabel"));
     $("#service-grid").insertAdjacentElement("afterend", pagination);
     pagination.addEventListener("click", (event) => {
       const button = event.target.closest("[data-page]");
@@ -399,11 +348,11 @@ function renderPagination(totalItems, totalPages) {
   pagination.hidden = false;
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
   pagination.innerHTML = `
-    <button type="button" data-page="${state.page - 1}" ${state.page === 1 ? "disabled" : ""}>\u4e0a\u4e00\u9875</button>
+    <button type="button" data-page="${state.page - 1}" ${state.page === 1 ? "disabled" : ""}>${escapeHtml(label("previous"))}</button>
     <div class="pagination-pages">
       ${pages.map((page) => `<button type="button" data-page="${page}" class="${page === state.page ? "active" : ""}" aria-current="${page === state.page ? "page" : "false"}">${page}</button>`).join("")}
     </div>
-    <button type="button" data-page="${state.page + 1}" ${state.page === totalPages ? "disabled" : ""}>\u4e0b\u4e00\u9875</button>
+    <button type="button" data-page="${state.page + 1}" ${state.page === totalPages ? "disabled" : ""}>${escapeHtml(label("next"))}</button>
   `;
 }
 
@@ -414,59 +363,56 @@ function renderServiceCard(service) {
     <article class="service-card">
       <div class="tag-row">
         <span class="tag official">${escapeHtml(awsCategory)}</span>
-        <span class="tag ${statusClass(status)}">${escapeHtml(status)}</span>
-        <span class="tag">${escapeHtml(service.service_group)}</span>
+        <span class="tag ${statusClass(status)}">${escapeHtml(serviceStatusLabel(status))}</span>
+        <span class="tag">${escapeHtml(serviceGroupLabel(service.service_group))}</span>
       </div>
       <h3>${escapeHtml(service.service)}</h3>
       <dl class="meta-list">
-        <div><dt>\u5bc6\u7801\u7ef4\u5ea6</dt><dd>${escapeHtml(service.service_group)}</dd></div>
-        <div><dt>\u5bc6\u7801\u7c7b\u522b</dt><dd>${escapeHtml(service.crypto_category)}</dd></div>
-        <div><dt>\u4e3b\u8981\u5173\u6ce8</dt><dd>${escapeHtml(service.main_focus)}</dd></div>
+        <div><dt>${escapeHtml(label("cryptoDimension"))}</dt><dd>${escapeHtml(serviceGroupLabel(service.service_group))}</dd></div>
+        <div><dt>${escapeHtml(label("cryptoCategory"))}</dt><dd>${escapeHtml(service.crypto_category)}</dd></div>
+        <div><dt>${escapeHtml(label("mainFocus"))}</dt><dd>${escapeHtml(service.main_focus)}</dd></div>
       </dl>
       <div class="card-actions">
-        <a class="primary-button" href="${escapeHtml(service.detail_path)}">\u67e5\u770b\u8be6\u60c5</a>
+        <a class="primary-button" href="${escapeHtml(service.detail_path)}">${escapeHtml(label("viewDetails"))}</a>
       </div>
     </article>
   `;
 }
+
 function renderDetail(serviceId) {
   setActiveNav("dashboard");
-  const app = $("#app");
-  app.innerHTML = $("#detail-template").innerHTML;
-  const backLink = $(".back-link");
-  if (backLink) {
-    backLink.href = "#/dashboard";
-    backLink.textContent = "\u8fd4\u56de\u98ce\u9669\u770b\u677f";
-  }
   const service = state.services.find((item) => item.service_id === serviceId);
   const serviceItems = state.items.filter((item) => item.service_id === serviceId);
 
   if (!service) {
-    $("#service-detail").innerHTML = `<div class="empty-state">\u672a\u627e\u5230 service_id \u4e3a ${escapeHtml(serviceId)} \u7684\u670d\u52a1\u3002<a class="detail-link" href="#/dashboard">\u8fd4\u56de\u98ce\u9669\u770b\u677f</a></div>`;
+    $("#app").innerHTML = `<div class="empty-state">${escapeHtml(label("serviceNotFound", serviceId))} <a class="detail-link" href="#/dashboard">${escapeHtml(label("backDashboard"))}</a></div>`;
     return;
   }
 
   const awsCategory = displayAwsCategory(service);
   const riskFocus = splitParts(service.typical_risks).map((risk) => `<li>${escapeHtml(risk)}</li>`).join("");
-  $("#service-detail").innerHTML = `
-    <div class="detail-header">
-      <p class="eyebrow">${escapeHtml(awsCategory)}</p>
-      <h1>${escapeHtml(service.service)}</h1>
-      <p class="detail-intro">${escapeHtml(service.service_intro)}</p>
-      <div class="info-grid">
-        ${renderKpi("AWS \u670d\u52a1\u5206\u7c7b", awsCategory)}
-        ${renderKpi("\u5bc6\u7801\u5b66\u7ef4\u5ea6", service.service_group)}
-        ${renderKpi("\u5bc6\u7801\u7c7b\u522b", service.crypto_category)}
-        ${renderKpi("\u914d\u7f6e\u53ef\u63a7\u6027", service.configurable_status)}
-        ${renderKpi("\u914d\u7f6e\u9879", `${serviceItems.length}`)}
+  $("#app").innerHTML = `
+    <a class="back-link" href="#/dashboard">${escapeHtml(label("backDashboard"))}</a>
+    <section id="service-detail" class="detail">
+      <div class="detail-header">
+        <p class="eyebrow">${escapeHtml(awsCategory)}</p>
+        <h1>${escapeHtml(service.service)}</h1>
+        <p class="detail-intro">${escapeHtml(service.service_intro)}</p>
+        <div class="info-grid">
+          ${renderKpi(label("awsCategory"), awsCategory)}
+          ${renderKpi(label("cryptoDimension"), serviceGroupLabel(service.service_group))}
+          ${renderKpi(label("cryptoCategory"), service.crypto_category)}
+          ${renderKpi(label("controllability"), serviceStatusLabel(service.configurable_status))}
+          ${renderKpi(label("configurationItems"), `${serviceItems.length}`)}
+        </div>
       </div>
-    </div>
-    <section class="risk-focus">
-      <h2>\u4e3b\u8981\u98ce\u9669\u5173\u6ce8\u70b9</h2>
-      <ul>${riskFocus || "<li>\u8be5\u670d\u52a1\u6682\u65e0\u914d\u7f6e\u9879\u98ce\u9669\uff0c\u5c5e\u4e8e\u8bf4\u660e\u6027\u5c55\u793a\u3002</li>"}</ul>
-    </section>
-    <section class="analysis-table-wrap">
-      ${renderItemsTable(serviceItems)}
+      <section class="risk-focus">
+        <h2>${escapeHtml(label("riskFocus"))}</h2>
+        <ul>${riskFocus || `<li>${escapeHtml(label("noConfigRisk"))}</li>`}</ul>
+      </section>
+      <section class="analysis-table-wrap">
+        ${renderItemsTable(serviceItems)}
+      </section>
     </section>
   `;
 
@@ -476,13 +422,14 @@ function renderDetail(serviceId) {
     const row = document.getElementById(button.dataset.expand);
     const expanded = row.hidden;
     row.hidden = !expanded;
-    button.textContent = expanded ? "\u6536\u8d77" : "\u5c55\u5f00";
+    button.textContent = expanded ? label("collapse") : label("expand");
   });
 }
-function renderKpi(label, value) {
+
+function renderKpi(title, value) {
   return `
     <div class="kpi">
-      <span>${escapeHtml(label)}</span>
+      <span>${escapeHtml(title)}</span>
       <strong>${escapeHtml(compact(value))}</strong>
     </div>
   `;
@@ -490,7 +437,7 @@ function renderKpi(label, value) {
 
 function renderItemsTable(items) {
   if (!items.length) {
-    return `<div class="empty-state">该服务本身不暴露直接密码套件、TLS policy 或算法选择入口。请在上层服务或应用层查看 TLS、证书、加密算法、密钥管理和访问控制配置。</div>`;
+    return `<div class="empty-state">${escapeHtml(label("noItems"))}</div>`;
   }
 
   const rows = items
@@ -502,19 +449,19 @@ function renderItemsTable(items) {
           <td>${escapeHtml(item.api_endpoint)}</td>
           <td>${escapeHtml(item.recommended_values)}</td>
           <td>${escapeHtml(item.risky_values)}</td>
-          <td><span class="tag ${riskLevelClass(item.risk_level)}">${escapeHtml(item.risk_level)}</span></td>
+          <td><span class="tag ${riskLevelClass(item.risk_level)}">${escapeHtml(label(`riskLevel_${item.risk_level}`) || item.risk_level)}</span></td>
           <td>${renderReference(item.references)}</td>
-          <td><button class="expand-button" type="button" data-expand="${detailId}">展开</button></td>
+          <td><button class="expand-button" type="button" data-expand="${detailId}">${escapeHtml(label("expand"))}</button></td>
         </tr>
         <tr id="${detailId}" class="detail-row" hidden>
           <td colspan="7">
             <div class="reason-grid">
               <div>
-                <h4>风险原因</h4>
+                <h4>${escapeHtml(label("riskReason"))}</h4>
                 <p>${escapeHtml(item.risk_reason)}</p>
               </div>
               <div>
-                <h4>安全原因</h4>
+                <h4>${escapeHtml(label("securityValueReason"))}</h4>
                 <p>${escapeHtml(item.security_value_reason)}</p>
               </div>
             </div>
@@ -537,13 +484,13 @@ function renderItemsTable(items) {
       </colgroup>
       <thead>
         <tr>
-          <th>配置项</th>
-          <th>API / 参数</th>
-          <th>推荐值</th>
-          <th>风险值</th>
-          <th>风险等级</th>
-          <th>参考文档</th>
-          <th>详情</th>
+          <th>${escapeHtml(label("configurationItem"))}</th>
+          <th>${escapeHtml(label("apiEndpoint"))}</th>
+          <th>${escapeHtml(label("recommendedValues"))}</th>
+          <th>${escapeHtml(label("riskyValues"))}</th>
+          <th>${escapeHtml(label("riskLevel"))}</th>
+          <th>${escapeHtml(label("references"))}</th>
+          <th>${escapeHtml(label("action"))}</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
@@ -552,33 +499,48 @@ function renderItemsTable(items) {
 }
 
 function renderReference(value) {
-  const text = compact(value, "AWS 官方文档");
-  const firstUrl = text.match(/https?:\/\/[^\s;；)）]+/);
+  const text = compact(value, label("referenceLink"));
+  const firstUrl = text.match(/https?:\/\/[^\s;]+/);
   if (!firstUrl) return escapeHtml(text);
-  return `<a class="detail-link" href="${escapeHtml(firstUrl[0])}" target="_blank" rel="noreferrer">官方文档</a>`;
+  return `<a class="detail-link" href="${escapeHtml(firstUrl[0])}" target="_blank" rel="noreferrer">${escapeHtml(label("referenceLink"))}</a>`;
 }
 
 function renderRiskTypes() {
   setActiveNav("risk-types");
-  const app = $("#app");
-  app.innerHTML = $("#risk-template").innerHTML;
-  $("#risk-list").innerHTML = state.riskTypes
-    .map((risk) => `
-      <details>
-        <summary>${escapeHtml(risk.risk_type)}</summary>
-        <div class="panel">
-          <p>${escapeHtml(risk.risk_description)}</p>
-          <p><strong>涉及服务：</strong>${escapeHtml(risk.related_services)}</p>
-          <p><strong>典型风险值：</strong>${escapeHtml(risk.typical_risky_values)}</p>
-          <p><strong>推荐方向：</strong>${escapeHtml(risk.recommended_direction)}</p>
-        </div>
-      </details>
-    `)
-    .join("");
+  $("#app").innerHTML = `
+    <section class="page-title">
+      <p class="eyebrow">${escapeHtml(label("riskTaxonomyEyebrow"))}</p>
+      <h1>${escapeHtml(label("riskTaxonomyTitle"))}</h1>
+      <p>${escapeHtml(label("riskTaxonomyCopy"))}</p>
+    </section>
+    <section class="info-band important">
+      <h2>${escapeHtml(label("naTitle"))}</h2>
+      <p>${escapeHtml(label("naCopy"))}</p>
+    </section>
+    <section class="accordion-section">
+      <h2>${escapeHtml(label("riskTypeList"))}</h2>
+      <div id="risk-list" class="accordion-list"></div>
+    </section>
+    <section class="two-column">
+      <div>
+        <h2>${escapeHtml(label("groupGuide"))}</h2>
+        <div id="group-guide" class="compact-table"></div>
+      </div>
+      <div>
+        <h2>${escapeHtml(label("fieldGuide"))}</h2>
+        <div id="field-guide" class="compact-table"></div>
+      </div>
+    </section>
+    <section class="accordion-section">
+      <h2>${escapeHtml(label("standardGuide"))}</h2>
+      <div id="standard-list" class="accordion-list"></div>
+    </section>
+  `;
 
-  $("#group-guide").innerHTML = renderGuideTable(["服务组", "含义", "代表服务"], groupGuide);
-  $("#field-guide").innerHTML = renderGuideTable(["字段", "页面名称", "含义"], fieldGuide);
-  $("#standard-list").innerHTML = standards
+  $("#risk-list").innerHTML = state.riskTypes.map(renderRiskType).join("");
+  $("#group-guide").innerHTML = renderGuideTable(config.guides.groupHeaders, config.guides.groupRows);
+  $("#field-guide").innerHTML = renderGuideTable(config.guides.fieldHeaders, config.guides.fieldRows);
+  $("#standard-list").innerHTML = config.guides.standardRows
     .map(([title, body]) => `
       <details open>
         <summary>${escapeHtml(title)}</summary>
@@ -586,6 +548,20 @@ function renderRiskTypes() {
       </details>
     `)
     .join("");
+}
+
+function renderRiskType(risk) {
+  return `
+    <details>
+      <summary>${escapeHtml(risk.risk_type)}</summary>
+      <div class="panel">
+        <p>${escapeHtml(risk.risk_description)}</p>
+        <p><strong>${escapeHtml(label("relatedServices"))}</strong>${escapeHtml(risk.related_services)}</p>
+        <p><strong>${escapeHtml(label("typicalRiskyValues"))}</strong>${escapeHtml(risk.typical_risky_values)}</p>
+        <p><strong>${escapeHtml(label("recommendedDirection"))}</strong>${escapeHtml(risk.recommended_direction)}</p>
+      </div>
+    </details>
+  `;
 }
 
 function renderGuideTable(headers, rows) {
@@ -599,15 +575,27 @@ function renderGuideTable(headers, rows) {
   `;
 }
 
-normalizeChrome();
+async function loadData() {
+  const [services, items, riskTypes] = await Promise.all([
+    fetch(config.data.services).then((res) => res.json()),
+    fetch(config.data.items).then((res) => res.json()),
+    fetch(config.data.riskTypes).then((res) => res.json()),
+  ]);
+  state.services = services;
+  state.items = items;
+  state.riskTypes = riskTypes;
+}
+
+updateChrome();
 window.addEventListener("hashchange", render);
+window.addEventListener("hashchange", updateChrome);
 
 loadData()
   .then(render)
   .catch((error) => {
     $("#app").innerHTML = `
       <div class="empty-state">
-        数据加载失败。请通过本地 HTTP 服务打开本页面，而不是直接双击 HTML 文件。
+        ${escapeHtml(label("loadError"))}
         <pre>${escapeHtml(error.message)}</pre>
       </div>
     `;

@@ -1,0 +1,156 @@
+[
+  {
+    "risk_type": "legacy_protocol_or_policy",
+    "risk_description": "The configuration permits deprecated TLS/SSL protocols or legacy compatibility policies, such as SSLv3, TLS 1.0, TLS 1.1, ELBSecurityPolicy-2016-08, or ELBSecurityPolicy-2015-05.",
+    "related_services": "Amazon CloudFront; ALB; NLB",
+    "typical_risky_values": "SSLv3; TLSv1; TLSv1_2016; TLSv1.1_2016; ELBSecurityPolicy-2016-08; ELBSecurityPolicy-2015-05; TLS13-1-0/1-1 policy families",
+    "recommended_direction": "Use TLS 1.2/1.3 policies, preferably TLS13-1-2-Res-PQ-2025-09 for ELB or TLSv1.3_2025/TLSv1.2_2025 for CloudFront."
+  },
+  {
+    "risk_type": "weak_or_compatibility_cipher_profile",
+    "risk_description": "The policy supports one or more risky cipher profiles: no ECDHE or TLS_ marker, CBC mode, or SHA legacy naming. This is why policies such as TLS13-1-2-Ext2-FIPS and TLS13-1-2-Ext2-FIPS-PQ are placed in Risky_Values even though they are FIPS policies.",
+    "related_services": "Amazon CloudFront; ALB; NLB",
+    "typical_risky_values": "AES128-GCM-SHA256 without ECDHE/TLS_; AES128-SHA256; AES128-SHA; AES256-SHA256; AES256-SHA; ECDHE-*-AES*-SHA256; ECDHE-*-AES*-SHA; Ext/Ext0/Ext1/Ext2 policy families",
+    "recommended_direction": "Prefer AEAD and forward-secrecy focused policies: TLS 1.3-only, Res, PQ-Res, FIPS-Res, or FS-1-2-Res-2020-10."
+  },
+  {
+    "risk_type": "certificate_lifecycle_or_identity_mismatch",
+    "risk_description": "The TLS endpoint depends on an invalid, expired, mismatched, incomplete, or unsupported certificate configuration.",
+    "related_services": "Amazon CloudFront; ALB; NLB",
+    "typical_risky_values": "Expired certificate; domain mismatch; incomplete chain; unsupported IAM imported NLB certificate key size; missing trust store or CRL for mTLS verify",
+    "recommended_direction": "Prefer ACM-managed certificates, validate SAN/CN against the serving domain, and monitor renewal or replacement."
+  },
+  {
+    "risk_type": "in_transit_encryption_governance_gap",
+    "risk_description": "The VPC does not provide sufficient visibility or enforcement for in-transit encryption, or exemptions are unmanaged.",
+    "related_services": "Amazon VPC",
+    "typical_risky_values": "VPC Encryption Controls off; old Flow Logs without encryption-status; enforce without remediation; broad exclusions",
+    "recommended_direction": "Enable monitor mode first, add encryption-status to Flow Logs, remediate cleartext paths, then move to enforce mode where appropriate."
+  },
+  {
+    "risk_type": "dnssec_integrity_or_chain_of_trust_gap",
+    "risk_description": "DNSSEC signing, KSK/KMS configuration, DS chain of trust, or DNSSEC monitoring is missing or misconfigured.",
+    "related_services": "Amazon Route 53",
+    "typical_risky_values": "DNSSEC disabled; wrong KMS key spec/region/policy; KSK ACTION_NEEDED; missing or wrong DS record; missing DNSSEC CloudWatch alarms",
+    "recommended_direction": "Enable DNSSEC for critical public hosted zones, use KMS ECC_NIST_P256 in us-east-1, establish the DS chain, and configure DNSSEC alarms."
+  },
+  {
+    "risk_type": "vpn_ipsec_weak_crypto",
+    "risk_description": "Site-to-Site VPN permits weak or legacy IKE/IPsec options such as IKEv1, SHA1, low DH groups, or non-GCM encryption used as a long-term compatibility baseline.",
+    "related_services": "AWS Site-to-Site VPN",
+    "typical_risky_values": "ikev1; SHA1; DH group 2/5; AES128/AES256 non-GCM as long-term baseline",
+    "recommended_direction": "Prefer ikev2, AES-GCM, SHA2 integrity, and DH group 14+ with 19/20/21 where supported."
+  },
+  {
+    "risk_type": "vpn_authentication_secret_or_certificate_gap",
+    "risk_description": "VPN tunnel authentication uses unmanaged PSKs or certificates without clear storage, rotation, chain validation, or lifecycle controls.",
+    "related_services": "AWS Site-to-Site VPN",
+    "typical_risky_values": "Standard PSK storage without Secrets Manager; weak/shared PSK lifecycle; invalid certificate chain or X.509 extensions",
+    "recommended_direction": "Use Secrets Manager PSK storage or AWS Private CA certificate authentication with lifecycle and validation controls."
+  },
+  {
+    "risk_type": "vpn_tls_certificate_governance_gap",
+    "risk_description": "Client VPN uses managed TLS transport, but certificate lifecycle, client private-key distribution, CRL validity, or client authentication governance is weak.",
+    "related_services": "AWS Client VPN",
+    "typical_risky_values": "Expired certificate; RSA 1024-bit long-term baseline; expired CRL; shared client certificate/private key; missing mutual authentication where required",
+    "recommended_direction": "Use ACM server certificates, controlled client certificates, monitored CRLs, and TLS 1.2+ clients."
+  },
+  {
+    "risk_type": "service_discovery_encryption_boundary_gap",
+    "risk_description": "Service discovery is mistaken for an encryption boundary, or DNS/API/downstream service encryption controls are not implemented where needed.",
+    "related_services": "AWS Cloud Map",
+    "typical_risky_values": "Public namespace without DNSSEC governance where integrity is required; secrets in metadata; downstream endpoints without TLS",
+    "recommended_direction": "Treat Cloud Map as metadata/discovery and apply TLS/DNSSEC/downstream encryption controls separately."
+  },
+  {
+    "risk_type": "kms_key_spec_usage_mismatch",
+    "risk_description": "KMS KeySpec, KeyUsage, algorithm, or key type is mismatched with the cryptographic purpose or AWS service integration requirement.",
+    "related_services": "AWS KMS",
+    "typical_risky_values": "Asymmetric/HMAC key for AWS service encryption; RSAES_OAEP_SHA_1; HMAC_224; one key reused for incompatible purposes",
+    "recommended_direction": "Choose KeySpec and KeyUsage by purpose, using SYMMETRIC_DEFAULT for most AWS service encryption and ML-DSA only for PQ signing needs."
+  },
+  {
+    "risk_type": "kms_key_material_origin_or_residency_gap",
+    "risk_description": "KMS key material origin, custom key store, imported material, external key store, or multi-Region choice is not aligned with operational, availability, and residency requirements.",
+    "related_services": "AWS KMS",
+    "typical_risky_values": "Imported key material without lifecycle plan; custom/external key store without availability plan; multi-Region key where residency or blast-radius concerns apply",
+    "recommended_direction": "Use AWS_KMS origin by default and document controls for external/imported/custom or multi-Region choices."
+  },
+  {
+    "risk_type": "kms_rotation_policy_gap",
+    "risk_description": "KMS key rotation is missing or assumed to apply automatically to key types that require manual rotation.",
+    "related_services": "AWS KMS",
+    "typical_risky_values": "No rotation policy; assuming automatic rotation for asymmetric, HMAC, imported, or custom key store keys",
+    "recommended_direction": "Enable automatic rotation for eligible symmetric AWS_KMS keys and define manual rotation for other key types."
+  },
+  {
+    "risk_type": "kms_key_policy_governance_gap",
+    "risk_description": "KMS key policy or IAM policy permits overbroad administration/use or bypasses safety checks.",
+    "related_services": "AWS KMS",
+    "typical_risky_values": "BypassPolicyLockoutSafetyCheck=true; overly broad key administrators; no algorithm condition restrictions",
+    "recommended_direction": "Keep lockout safety enabled and use least privilege plus KMS condition keys."
+  },
+  {
+    "risk_type": "hsm_mode_or_mechanism_misconfiguration",
+    "risk_description": "CloudHSM cluster mode or cryptographic mechanism selection allows non-FIPS or legacy algorithms where the workload requires FIPS or modern cryptography.",
+    "related_services": "AWS CloudHSM",
+    "typical_risky_values": "non-FIPS cluster for regulated workload; DES3; SHA1; RSA-PKCS; AES-ECB",
+    "recommended_direction": "Choose cluster mode at creation based on compliance needs and prefer modern AEAD/SHA-2/OAEP/ECDSA/HMAC mechanisms."
+  },
+  {
+    "risk_type": "hsm_key_attribute_or_ownership_gap",
+    "risk_description": "HSM key attributes, extractability, wrapping permissions, or crypto user ownership are broader than the intended key purpose.",
+    "related_services": "AWS CloudHSM",
+    "typical_risky_values": "extractable sensitive keys; overbroad wrap/unwrap/sign/decrypt attributes; shared CU credentials",
+    "recommended_direction": "Use least-privilege key attributes, non-extractable sensitive keys, trusted wrapping keys, and controlled CU ownership."
+  },
+  {
+    "risk_type": "certificate_private_key_export_gap",
+    "risk_description": "Certificate private key material is exported or handled outside ACM without sufficient passphrase, inventory, storage, and revocation controls.",
+    "related_services": "AWS Certificate Manager",
+    "typical_risky_values": "unnecessary private key export; weak passphrase; passphrase in scripts/logs; no revocation plan",
+    "recommended_direction": "Keep certificates in ACM-integrated services where possible; protect passphrase and exported private keys when export is required."
+  },
+  {
+    "risk_type": "code_signing_algorithm_or_profile_gap",
+    "risk_description": "Code signing profile, platform algorithm, signature validity, or IAM permissions create weak or overbroad signing trust.",
+    "related_services": "AWS Signer",
+    "typical_risky_values": "SHA1-RSA platform as new baseline; overbroad StartSigningJob; excessive validity; no replacement process",
+    "recommended_direction": "Use modern ECDSA/SHA2 platforms, least-privilege signing profile access, and lifecycle controls."
+  },
+  {
+    "risk_type": "client_side_encryption_sdk_misconfiguration",
+    "risk_description": "Client-side encryption SDK configuration weakens key commitment, keyring boundaries, field-level cryptographic actions, beacon leakage, or wrapping key protection.",
+    "related_services": "AWS Crypto Tools",
+    "typical_risky_values": "no key commitment baseline; discovery keyring without filter; DO_NOTHING for sensitive fields; poorly designed beacons; legacy wrapping algorithms for new encryption",
+    "recommended_direction": "Use key commitment, scoped KMS keyrings, encrypt/sign field actions, planned beacon design, and current wrapping algorithms."
+  },
+  {
+    "risk_type": "payment_crypto_key_attribute_mismatch",
+    "risk_description": "Payment Cryptography key algorithm, key usage, or key modes of use are broader than the payment purpose or rely on weak legacy compatibility choices.",
+    "related_services": "AWS Payment Cryptography",
+    "typical_risky_values": "TDES_2KEY; NoRestrictions; one key reused for PIN/CVV/MAC/data encryption; all modes enabled unnecessarily",
+    "recommended_direction": "Use single-purpose key usage, least-privilege modes, and AES or TDES_3KEY where payment interoperability requires TDES."
+  },
+  {
+    "risk_type": "payment_crypto_key_exchange_or_export_gap",
+    "risk_description": "Payment key import/export uses weak or mismatched key exchange methods, exportability is broader than needed, or KEK lifecycle is unmanaged.",
+    "related_services": "AWS Payment Cryptography",
+    "typical_risky_values": "paper key components as steady state; RSA wrap when TR-34 is required; TR-31 legacy version use without migration; exportable working keys without need",
+    "recommended_direction": "Prefer TR-34/ECDH for KEK exchange, TR-31 for working keys, and document KEK rotation and export need."
+  },
+  {
+    "risk_type": "payment_crypto_operation_scope_gap",
+    "risk_description": "Payment cryptographic operations are not separated by payment function, environment, or IAM boundary.",
+    "related_services": "AWS Payment Cryptography",
+    "typical_risky_values": "same key for PIN/CVV/MAC/data encryption; test key in production; broad IAM data plane permissions",
+    "recommended_direction": "Separate keys, aliases, IAM permissions, and environments by operation family."
+  },
+  {
+    "risk_type": "payment_crypto_boundary_or_transport_gap",
+    "risk_description": "Payment Cryptography HSM and transport boundary assumptions are wrong, or API clients/metadata expose sensitive information.",
+    "related_services": "AWS Payment Cryptography",
+    "typical_risky_values": "assuming plaintext export; old TLS client; no PrivateLink where mandated; secrets in aliases/tags/free-form fields",
+    "recommended_direction": "Use modern TLS/PQ-capable clients where relevant, PrivateLink for private connectivity, and strict metadata hygiene."
+  }
+]

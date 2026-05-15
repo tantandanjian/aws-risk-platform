@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AWS Cryptography Risk Platform</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="#/">AWS Cryptography Risk Platform</a>
+      <div class="topbar-actions">
+        <nav class="nav" aria-label="Navigation"></nav>
+        <div class="language-switcher" role="group" aria-label="Language">
+          <a href="./index-en.html" data-lang-page="en">English</a>
+          <a href="./index.html" data-lang-page="zh">中文</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="app" class="app" aria-live="polite"></main>
+
+    <script>
+      window.APP_CONFIG = {
+        lang: "en",
+        langKey: "en",
+        title: "AWS Cryptography Risk Platform",
+        languagePages: {
+          en: "./index-en.html",
+          zh: "./index.html",
+        },
+        data: {
+          services: "./data/en_services.json",
+          items: "./data/en_config_items.json",
+          riskTypes: "./data/en_risk_types.json",
+        },
+        categoryOverrides: {
+          kms: "Cryptography & PKI",
+          cloudhsm: "Cryptography & PKI",
+          "aws-encryption-sdk": "Cryptography & PKI",
+          "aws-database-encryption-sdk": "Cryptography & PKI",
+          "s3-encryption-client": "Cryptography & PKI",
+          signer: "Security, Identity, & Compliance",
+          acm: "Security, Identity, & Compliance",
+          "payment-cryptography": "Security, Identity, & Compliance",
+        },
+        filters: {
+          awsCategories: [
+            { value: "all", label: "All" },
+            { value: "Networking & Content Delivery", label: "Networking & Content Delivery" },
+            { value: "Cryptography & PKI", label: "Cryptography & PKI" },
+            { value: "Security, Identity, & Compliance", label: "Security, Identity, & Compliance" },
+          ],
+          cryptoGroups: [
+            { value: "all", label: "All" },
+            { value: "TLS / Security Policy", label: "TLS / Security Policy" },
+            { value: "DNSSEC / Integrity", label: "DNSSEC / Integrity" },
+            { value: "Network Connectivity Security", label: "Network Connectivity Security" },
+            { value: "VPN", label: "VPN" },
+            { value: "Key Management", label: "Key Management" },
+            { value: "HSM / Hardware Security Module", label: "HSM / Hardware Security Module" },
+            { value: "Certificate Management", label: "Certificate Management" },
+            { value: "Code Signing", label: "Code Signing" },
+            { value: "Client-side Encryption SDK", label: "Client-side Encryption SDK" },
+            { value: "Payment Cryptography", label: "Payment Cryptography" },
+          ],
+          statuses: [
+            { value: "all", label: "All" },
+            { value: "configurable", label: "Configurable" },
+            { value: "partially_configurable", label: "Partially configurable" },
+            { value: "not_configurable", label: "Not configurable" },
+          ],
+        },
+        labels: {
+          navCover: "Home",
+          navDashboard: "Risk Dashboard",
+          navRiskTypes: "Risk Taxonomy",
+          coverEyebrow: "AWS Cryptography Configuration",
+          coverTitle: "AWS Cloud Service Cryptography Configuration Risk Platform",
+          coverCopy: "Explore TLS/HTTPS, DNSSEC, key management, HSM, certificates, code signing, client-side encryption SDKs, and payment cryptography risks across AWS services.",
+          enterDashboard: "Open Risk Dashboard",
+          viewRiskTypes: "View Risk Taxonomy",
+          servicesCovered: "Services covered",
+          configItems: "Configuration items",
+          officialCategories: "AWS categories",
+          dashboardTitle: "Cryptography configuration risks organized by AWS service category",
+          dashboardCopy: "Use AWS official categories as the primary grouping while preserving cryptography dimensions such as TLS, DNSSEC, key management, HSM, certificate lifecycle, code signing, and client-side encryption SDKs.",
+          services: "Services",
+          awsServiceCategory: "AWS service category",
+          cryptoDimension: "Cryptography dimension",
+          controllability: "Configuration controllability",
+          searchLabel: "Search service or cryptography dimension",
+          searchPlaceholder: "Search CloudFront, ACM, TLS, KMS, client-side encryption SDK...",
+          serviceOverview: "Service Risk Overview",
+          matchingSummary: (count, page, pages) => `${count} services match the current filters. Page ${page} of ${pages}.`,
+          emptyResults: "No matching services. Clear the search term or switch filters back to All.",
+          previous: "Previous",
+          next: "Next",
+          paginationLabel: "Service list pagination",
+          viewDetails: "View Details",
+          backDashboard: "Back to Risk Dashboard",
+          serviceNotFound: (id) => `No service found for service_id ${id}.`,
+          riskFocus: "Primary Risk Focus",
+          noConfigRisk: "This service currently has no configuration-item risks and is shown for context.",
+          awsCategory: "AWS service category",
+          cryptoCategory: "Cryptography category",
+          mainFocus: "Main focus",
+          configurationItems: "Configuration items",
+          configurationItem: "Configuration item",
+          apiEndpoint: "API / endpoint",
+          recommendedValues: "Recommended values",
+          riskyValues: "Risky values",
+          riskLevel: "Risk level",
+          riskLevel_high: "High",
+          riskLevel_medium: "Medium",
+          riskLevel_low: "Low",
+          references: "References",
+          action: "Action",
+          expand: "Expand",
+          collapse: "Collapse",
+          riskReason: "Risk reason",
+          securityValueReason: "Security value reason",
+          noItems: "No direct user-configurable cryptographic item is listed for this service. Treat the entry as explanatory and apply TLS, DNSSEC, or downstream encryption controls where relevant.",
+          referenceLink: "AWS documentation",
+          riskTaxonomyTitle: "Risk Taxonomy",
+          riskTaxonomyCopy: "A consolidated view of cryptography configuration risk types, affected AWS services, typical risky values, and recommended remediation directions.",
+          naTitle: "How to interpret N/A and non-configurable services",
+          naCopy: "Some services do not expose direct TLS policy, cipher suite, or KMS key configuration. They remain in the platform to clarify encryption boundaries and point users to adjacent controls such as API TLS, Route 53 DNSSEC, PrivateLink, or downstream service TLS.",
+          riskTypeList: "Supported Risk Types",
+          relatedServices: "Related services: ",
+          typicalRiskyValues: "Typical risky values: ",
+          recommendedDirection: "Recommended direction: ",
+          groupGuide: "Service Group Guide",
+          fieldGuide: "Data Field Guide",
+          standardGuide: "Risk Judgment Guide",
+          showMore: (count) => `Show ${count} more`,
+          showLess: "Show less",
+          loadError: "Failed to load data. Please run the project through a local HTTP server so the browser can fetch JSON files.",
+          coverGraphicLabel: "AWS cryptography risk cover graphic",
+          platformSummaryLabel: "Platform summary",
+          platformMetricsLabel: "Platform metrics",
+          serviceFiltersLabel: "Service filters",
+          serviceCardsLabel: "Service cards",
+          riskTaxonomyEyebrow: "Risk Taxonomy",
+        },
+        guides: {
+          groupHeaders: ["Cryptography dimension", "Description", "Related services"],
+          groupRows: [
+            ["TLS / Security Policy", "TLS protocol versions, HTTPS listeners, viewer security policies, and TLS endpoints.", "CloudFront, ALB, NLB, VPC Lattice"],
+            ["DNSSEC / Integrity", "DNS response integrity and chain-of-trust controls.", "Route 53"],
+            ["Network Connectivity Security", "Transport encryption visibility, enforcement, and service discovery boundaries.", "VPC, PrivateLink, Cloud Map"],
+            ["VPN / IPsec", "IKE, IPsec, Phase 1/2 algorithms, DH groups, and tunnel authentication.", "Site-to-Site VPN, Client VPN"],
+            ["Key Management", "KMS key type, usage, origin, rotation, and policy governance.", "AWS KMS"],
+            ["HSM / Hardware Security Module", "HSM mode, mechanisms, key attributes, and crypto user ownership.", "CloudHSM"],
+            ["Certificate Management", "Certificate request, import, export, transparency, renewal, and private-key boundaries.", "ACM, Private CA"],
+            ["Code Signing", "Signing profile platform, signature algorithm, validity, and signing permissions.", "AWS Signer"],
+            ["Client-side Encryption SDK", "Commitment policy, keyrings, cryptographic actions, and searchable encryption leakage.", "AWS Encryption SDK, Database Encryption SDK, S3 Encryption Client"],
+            ["Payment Cryptography", "Payment key attributes, PIN/CVV/MAC/data operations, and key import/export.", "AWS Payment Cryptography"],
+          ],
+          fieldHeaders: ["Field", "Meaning", "Description"],
+          fieldRows: [
+            ["Service", "AWS service display name", "Human-readable service name."],
+            ["Service_Group", "Cryptography dimension", "The cryptography-oriented grouping used in the dashboard."],
+            ["Crypto_Category", "Cryptography category", "More specific protocol, key, certificate, or SDK category."],
+            ["Configurable_Status", "Configuration controllability", "Whether the cryptographic control is directly configurable by customers."],
+            ["Configuration_Item", "Configuration item", "The concrete setting, policy, API parameter, or SDK option being assessed."],
+            ["API_Endpoint", "API / endpoint", "The API, CLI, SDK, or configuration surface where the item appears."],
+            ["Recommended_Values", "Recommended values", "Preferred values or control direction."],
+            ["Risky_Values", "Risky values", "Values that should be avoided, remediated, or justified as compatibility exceptions."],
+          ],
+          standardRows: [
+            ["Risky value judgment", "A value is considered risky when it enables deprecated protocols, weak cipher properties, missing forward secrecy, weak key usage, uncontrolled key export, or ambiguous encryption boundaries."],
+            ["Recommended value judgment", "Recommended values prioritize TLS 1.2/1.3, AEAD and forward secrecy, DNSSEC chain integrity, least-privilege key usage, governed certificate lifecycle, and current SDK cryptographic baselines."],
+            ["Non-configurable services", "N/A does not mean no security concern. It means the service does not expose a direct cryptographic configuration field, so controls must be enforced through adjacent services and architecture."],
+          ],
+        },
+      };
+    </script>
+    <script src="./app.js"></script>
+  </body>
+</html>

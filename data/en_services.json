@@ -1,0 +1,306 @@
+[
+  {
+    "service_id": "cloudfront",
+    "service": "Amazon CloudFront",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "TLS / Security Policy",
+    "crypto_category": "TLS/HTTPS; Certificate",
+    "configurable_status": "configurable",
+    "main_focus": "Viewer TLS security policy; viewer/origin HTTPS; ACM/IAM certificate binding",
+    "typical_risks": "Legacy viewer security policies such as SSLv3, TLS 1.0, or TLS 1.1; viewer or origin HTTP paths; weak origin TLS versions; expired, mismatched, or incomplete certificates.",
+    "service_intro": "CloudFront cryptography configuration focuses on TLS/HTTPS from viewers to edge locations, from edge locations to origins, and on custom-domain certificate governance.",
+    "detail_path": "#/services/cloudfront",
+    "recommended_values": [
+      "TLSv1.3_2025",
+      "TLSv1.2_2025",
+      "TLSv1.2_2021"
+    ],
+    "api_endpoint_focus": "UpdateDistribution.DistributionConfig.ViewerCertificate.MinimumProtocolVersion"
+  },
+  {
+    "service_id": "alb",
+    "service": "Elastic Load Balancing - Application Load Balancer (ALB)",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "TLS / Security Policy",
+    "crypto_category": "TLS/HTTPS; Certificate; PQC/PQ TLS",
+    "configurable_status": "configurable",
+    "main_focus": "HTTPS listener SslPolicy; listener certificate; SNI certificate list; mutual TLS",
+    "typical_risks": "Legacy TLS policies, weak compatibility ciphers, FIPS legacy policy misuse, implicit default policies during automation, and certificate or client-certificate trust issues.",
+    "service_intro": "ALB cryptography configuration centers on HTTPS listener SslPolicy, certificates, SNI certificate lists, and optional mutual TLS.",
+    "detail_path": "#/services/alb",
+    "recommended_values": [
+      "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+      "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09"
+    ],
+    "api_endpoint_focus": "CreateListener.SslPolicy / ModifyListener.SslPolicy / DescribeSSLPolicies"
+  },
+  {
+    "service_id": "nlb",
+    "service": "Elastic Load Balancing - Network Load Balancer (NLB)",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "TLS / Security Policy",
+    "crypto_category": "TLS/HTTPS; Certificate; PQC/PQ TLS",
+    "configurable_status": "configurable",
+    "main_focus": "TLS listener SslPolicy; listener certificate; ALPN policy; TLS offload versus TCP pass-through",
+    "typical_risks": "Legacy TLS policies, weak compatibility ciphers, unmanaged certificates, protocol-mode confusion, and mismatch between TLS offload and end-to-end encryption requirements.",
+    "service_intro": "NLB cryptography configuration focuses on TLS listener SslPolicy, listener certificates, ALPN, and the choice between TLS offload and TCP pass-through.",
+    "detail_path": "#/services/nlb",
+    "recommended_values": [
+      "ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09",
+      "ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09"
+    ],
+    "api_endpoint_focus": "CreateListener.SslPolicy / ModifyListener.SslPolicy / DescribeSSLPolicies"
+  },
+  {
+    "service_id": "vpc",
+    "service": "Amazon VPC",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "Network Connectivity Security",
+    "crypto_category": "In-transit encryption; Network encryption governance",
+    "configurable_status": "partially_configurable",
+    "main_focus": "VPC Encryption Controls; Flow Logs encryption-status; Transit Gateway encryption support; encryption exclusions",
+    "typical_risks": "VPC Encryption Controls disabled, insufficient encryption-status visibility, long-lived monitored cleartext flows, enforcement before remediation, and unmanaged exclusions.",
+    "service_intro": "Amazon VPC is not a TLS policy or cipher-suite configuration surface, but it can support in-transit encryption governance through VPC Encryption Controls, Flow Logs, and Transit Gateway encryption support.",
+    "detail_path": "#/services/vpc",
+    "recommended_values": [
+      "monitor mode before enforcement",
+      "enforce mode after remediation"
+    ],
+    "api_endpoint_focus": "CreateVpcEncryptionControl / ModifyVpcEncryptionControl / CreateFlowLogs"
+  },
+  {
+    "service_id": "route-53",
+    "service": "Amazon Route 53",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "DNSSEC / Integrity",
+    "crypto_category": "DNSSEC; KMS; Digital signature",
+    "configurable_status": "configurable",
+    "main_focus": "DNSSEC signing; key-signing key (KSK); AWS KMS asymmetric key; DS chain of trust; Resolver DNSSEC validation",
+    "typical_risks": "DNSSEC disabled for critical public hosted zones, KSK/KMS region or policy mistakes, missing or incorrect DS chain of trust, KSK ACTION_NEEDED status, and missing DNSSEC alarms.",
+    "service_intro": "Route 53 cryptography configuration is primarily DNSSEC rather than TLS ciphers. The KSK works with an asymmetric KMS key to sign the DNSSEC chain of trust.",
+    "detail_path": "#/services/route-53",
+    "recommended_values": [
+      "DNSSEC enabled for critical public zones",
+      "KMS ECC_NIST_P256 key in us-east-1"
+    ],
+    "api_endpoint_focus": "EnableHostedZoneDNSSEC / CreateKeySigningKey / GetDNSSEC"
+  },
+  {
+    "service_id": "site-to-site-vpn",
+    "service": "AWS Virtual Private Network - AWS Site-to-Site VPN",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "VPN",
+    "crypto_category": "IKE/IPsec; Encryption; Integrity; DH; PSK/Certificate",
+    "configurable_status": "configurable",
+    "main_focus": "IKEVersions; Phase1/Phase2 encryption algorithms; Phase1/Phase2 integrity algorithms; DH groups; PSK or private certificate authentication",
+    "typical_risks": "IKEv1, weak DH groups, SHA1 integrity, long-term non-GCM compatibility encryption, unmanaged PSKs, and certificate authentication lifecycle gaps.",
+    "service_intro": "Site-to-Site VPN cryptography configuration is mainly managed through IKE/IPsec tunnel options.",
+    "detail_path": "#/services/site-to-site-vpn",
+    "recommended_values": [
+      "ikev2",
+      "AES128-GCM-16 / AES256-GCM-16",
+      "SHA2-256 / SHA2-384 / SHA2-512",
+      "DH group 14+; prefer 19/20/21",
+      "PSK in Secrets Manager or private certificate authentication"
+    ],
+    "api_endpoint_focus": "ModifyVpnTunnelOptions / CreateVpnConnection.Options.TunnelOptions"
+  },
+  {
+    "service_id": "client-vpn",
+    "service": "AWS Virtual Private Network - AWS Client VPN",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "VPN",
+    "crypto_category": "TLS; Certificate; VPN authentication",
+    "configurable_status": "partially_configurable",
+    "main_focus": "TLS 1.2+ managed VPN transport; server certificate in ACM; mutual authentication client certificate; CRL lifecycle",
+    "typical_risks": "Expired or incomplete certificates, long-term RSA 1024-bit certificates, uncontrolled client certificate and private-key distribution, expired CRLs, and weak authentication governance.",
+    "service_intro": "Client VPN uses TLS 1.2 or later for remote-access VPN connections. Users mainly control certificates, mutual authentication, and authorization rules.",
+    "detail_path": "#/services/client-vpn",
+    "recommended_values": [
+      "TLS 1.2 or later",
+      "ACM server certificate",
+      "mutual authentication where certificate-based client identity is required",
+      "valid CRL when revocation is used"
+    ],
+    "api_endpoint_focus": "CreateClientVpnEndpoint.ServerCertificateArn / AuthenticationOptions / ClientCertificateArn"
+  },
+  {
+    "service_id": "cloud-map",
+    "service": "AWS Cloud Map",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "Network Connectivity Security",
+    "crypto_category": "N/A; relies on API TLS and downstream service encryption",
+    "configurable_status": "not_configurable",
+    "main_focus": "No direct TLS/cipher/key configuration; namespace discovery type; Route 53 DNS integration for DNS namespaces",
+    "typical_risks": "Treating Cloud Map as an encryption or TLS termination boundary, leaving public DNS integrity to chance, placing sensitive data in metadata, or failing to enable TLS on downstream services.",
+    "service_intro": "Cloud Map is a service discovery service and does not expose user-selectable cipher suites, TLS policies, or KMS key configuration.",
+    "detail_path": "#/services/cloud-map",
+    "recommended_values": [
+      "Use HTTPS/TLS for AWS API access",
+      "Use private DNS namespace for internal discovery where appropriate",
+      "Apply Route 53 DNSSEC controls for public DNS integrity needs",
+      "Enable TLS on downstream service endpoints"
+    ],
+    "api_endpoint_focus": "CreateHttpNamespace / CreatePrivateDnsNamespace / CreatePublicDnsNamespace / DiscoverInstances"
+  },
+  {
+    "service_id": "kms",
+    "service": "AWS Key Management Service (AWS KMS)",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Key Management",
+    "crypto_category": "KMS; KeySpec; KeyUsage; PQC/ML-DSA",
+    "configurable_status": "configurable",
+    "main_focus": "CreateKey.KeySpec; KeyUsage; Origin; MultiRegion; key rotation; key policy; ML-DSA post-quantum signing keys",
+    "typical_risks": "KeySpec and KeyUsage mismatch, asymmetric or HMAC key misuse for AWS service encryption, legacy algorithms, missing rotation, unmanaged imported or custom-store material, and overbroad key policies.",
+    "service_intro": "AWS KMS is the core AWS key management service. Cryptographic controls include KeySpec, KeyUsage, Origin, MultiRegion, rotation, and key policy.",
+    "detail_path": "#/services/kms",
+    "recommended_values": [
+      "SYMMETRIC_DEFAULT for AWS service encryption",
+      "KeyUsage aligned to one purpose",
+      "ML_DSA_44/65/87 for PQ signing use cases",
+      "automatic rotation for eligible symmetric AWS_KMS keys",
+      "manual rotation plan for asymmetric/HMAC/imported/custom-store keys"
+    ],
+    "api_endpoint_focus": "CreateKey.KeySpec / KeyUsage / Origin / MultiRegion; EnableKeyRotation; PutKeyPolicy",
+    "display_aws_category": "Cryptography & PKI"
+  },
+  {
+    "service_id": "cloudhsm",
+    "service": "AWS CloudHSM",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "HSM / Hardware Security Module",
+    "crypto_category": "HSM; PKCS#11; JCE; CNG/KSP; FIPS",
+    "configurable_status": "configurable",
+    "main_focus": "Cluster mode; HSM type; PKCS#11/JCE/CNG mechanisms; key attributes; crypto user ownership",
+    "typical_risks": "DES3, SHA1, RSA-PKCS, or other legacy mechanisms used as a long-term baseline; overbroad key attributes; weak CU ownership; and non-FIPS clusters in regulated scenarios.",
+    "service_intro": "CloudHSM is a dedicated HSM service controlled by the customer. Key risks live in client SDK mechanism choices, key attributes, CU permissions, and cluster mode.",
+    "detail_path": "#/services/cloudhsm",
+    "recommended_values": [
+      "FIPS mode where compliance requires it",
+      "AES-GCM/AES Key Wrap/RSA-OAEP/ECDSA/HMAC with SHA2+",
+      "least-privilege key attributes",
+      "controlled CU ownership"
+    ],
+    "api_endpoint_focus": "CreateCluster.Mode / Client SDK mechanisms / key attributes",
+    "display_aws_category": "Cryptography & PKI"
+  },
+  {
+    "service_id": "acm",
+    "service": "AWS Certificate Manager",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Certificate Management",
+    "crypto_category": "Certificate; TLS",
+    "configurable_status": "configurable",
+    "main_focus": "RequestCertificate.KeyAlgorithm; CertificateTransparencyLoggingPreference; ExportCertificate.Passphrase; ImportCertificate lifecycle",
+    "typical_risks": "RSA 1024 or obsolete certificate algorithms used as a baseline, imported certificates without managed renewal, incomplete chains, mismatched private keys, weak exported private-key handling, and CT logging exceptions.",
+    "service_intro": "ACM cryptography configuration focuses on TLS certificate algorithms, certificate transparency logging, certificate import/export, and renewal governance.",
+    "detail_path": "#/services/acm",
+    "recommended_values": [
+      "RSA_2048",
+      "EC_prime256v1",
+      "EC_secp384r1",
+      "CertificateTransparencyLoggingPreference=ENABLED",
+      "ACM managed renewal where possible"
+    ],
+    "api_endpoint_focus": "RequestCertificate.KeyAlgorithm / Options / ImportCertificate / ExportCertificate",
+    "display_aws_category": "Security, Identity, & Compliance"
+  },
+  {
+    "service_id": "signer",
+    "service": "AWS Signer",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Code Signing",
+    "crypto_category": "Digital signature; Code signing",
+    "configurable_status": "partially_configurable",
+    "main_focus": "PutSigningProfile.platformId; signature algorithm family; signing profile validity; signing material for IoT workflows",
+    "typical_risks": "SHA1-RSA platforms used as a new baseline, overbroad signing profile permissions, excessive signature validity, missing revocation or replacement workflows, and unmanaged IoT signing certificates.",
+    "service_intro": "Signer cryptography configuration is mainly the signing algorithm and artifact format selected through the signing profile platformId.",
+    "detail_path": "#/services/signer",
+    "recommended_values": [
+      "AWSLambda-SHA384-ECDSA",
+      "Notation-OCI-SHA384-ECDSA",
+      "AWSIoTDeviceManagement-SHA256-ECDSA",
+      "AmazonFreeRTOS-Default"
+    ],
+    "api_endpoint_focus": "PutSigningProfile.platformId / StartSigningJob.profileName",
+    "display_aws_category": "Security, Identity, & Compliance"
+  },
+  {
+    "service_id": "aws-encryption-sdk",
+    "service": "AWS Encryption SDK",
+    "aws_category": "Developer Tools",
+    "service_group": "Client-side Encryption SDK",
+    "crypto_category": "Client-side encryption SDK; Keyring; Commitment policy",
+    "configurable_status": "configurable",
+    "main_focus": "commitment policy; AWS KMS keyrings; discovery keyring and discovery filter; encryption context",
+    "typical_risks": "Non-committing algorithm suites for new encryption, KMS discovery keyrings without discovery filters, raw keyrings without strong key protection, and missing encryption context semantics.",
+    "service_intro": "The AWS Encryption SDK is a general client-side encryption SDK. Important controls include commitment policy, keyrings, discovery filters, and encryption context.",
+    "detail_path": "#/services/aws-encryption-sdk",
+    "recommended_values": [
+      "RequireEncryptRequireDecrypt",
+      "AWS KMS keyring with explicit KMS key identifiers",
+      "discovery filter when discovery keyring is required"
+    ],
+    "api_endpoint_focus": "SDK client configuration: commitmentPolicy / keyring / discoveryFilter",
+    "display_aws_category": "Cryptography & PKI"
+  },
+  {
+    "service_id": "aws-database-encryption-sdk",
+    "service": "AWS Database Encryption SDK",
+    "aws_category": "Developer Tools",
+    "service_group": "Client-side Encryption SDK",
+    "crypto_category": "Client-side encryption SDK; Searchable encryption; Keyring",
+    "configurable_status": "configurable",
+    "main_focus": "cryptographic actions; AWS KMS hierarchical keyring; beacons; searchable encryption planning",
+    "typical_risks": "DO_NOTHING used for sensitive fields, irreversible action changes on existing populated fields, beacons with excessive leakage, and searchable encryption planned without the KMS hierarchical keyring.",
+    "service_intro": "The AWS Database Encryption SDK provides field-level client-side database encryption. Key concerns are cryptographic actions, the KMS hierarchical keyring, and beacon leakage.",
+    "detail_path": "#/services/aws-database-encryption-sdk",
+    "recommended_values": [
+      "ENCRYPT_AND_SIGN for sensitive fields",
+      "AWS KMS Hierarchical keyring for searchable encryption",
+      "beacon design before production data"
+    ],
+    "api_endpoint_focus": "table encryption config / cryptographic actions / beacon configuration / KMS hierarchical keyring",
+    "display_aws_category": "Cryptography & PKI"
+  },
+  {
+    "service_id": "s3-encryption-client",
+    "service": "Amazon S3 Encryption Client",
+    "aws_category": "Storage",
+    "service_group": "Client-side Encryption SDK",
+    "crypto_category": "Client-side encryption SDK; Keyring; Wrapping key",
+    "configurable_status": "configurable",
+    "main_focus": "keyring; wrapping key; commitment policy; legacy wrapping algorithms; encryption context",
+    "typical_risks": "Legacy wrapping algorithms for new encryption, raw AES/RSA wrapping keys without KMS or HSM-grade protection, permissive commitment policy, and unmanaged instruction files or encryption context.",
+    "service_intro": "The Amazon S3 Encryption Client provides client-side envelope encryption for S3 objects, centered on data keys, wrapping keys, keyrings, commitment policy, and legacy wrapping algorithms.",
+    "detail_path": "#/services/s3-encryption-client",
+    "recommended_values": [
+      "AWS KMS wrapping key where possible",
+      "current fully supported wrapping algorithms",
+      "RequireEncryptRequireDecrypt or migration-appropriate require policy"
+    ],
+    "api_endpoint_focus": "S3EncryptionClient builder keyring / wrapping key / commitmentPolicy",
+    "display_aws_category": "Cryptography & PKI"
+  },
+  {
+    "service_id": "payment-cryptography",
+    "service": "AWS Payment Cryptography",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Payment Cryptography",
+    "crypto_category": "Payment cryptography; PIN; CVV; MAC; TR-31/TR-34; HSM",
+    "configurable_status": "configurable",
+    "main_focus": "CreateKey.KeyAttributes: KeyAlgorithm, KeyUsage, KeyModesOfUse; TR-31/TR-34/RSA/ECDH key import and export; PIN/CVV/MAC/data encryption operations",
+    "typical_risks": "Overbroad KeyUsage or KeyModesOfUse, TDES_2KEY as a new baseline, NoRestrictions overuse, key exchange paths mismatched with compliance expectations, and weak exportable-key or KEK rotation governance.",
+    "service_intro": "AWS Payment Cryptography is a specialized service for payment cryptography such as PIN, CVV, MAC, DUKPT, TR-31, and TR-34 workflows.",
+    "detail_path": "#/services/payment-cryptography",
+    "recommended_values": [
+      "AES_128/AES_192/AES_256 where supported by the payment use case",
+      "TDES_3KEY when TDES is required for legacy payment interoperability",
+      "least-privilege KeyModesOfUse",
+      "TR-34 or ECDH for KEK exchange where supported",
+      "TR-31 for working key exchange after KEK establishment"
+    ],
+    "api_endpoint_focus": "CreateKey.KeyAttributes / ImportKey / ExportKey / GetParametersForImport / GetParametersForExport",
+    "display_aws_category": "Security, Identity, & Compliance"
+  }
+]

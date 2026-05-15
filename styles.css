@@ -377,6 +377,12 @@ h3 {
   color: var(--accent);
 }
 
+.chip-toggle {
+  border-style: dashed;
+  color: var(--accent);
+  font-weight: 750;
+}
+
 .section-head {
   display: flex;
   justify-content: space-between;

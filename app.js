@@ -7,9 +7,11 @@ const state = {
   activeStatus: "\u5168\u90e8",
   query: "",
   page: 1,
+  expandedFilters: {},
 };
 
 const pageSize = 9;
+const collapsedFilterLimit = 6;
 
 const awsCategories = [
   "\u5168\u90e8",
@@ -173,6 +175,21 @@ function setActiveNav(route) {
   });
 }
 
+function renderFilterOptions(container, options, config) {
+  const expanded = Boolean(state.expandedFilters[config.key]);
+  const shouldCollapse = options.length > collapsedFilterLimit;
+  let visibleOptions = shouldCollapse && !expanded ? options.slice(0, collapsedFilterLimit) : options;
+  const activeValue = config.activeValue?.();
+  if (shouldCollapse && !expanded && activeValue && !visibleOptions.includes(activeValue) && options.includes(activeValue)) {
+    visibleOptions = [...visibleOptions, activeValue];
+  }
+  const hiddenCount = options.length - visibleOptions.length;
+  container.innerHTML = `
+    ${visibleOptions.map((option) => `<button class="chip" type="button" ${config.attribute}="${escapeHtml(option)}">${escapeHtml(option)}</button>`).join("")}
+    ${shouldCollapse ? `<button class="chip chip-toggle" type="button" data-filter-toggle="${config.key}" aria-expanded="${expanded}">${expanded ? "\u6536\u8d77" : `\u5c55\u5f00 ${hiddenCount}`}</button>` : ""}
+  `;
+}
+
 function render() {
   const hash = location.hash || "#/";
   if (hash.startsWith("#/services/")) {
@@ -248,8 +265,15 @@ function renderHome() {
   $("[data-count='groups']").textContent = new Set(state.services.map(displayAwsCategory)).size;
 
   const filterWrap = $("#group-filters");
-  filterWrap.innerHTML = awsCategories.map((category) => `<button class="chip" type="button" data-aws-category="${escapeHtml(category)}">${escapeHtml(category)}</button>`).join("");
+  renderFilterOptions(filterWrap, awsCategories, { key: "awsCategory", attribute: "data-aws-category", activeValue: () => state.activeAwsCategory });
   filterWrap.addEventListener("click", (event) => {
+    const toggle = event.target.closest("[data-filter-toggle]");
+    if (toggle) {
+      state.expandedFilters[toggle.dataset.filterToggle] = !state.expandedFilters[toggle.dataset.filterToggle];
+      renderFilterOptions(filterWrap, awsCategories, { key: "awsCategory", attribute: "data-aws-category", activeValue: () => state.activeAwsCategory });
+      updateHomeResults();
+      return;
+    }
     const button = event.target.closest("[data-aws-category]");
     if (!button) return;
     state.activeAwsCategory = button.dataset.awsCategory;
@@ -258,8 +282,15 @@ function renderHome() {
   });
 
   const cryptoWrap = $("#crypto-filters");
-  cryptoWrap.innerHTML = cryptoGroups.map((group) => `<button class="chip" type="button" data-group="${escapeHtml(group)}">${escapeHtml(group)}</button>`).join("");
+  renderFilterOptions(cryptoWrap, cryptoGroups, { key: "cryptoGroup", attribute: "data-group", activeValue: () => state.activeGroup });
   cryptoWrap.addEventListener("click", (event) => {
+    const toggle = event.target.closest("[data-filter-toggle]");
+    if (toggle) {
+      state.expandedFilters[toggle.dataset.filterToggle] = !state.expandedFilters[toggle.dataset.filterToggle];
+      renderFilterOptions(cryptoWrap, cryptoGroups, { key: "cryptoGroup", attribute: "data-group", activeValue: () => state.activeGroup });
+      updateHomeResults();
+      return;
+    }
     const button = event.target.closest("[data-group]");
     if (!button) return;
     state.activeGroup = button.dataset.group;
@@ -268,8 +299,15 @@ function renderHome() {
   });
 
   const statusWrap = $("#status-filters");
-  statusWrap.innerHTML = statuses.map((status) => `<button class="chip" type="button" data-status="${escapeHtml(status)}">${escapeHtml(status)}</button>`).join("");
+  renderFilterOptions(statusWrap, statuses, { key: "status", attribute: "data-status", activeValue: () => state.activeStatus });
   statusWrap.addEventListener("click", (event) => {
+    const toggle = event.target.closest("[data-filter-toggle]");
+    if (toggle) {
+      state.expandedFilters[toggle.dataset.filterToggle] = !state.expandedFilters[toggle.dataset.filterToggle];
+      renderFilterOptions(statusWrap, statuses, { key: "status", attribute: "data-status", activeValue: () => state.activeStatus });
+      updateHomeResults();
+      return;
+    }
     const button = event.target.closest("[data-status]");
     if (!button) return;
     state.activeStatus = button.dataset.status;

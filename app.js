@@ -2,12 +2,23 @@ const state = {
   services: [],
   items: [],
   riskTypes: [],
+  activeAwsCategory: "\u5168\u90e8",
   activeGroup: "\u5168\u90e8",
   activeStatus: "\u5168\u90e8",
   query: "",
+  page: 1,
 };
 
-const groups = [
+const pageSize = 9;
+
+const awsCategories = [
+  "\u5168\u90e8",
+  "Networking & Content Delivery",
+  "Cryptography & PKI",
+  "Security, Identity, & Compliance",
+];
+
+const cryptoGroups = [
   "\u5168\u90e8",
   "TLS / \u5b89\u5168\u7b56\u7565",
   "DNSSEC / \u5b8c\u6574\u6027",
@@ -76,6 +87,22 @@ function $(selector, root = document) {
   return root.querySelector(selector);
 }
 
+function normalizeChrome() {
+  document.title = "AWS Cryptography Risk Platform";
+  const brand = $(".brand");
+  if (brand) brand.textContent = "AWS Cryptography Risk Platform";
+
+  const nav = $(".nav");
+  if (nav) {
+    nav.setAttribute("aria-label", "Navigation");
+    nav.innerHTML = `
+      <a href="#/" data-nav="cover">\u9996\u9875</a>
+      <a href="#/dashboard" data-nav="dashboard">\u98ce\u9669\u770b\u677f</a>
+      <a href="#/risk-types" data-nav="risk-types">\u98ce\u9669\u7c7b\u578b\u8bf4\u660e</a>
+    `;
+  }
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -88,6 +115,32 @@ function escapeHtml(value) {
 function compact(value, fallback = "N/A") {
   const text = String(value ?? "").trim();
   return text || fallback;
+}
+
+function displayAwsCategory(service) {
+  const serviceGroup = compact(service.service_group, "");
+  const serviceId = compact(service.service_id, "");
+  if (
+    serviceGroup.includes("\u5bc6\u94a5") ||
+    serviceGroup.includes("HSM") ||
+    serviceGroup.includes("\u5ba2\u6237\u7aef\u52a0\u5bc6") ||
+    serviceId.includes("encryption-sdk") ||
+    serviceId.includes("encryption-client") ||
+    serviceId === "kms" ||
+    serviceId === "cloudhsm"
+  ) {
+    return "Cryptography & PKI";
+  }
+  if (
+    serviceId === "signer" ||
+    serviceId === "acm" ||
+    serviceId === "payment-cryptography" ||
+    serviceGroup.includes("\u8bc1\u4e66") ||
+    serviceGroup.includes("\u652f\u4ed8\u5bc6\u7801")
+  ) {
+    return "Security, Identity, & Compliance";
+  }
+  return compact(service.aws_category, "Security, Identity, & Compliance");
 }
 
 function splitParts(value) {
@@ -124,28 +177,93 @@ function render() {
   const hash = location.hash || "#/";
   if (hash.startsWith("#/services/")) {
     renderDetail(hash.replace("#/services/", ""));
+  } else if (hash === "#/dashboard") {
+    renderHome();
   } else if (hash === "#/risk-types") {
     renderRiskTypes();
   } else {
-    renderHome();
+    renderCover();
   }
 }
 
+function renderCover() {
+  setActiveNav("cover");
+  const app = $("#app");
+  app.innerHTML = $("#cover-template").innerHTML;
+
+  $("[data-cover-count='services']").textContent = state.services.length;
+  $("[data-cover-count='items']").textContent = state.items.length;
+  $("[data-cover-count='groups']").textContent = new Set(state.services.map(displayAwsCategory)).size;
+  const coverLabels = document.querySelectorAll(".cover-stats span");
+  ["\u8986\u76d6\u670d\u52a1", "\u914d\u7f6e\u9879", "AWS \u5b98\u65b9\u5206\u7c7b"].forEach((label, index) => {
+    if (coverLabels[index]) coverLabels[index].textContent = label;
+  });
+}
+
+function normalizeDashboardLabels() {
+  const heroTitle = $(".hero h1");
+  if (heroTitle) heroTitle.textContent = "\u6309 AWS \u5b98\u65b9\u5206\u7c7b\u7ec4\u7ec7\u7684\u5bc6\u7801\u5b66\u914d\u7f6e\u98ce\u9669\u770b\u677f";
+  const heroCopy = $(".hero-copy");
+  if (heroCopy) {
+    heroCopy.textContent = "\u4ee5 Networking & Content Delivery\u3001Cryptography & PKI\u3001Security, Identity, & Compliance \u4f5c\u4e3a\u4e00\u7ea7\u670d\u52a1\u5206\u7c7b\uff0c\u540c\u65f6\u4fdd\u7559 TLS\u3001DNSSEC\u3001\u5bc6\u94a5\u7ba1\u7406\u3001HSM\u3001\u8bc1\u4e66\u548c\u5ba2\u6237\u7aef\u52a0\u5bc6 SDK \u7b49\u5bc6\u7801\u5b66\u7ef4\u5ea6\u3002";
+  }
+
+  const metricLabels = document.querySelectorAll(".hero-metrics span");
+  ["\u670d\u52a1", "\u914d\u7f6e\u9879", "AWS \u5b98\u65b9\u5206\u7c7b"].forEach((label, index) => {
+    if (metricLabels[index]) metricLabels[index].textContent = label;
+  });
+
+  const filterLabels = document.querySelectorAll(".filter-label");
+  if (filterLabels[0]) filterLabels[0].textContent = "AWS \u670d\u52a1\u5206\u7c7b";
+  if (filterLabels[1]) filterLabels[1].textContent = "\u914d\u7f6e\u53ef\u63a7\u6027";
+
+  const groupBlock = $("#group-filters")?.closest(".filter-block");
+  if (groupBlock && !$("#crypto-filters")) {
+    const cryptoBlock = document.createElement("div");
+    cryptoBlock.className = "filter-block";
+    cryptoBlock.innerHTML = `
+      <span class="filter-label">\u5bc6\u7801\u5b66\u7ef4\u5ea6</span>
+      <div id="crypto-filters" class="chips" role="list"></div>
+    `;
+    groupBlock.insertAdjacentElement("afterend", cryptoBlock);
+  }
+
+  const searchLabel = $(".search-box span");
+  if (searchLabel) searchLabel.textContent = "\u641c\u7d22\u670d\u52a1 / \u5bc6\u7801\u7ef4\u5ea6";
+  const searchInput = $("#search-input");
+  if (searchInput) searchInput.placeholder = "\u8f93\u5165 CloudFront\u3001ACM\u3001TLS\u3001KMS\u3001\u5ba2\u6237\u7aef\u52a0\u5bc6 SDK...";
+
+  const sectionTitle = $(".section-head h2");
+  if (sectionTitle) sectionTitle.textContent = "\u670d\u52a1\u98ce\u9669\u603b\u89c8";
+}
+
 function renderHome() {
-  setActiveNav("home");
+  setActiveNav("dashboard");
   const app = $("#app");
   app.innerHTML = $("#home-template").innerHTML;
+  normalizeDashboardLabels();
 
   $("[data-count='services']").textContent = state.services.length;
   $("[data-count='items']").textContent = state.items.length;
-  $("[data-count='groups']").textContent = new Set(state.services.map((service) => service.service_group)).size;
+  $("[data-count='groups']").textContent = new Set(state.services.map(displayAwsCategory)).size;
 
   const filterWrap = $("#group-filters");
-  filterWrap.innerHTML = groups.map((group) => `<button class="chip" type="button" data-group="${escapeHtml(group)}">${escapeHtml(group)}</button>`).join("");
+  filterWrap.innerHTML = awsCategories.map((category) => `<button class="chip" type="button" data-aws-category="${escapeHtml(category)}">${escapeHtml(category)}</button>`).join("");
   filterWrap.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-aws-category]");
+    if (!button) return;
+    state.activeAwsCategory = button.dataset.awsCategory;
+    state.page = 1;
+    updateHomeResults();
+  });
+
+  const cryptoWrap = $("#crypto-filters");
+  cryptoWrap.innerHTML = cryptoGroups.map((group) => `<button class="chip" type="button" data-group="${escapeHtml(group)}">${escapeHtml(group)}</button>`).join("");
+  cryptoWrap.addEventListener("click", (event) => {
     const button = event.target.closest("[data-group]");
     if (!button) return;
     state.activeGroup = button.dataset.group;
+    state.page = 1;
     updateHomeResults();
   });
 
@@ -155,6 +273,7 @@ function renderHome() {
     const button = event.target.closest("[data-status]");
     if (!button) return;
     state.activeStatus = button.dataset.status;
+    state.page = 1;
     updateHomeResults();
   });
 
@@ -162,6 +281,7 @@ function renderHome() {
   input.value = state.query;
   input.addEventListener("input", (event) => {
     state.query = event.target.value.trim();
+    state.page = 1;
     updateHomeResults();
   });
 
@@ -169,6 +289,9 @@ function renderHome() {
 }
 
 function updateHomeResults() {
+  document.querySelectorAll("[data-aws-category]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.awsCategory === state.activeAwsCategory);
+  });
   document.querySelectorAll("[data-group]").forEach((button) => {
     button.classList.toggle("active", button.dataset.group === state.activeGroup);
   });
@@ -178,79 +301,131 @@ function updateHomeResults() {
 
   const query = state.query.toLowerCase();
   const filtered = state.services.filter((service) => {
+    const awsCategory = displayAwsCategory(service);
+    const awsCategoryMatches = state.activeAwsCategory === "\u5168\u90e8" || awsCategory === state.activeAwsCategory;
     const groupMatches = state.activeGroup === "\u5168\u90e8" || service.service_group === state.activeGroup;
     const statusMatches = state.activeStatus === "\u5168\u90e8" || service.configurable_status === state.activeStatus;
     const haystack = [
       service.service_id,
       service.service,
+      awsCategory,
+      service.aws_category,
       service.service_group,
       service.crypto_category,
       service.configurable_status,
       service.main_focus,
       service.typical_risks,
     ].join(" ").toLowerCase();
-    return groupMatches && statusMatches && (!query || haystack.includes(query));
+    return awsCategoryMatches && groupMatches && statusMatches && (!query || haystack.includes(query));
   });
 
-  $("#result-summary").textContent = `共 ${filtered.length} 个服务匹配当前条件`;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  state.page = Math.min(Math.max(1, state.page), totalPages);
+  const startIndex = (state.page - 1) * pageSize;
+  const pageItems = filtered.slice(startIndex, startIndex + pageSize);
+
+  $("#result-summary").textContent = `\u5171 ${filtered.length} \u4e2a\u670d\u52a1\u5339\u914d\u5f53\u524d\u6761\u4ef6\uff0c\u5f53\u524d\u7b2c ${state.page} / ${totalPages} \u9875`;
   const grid = $("#service-grid");
   if (!filtered.length) {
-    grid.innerHTML = `<div class="empty-state">没有匹配的服务。可以清空搜索词，或切换到“全部”分类。</div>`;
+    grid.innerHTML = `<div class="empty-state">\u6ca1\u6709\u5339\u914d\u7684\u670d\u52a1\u3002\u53ef\u4ee5\u6e05\u7a7a\u641c\u7d22\u8bcd\uff0c\u6216\u5207\u6362\u5230\u201c\u5168\u90e8\u201d\u5206\u7c7b\u3002</div>`;
+    renderPagination(0, 1);
     return;
   }
-  grid.innerHTML = filtered.map(renderServiceCard).join("");
+  grid.innerHTML = pageItems.map(renderServiceCard).join("");
+  renderPagination(filtered.length, totalPages);
+}
+
+function renderPagination(totalItems, totalPages) {
+  let pagination = $("#pagination");
+  if (!pagination) {
+    pagination = document.createElement("nav");
+    pagination.id = "pagination";
+    pagination.className = "pagination";
+    pagination.setAttribute("aria-label", "\u670d\u52a1\u5217\u8868\u5206\u9875");
+    $("#service-grid").insertAdjacentElement("afterend", pagination);
+    pagination.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-page]");
+      if (!button || button.disabled) return;
+      state.page = Number(button.dataset.page);
+      updateHomeResults();
+      $(".section-head")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }
+
+  if (totalItems <= pageSize) {
+    pagination.innerHTML = "";
+    pagination.hidden = true;
+    return;
+  }
+
+  pagination.hidden = false;
+  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+  pagination.innerHTML = `
+    <button type="button" data-page="${state.page - 1}" ${state.page === 1 ? "disabled" : ""}>\u4e0a\u4e00\u9875</button>
+    <div class="pagination-pages">
+      ${pages.map((page) => `<button type="button" data-page="${page}" class="${page === state.page ? "active" : ""}" aria-current="${page === state.page ? "page" : "false"}">${page}</button>`).join("")}
+    </div>
+    <button type="button" data-page="${state.page + 1}" ${state.page === totalPages ? "disabled" : ""}>\u4e0b\u4e00\u9875</button>
+  `;
 }
 
 function renderServiceCard(service) {
   const status = compact(service.configurable_status);
+  const awsCategory = displayAwsCategory(service);
   return `
     <article class="service-card">
       <div class="tag-row">
+        <span class="tag official">${escapeHtml(awsCategory)}</span>
         <span class="tag ${statusClass(status)}">${escapeHtml(status)}</span>
         <span class="tag">${escapeHtml(service.service_group)}</span>
       </div>
       <h3>${escapeHtml(service.service)}</h3>
       <dl class="meta-list">
-        <div><dt>密码类别</dt><dd>${escapeHtml(service.crypto_category)}</dd></div>
-        <div><dt>主要关注点</dt><dd>${escapeHtml(service.main_focus)}</dd></div>
-        <div><dt>典型风险</dt><dd>${escapeHtml(service.typical_risks)}</dd></div>
+        <div><dt>\u5bc6\u7801\u7ef4\u5ea6</dt><dd>${escapeHtml(service.service_group)}</dd></div>
+        <div><dt>\u5bc6\u7801\u7c7b\u522b</dt><dd>${escapeHtml(service.crypto_category)}</dd></div>
+        <div><dt>\u4e3b\u8981\u5173\u6ce8</dt><dd>${escapeHtml(service.main_focus)}</dd></div>
       </dl>
       <div class="card-actions">
-        <a class="primary-button" href="${escapeHtml(service.detail_path)}">查看详情</a>
+        <a class="primary-button" href="${escapeHtml(service.detail_path)}">\u67e5\u770b\u8be6\u60c5</a>
       </div>
     </article>
   `;
 }
-
 function renderDetail(serviceId) {
-  setActiveNav("home");
+  setActiveNav("dashboard");
   const app = $("#app");
   app.innerHTML = $("#detail-template").innerHTML;
+  const backLink = $(".back-link");
+  if (backLink) {
+    backLink.href = "#/dashboard";
+    backLink.textContent = "\u8fd4\u56de\u98ce\u9669\u770b\u677f";
+  }
   const service = state.services.find((item) => item.service_id === serviceId);
   const serviceItems = state.items.filter((item) => item.service_id === serviceId);
 
   if (!service) {
-    $("#service-detail").innerHTML = `<div class="empty-state">未找到 service_id 为 ${escapeHtml(serviceId)} 的服务。<a class="detail-link" href="#/">返回首页</a></div>`;
+    $("#service-detail").innerHTML = `<div class="empty-state">\u672a\u627e\u5230 service_id \u4e3a ${escapeHtml(serviceId)} \u7684\u670d\u52a1\u3002<a class="detail-link" href="#/dashboard">\u8fd4\u56de\u98ce\u9669\u770b\u677f</a></div>`;
     return;
   }
 
+  const awsCategory = displayAwsCategory(service);
   const riskFocus = splitParts(service.typical_risks).map((risk) => `<li>${escapeHtml(risk)}</li>`).join("");
   $("#service-detail").innerHTML = `
     <div class="detail-header">
-      <p class="eyebrow">${escapeHtml(service.aws_category)}</p>
+      <p class="eyebrow">${escapeHtml(awsCategory)}</p>
       <h1>${escapeHtml(service.service)}</h1>
       <p class="detail-intro">${escapeHtml(service.service_intro)}</p>
       <div class="info-grid">
-        ${renderKpi("服务组", service.service_group)}
-        ${renderKpi("密码类别", service.crypto_category)}
-        ${renderKpi("配置可控性", service.configurable_status)}
-        ${renderKpi("配置项", `${serviceItems.length}`)}
-        ${renderKpi("风险关注", splitParts(service.typical_risks)[0] || "N/A")}
+        ${renderKpi("AWS \u670d\u52a1\u5206\u7c7b", awsCategory)}
+        ${renderKpi("\u5bc6\u7801\u5b66\u7ef4\u5ea6", service.service_group)}
+        ${renderKpi("\u5bc6\u7801\u7c7b\u522b", service.crypto_category)}
+        ${renderKpi("\u914d\u7f6e\u53ef\u63a7\u6027", service.configurable_status)}
+        ${renderKpi("\u914d\u7f6e\u9879", `${serviceItems.length}`)}
       </div>
     </div>
     <section class="risk-focus">
-      <h2>主要风险关注点</h2>
-      <ul>${riskFocus || "<li>该服务暂无配置项风险，属于说明性展示。</li>"}</ul>
+      <h2>\u4e3b\u8981\u98ce\u9669\u5173\u6ce8\u70b9</h2>
+      <ul>${riskFocus || "<li>\u8be5\u670d\u52a1\u6682\u65e0\u914d\u7f6e\u9879\u98ce\u9669\uff0c\u5c5e\u4e8e\u8bf4\u660e\u6027\u5c55\u793a\u3002</li>"}</ul>
     </section>
     <section class="analysis-table-wrap">
       ${renderItemsTable(serviceItems)}
@@ -263,10 +438,9 @@ function renderDetail(serviceId) {
     const row = document.getElementById(button.dataset.expand);
     const expanded = row.hidden;
     row.hidden = !expanded;
-    button.textContent = expanded ? "收起" : "展开";
+    button.textContent = expanded ? "\u6536\u8d77" : "\u5c55\u5f00";
   });
 }
-
 function renderKpi(label, value) {
   return `
     <div class="kpi">
@@ -387,6 +561,7 @@ function renderGuideTable(headers, rows) {
   `;
 }
 
+normalizeChrome();
 window.addEventListener("hashchange", render);
 
 loadData()

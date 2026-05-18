@@ -152,5 +152,61 @@
     "related_services": "AWS Payment Cryptography",
     "typical_risky_values": "assuming plaintext export; old TLS client; no PrivateLink where mandated; secrets in aliases/tags/free-form fields",
     "recommended_direction": "Use modern TLS/PQ-capable clients where relevant, PrivateLink for private connectivity, and strict metadata hygiene."
+  },
+  {
+    "risk_type": "mesh_tls_or_mtls_governance_gap",
+    "risk_description": "Service mesh TLS/mTLS is disabled, permissive for too long, or lacks backend trust and service identity validation.",
+    "related_services": "AWS App Mesh",
+    "typical_risky_values": "Listener TLS DISABLED; Listener TLS PERMISSIVE as long-term baseline; clientPolicy.tls.enforce false; missing validation trust; missing SAN identity binding",
+    "recommended_direction": "Use STRICT listener TLS, enforce backend client TLS, configure trust anchors, and validate SANs where service identity matters."
+  },
+  {
+    "risk_type": "direct_connect_macsec_gap",
+    "risk_description": "Direct Connect MACsec is disabled, allowed to fall back, unsupported by the selected connection, or operated with weak key lifecycle controls.",
+    "related_services": "AWS Direct Connect",
+    "typical_risky_values": "encryptionMode no_encrypt; should_encrypt as steady state; macSecCapable false; unmonitored portEncryptionStatus; unmanaged CKN/CAK material",
+    "recommended_direction": "Use MACsec-capable connections, associate and rotate MACsec keys through controlled processes, monitor encryption status, and use must_encrypt after validation."
+  },
+  {
+    "risk_type": "managed_interconnect_encryption_boundary_gap",
+    "risk_description": "Managed private connectivity or MACsec protection is mistaken for end-to-end application encryption, or partner network controls are not verified.",
+    "related_services": "AWS Interconnect",
+    "typical_risky_values": "No partner network security review; assuming AWS-to-partner MACsec covers all hops; no TLS/IPsec overlay for sensitive traffic; missing connection change audit",
+    "recommended_direction": "Document the AWS/partner/customer encryption boundary, verify partner controls, and overlay TLS or IPsec for sensitive workloads."
+  },
+  {
+    "risk_type": "rtb_fabric_tls_or_trust_boundary_gap",
+    "risk_description": "RTB Fabric traffic uses HTTP or lacks properly scoped TLS trust, or sensitive credentials are placed in metadata fields outside the intended encrypted payload boundary.",
+    "related_services": "AWS RTB Fabric",
+    "typical_risky_values": "CreateResponderGateway.protocol HTTP; CreateLink.httpResponderAllowed true; missing or broad trustStoreConfiguration; credentials in URLs; sensitive data in tags/name/description",
+    "recommended_direction": "Use HTTPS/TLS 1.2+ for RTB communications, keep HTTP responder allowance exceptional, scope trust store CA certificates, and keep credentials or sensitive identifiers out of metadata."
+  },
+  {
+    "risk_type": "verified_access_tls_or_backend_boundary_gap",
+    "risk_description": "Verified Access has managed user-to-endpoint TLS, but customer-controlled certificates, endpoint protocol, backend encryption, trust providers, or policies are weak or misaligned.",
+    "related_services": "AWS Verified Access",
+    "typical_risky_values": "expired or mismatched DomainCertificateArn; HTTP backend path for sensitive apps; assuming managed TLS covers backend hops; missing or overbroad Verified Access policy; weak trust provider alignment",
+    "recommended_direction": "Use ACM public certificates that match the application domain, document the TLS/backend encryption boundary, use HTTPS/TLS/IPsec for sensitive backend paths, and align policies with trust-provider claims."
+  },
+  {
+    "risk_type": "secrets_manager_encryption_or_rotation_gap",
+    "risk_description": "Secrets Manager encryption key choice, KMS permissions, rotation configuration, metadata hygiene, or replication boundary is weak or misaligned with the secret sensitivity.",
+    "related_services": "AWS Secrets Manager",
+    "typical_risky_values": "default aws/secretsmanager where customer managed key is required; broad KMS decrypt policy; rotation disabled or failing; sensitive data in name/description/tags; replica without regional KMS governance",
+    "recommended_direction": "Use customer managed KMS keys where independent control is needed, enable and monitor rotation, keep sensitive values out of metadata, and review both KMS and secret resource policies."
+  },
+  {
+    "risk_type": "iam_long_term_credential_or_certificate_gap",
+    "risk_description": "IAM long-term credentials, server certificates, signing/SAML certificates, passwords, or MFA controls are unmanaged, stale, or used where federation/ACM/temporary credentials should be preferred.",
+    "related_services": "AWS Identity and Access Management (IAM)",
+    "typical_risky_values": "root access key; old active access keys; IAM server certificate where ACM is supported; expired SAML X.509 certificate; unmanaged private decryption key; weak password policy; no MFA for privileged users",
+    "recommended_direction": "Prefer roles, federation, temporary credentials, ACM-managed certificates, monitored certificate rotation, strong password policy, and MFA for remaining IAM users."
+  },
+  {
+    "risk_type": "iam_identity_center_federation_certificate_or_token_gap",
+    "risk_description": "IAM Identity Center SAML certificates, SCIM bearer tokens, MFA responsibility, or external IdP trust boundaries are not rotated, protected, or clearly enforced.",
+    "related_services": "AWS IAM Identity Center",
+    "typical_risky_values": "SAML certificate near expiry; stale application certificate; expired SCIM token; token stored outside secret management; MFA disabled or delegated but unverified; unsupported encrypted SAML assertion assumption",
+    "recommended_direction": "Rotate SAML certificates and SCIM tokens before expiration, store tokens securely, define MFA enforcement ownership, and validate external IdP trust metadata."
   }
 ]

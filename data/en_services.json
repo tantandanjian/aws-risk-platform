@@ -302,5 +302,151 @@
     ],
     "api_endpoint_focus": "CreateKey.KeyAttributes / ImportKey / ExportKey / GetParametersForImport / GetParametersForExport",
     "display_aws_category": "Security, Identity, & Compliance"
+  },
+  {
+    "service_id": "app-mesh",
+    "service": "AWS App Mesh",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "TLS / Security Policy",
+    "crypto_category": "TLS/HTTPS; Certificate",
+    "configurable_status": "configurable",
+    "main_focus": "Virtual node listener TLS; backend client TLS policy; mTLS certificate and trust validation",
+    "typical_risks": "Listener TLS disabled or left in permissive migration mode; backend client TLS not enforced; weak mTLS trust chain, SAN validation, or certificate lifecycle governance; treating App Mesh TLS as a substitute for workload identity governance.",
+    "service_intro": "AWS App Mesh cryptography configuration focuses on service-to-service TLS/mTLS inside the mesh, including listener TLS mode, backend client TLS policy, certificate sources, and trust validation.",
+    "detail_path": "#/services/app-mesh",
+    "recommended_values": [
+      "Listener TLS mode: STRICT",
+      "ClientPolicy.tls.enforce: true",
+      "mTLS with validated trust chain and SAN"
+    ],
+    "api_endpoint_focus": "CreateVirtualNode.spec.listeners.tls / UpdateVirtualNode.spec.backendDefaults.clientPolicy.tls"
+  },
+  {
+    "service_id": "direct-connect",
+    "service": "AWS Direct Connect",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "Network Connectivity Security",
+    "crypto_category": "MACsec; In-transit encryption; Key material",
+    "configurable_status": "configurable",
+    "main_focus": "MACsec encryption mode; CKN/CAK key association; port/LAG MACsec capability and monitoring",
+    "typical_risks": "MACsec disabled or no_encrypt; should_encrypt used as a long-term baseline; CKN/CAK material not managed through Secrets Manager and rotation controls; missing portEncryptionStatus monitoring; confusing link-layer MACsec with application end-to-end encryption.",
+    "service_intro": "AWS Direct Connect cryptography configuration centers on optional MACsec, controlled through encryptionMode and MACsec key association for link-layer encryption.",
+    "detail_path": "#/services/direct-connect",
+    "recommended_values": [
+      "encryptionMode: must_encrypt",
+      "MACsec key in Secrets Manager",
+      "Monitor portEncryptionStatus"
+    ],
+    "api_endpoint_focus": "UpdateConnection.encryptionMode / AssociateMacSecKey / DescribeConnections"
+  },
+  {
+    "service_id": "aws-interconnect",
+    "service": "AWS Interconnect",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "Network Connectivity Security",
+    "crypto_category": "Managed MACsec; In-transit encryption boundary",
+    "configurable_status": "partially_configurable",
+    "main_focus": "Managed AWS-to-partner MACsec boundary; partner network encryption assurances; application-layer encryption overlay",
+    "typical_risks": "Treating AWS Interconnect managed MACsec as end-to-end encryption; not verifying partner network encryption or isolation commitments; sensitive workloads without TLS/IPsec overlay; missing audit for connection and routing changes.",
+    "service_intro": "AWS Interconnect provides managed private connectivity through AWS partners. Unlike Direct Connect, it does not expose fine-grained customer MACsec key or cipher configuration, so analysis should focus on the managed encryption boundary, partner controls, and compensating end-to-end encryption.",
+    "detail_path": "#/services/aws-interconnect",
+    "recommended_values": [
+      "Use managed Interconnect connection for private connectivity",
+      "Verify partner network security commitments",
+      "Overlay TLS/IPsec for sensitive traffic"
+    ],
+    "api_endpoint_focus": "CreateConnection / GetConnection / ListConnections; service data-in-transit protection boundary"
+  },
+  {
+    "service_id": "rtb-fabric",
+    "service": "AWS RTB Fabric",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "Network Connectivity Security",
+    "crypto_category": "TLS/HTTPS; Certificate; Trust store",
+    "configurable_status": "configurable",
+    "main_focus": "Gateway protocol HTTPS; responder trust store CA certificates; HTTP responder allowance; TLS 1.2+ RTB communications",
+    "typical_risks": "Using HTTP or allowing HTTP responders as a long-term baseline; not enabling TLS for RTB application communications; missing or overly broad trust store CA configuration; placing credentials or sensitive information in URLs, tags, or free-form fields; mistaking service-managed encryption for application TLS and identity validation.",
+    "service_intro": "AWS RTB Fabric is a specialized networking service for real-time bidding traffic. Cryptography-relevant configuration centers on TLS/HTTPS between RTB applications, responder gateway protocol and trust store, and whether links allow HTTP responders.",
+    "detail_path": "#/services/rtb-fabric",
+    "recommended_values": [
+      "CreateResponderGateway.protocol: HTTPS",
+      "CreateLink.httpResponderAllowed: false",
+      "TrustStoreConfiguration with scoped CA certificates"
+    ],
+    "api_endpoint_focus": "CreateResponderGateway.protocol / trustStoreConfiguration / CreateLink.httpResponderAllowed"
+  },
+  {
+    "service_id": "verified-access",
+    "service": "AWS Verified Access",
+    "aws_category": "Networking & Content Delivery",
+    "service_group": "TLS / Security Policy",
+    "crypto_category": "TLS/HTTPS; Certificate",
+    "configurable_status": "partially_configurable",
+    "main_focus": "Managed TLS 1.2+ from users to Verified Access; endpoint domain certificate ARN; endpoint protocol and backend encryption boundary",
+    "typical_risks": "Expired or mismatched DomainCertificateArn; weak certificate lifecycle governance; HTTP backend paths for sensitive applications; assuming managed user-to-Verified-Access TLS covers backend hops and end-to-end encryption; trust provider or policy misalignment exposing an encrypted channel to the wrong principals.",
+    "service_intro": "AWS Verified Access encrypts Internet traffic from end users to Verified Access endpoints using managed TLS 1.2 or later. Customer-controlled cryptography-relevant areas are endpoint domain certificate governance, application domain matching, endpoint protocol, and the backend encryption boundary.",
+    "detail_path": "#/services/verified-access",
+    "recommended_values": [
+      "ACM public certificate matching ApplicationDomain",
+      "HTTPS or TCP with backend encryption for sensitive applications",
+      "TLS/IPsec overlay where backend confidentiality requires it"
+    ],
+    "api_endpoint_focus": "CreateVerifiedAccessEndpoint.DomainCertificateArn / ApplicationDomain / endpoint protocol"
+  },
+  {
+    "service_id": "secrets-manager",
+    "service": "AWS Secrets Manager",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Key Management",
+    "crypto_category": "Secrets; KMS; Envelope encryption; Rotation",
+    "configurable_status": "configurable",
+    "main_focus": "KMS encryption key; secret rotation; secret value versus metadata boundary; resource/KMS policy controls",
+    "typical_risks": "Using the default aws/secretsmanager key where independent authorization or audit is required; rotation disabled or unverified; broad KMS key policy or secret resource policy; sensitive data in unencrypted metadata such as secret name, description, or tags; unclear KMS governance for replicated secrets.",
+    "service_intro": "AWS Secrets Manager cryptography configuration centers on AWS KMS envelope encryption, encryption key selection, secret rotation, and access control. Risks focus on weak KMS governance, missing rotation, metadata leakage, and unclear multi-Region encryption boundaries.",
+    "detail_path": "#/services/secrets-manager",
+    "recommended_values": [
+      "Customer managed KMS key where independent control is required",
+      "automatic rotation for supported secrets",
+      "no sensitive data in metadata"
+    ],
+    "api_endpoint_focus": "CreateSecret.KmsKeyId / UpdateSecret.KmsKeyId / RotateSecret.RotationRules"
+  },
+  {
+    "service_id": "iam",
+    "service": "AWS Identity and Access Management (IAM)",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Identity & Credential Security",
+    "crypto_category": "Credentials; Certificate; SAML; MFA",
+    "configurable_status": "partially_configurable",
+    "main_focus": "IAM access keys; server certificates; signing certificates; SAML provider certificates and encrypted assertions; password/MFA credential controls",
+    "typical_risks": "Long-term access keys not rotated or unused keys left active; using IAM server certificates instead of ACM where ACM is supported; expired, incomplete, or mismatched certificates; SAML X.509 certificates and encrypted assertion private keys not monitored or rotated; weak password policy or missing MFA.",
+    "service_intro": "IAM is not a TLS cipher-suite configuration surface, but it manages cryptography-relevant identity credentials such as access keys, server certificates, signing certificates, SAML certificates, MFA devices, and password policy.",
+    "detail_path": "#/services/iam",
+    "recommended_values": [
+      "temporary credentials and IAM roles",
+      "ACM for server certificates where supported",
+      "monitored SAML certificate/private key rotation",
+      "MFA and strong password policy"
+    ],
+    "api_endpoint_focus": "CreateAccessKey / GetAccessKeyLastUsed / UploadServerCertificate / UploadSigningCertificate / CreateSAMLProvider"
+  },
+  {
+    "service_id": "iam-identity-center",
+    "service": "AWS IAM Identity Center",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Identity & Credential Security",
+    "crypto_category": "SAML; X.509 Certificate; SCIM token; MFA",
+    "configurable_status": "partially_configurable",
+    "main_focus": "SAML X.509 certificate rotation; SCIM access token rotation; MFA enforcement; external IdP trust boundary",
+    "typical_risks": "SAML 2.0 X.509 certificates near expiry without rotation; expired or unmanaged SCIM access tokens; unclear MFA responsibility between external IdP and IAM Identity Center; assuming all SAML encrypted assertion scenarios are supported; application signing certificate rotation without overlap testing.",
+    "service_intro": "IAM Identity Center cryptography-relevant configuration focuses on identity federation trust material rather than cipher-suite selection: X.509 certificates, SCIM bearer tokens, MFA, and external IdP trust boundaries.",
+    "detail_path": "#/services/iam-identity-center",
+    "recommended_values": [
+      "rotate SAML 2.0 certificates before expiration",
+      "rotate SCIM access tokens",
+      "enable or delegate MFA explicitly",
+      "monitor external IdP trust metadata"
+    ],
+    "api_endpoint_focus": "IAM Identity Center SAML certificate management / SCIM access token rotation / MFA settings"
   }
 ]

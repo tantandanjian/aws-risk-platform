@@ -8,8 +8,8 @@
     "risky_values": "SSLv3\nTLSv1\nTLSv1_2016\nTLSv1.1_2016\nTLSv1.2_2018\nTLSv1.2_2019",
     "risk_type": "legacy_protocol_or_policy",
     "risk_level": "high",
-    "risk_reason": "CloudFront security policy controls both the minimum viewer SSL/TLS protocol and supported ciphers. Old policies allow SSLv3/TLS 1.0/TLS 1.1 or legacy ciphers such as 3DES/RC4/CBC/SHA.",
-    "security_value_reason": "Use the newest CloudFront viewer security policies that keep the minimum protocol at TLS 1.2 or TLS 1.3 and avoid legacy cipher exposure.",
+    "risk_reason": "ViewerCertificate.MinimumProtocolVersion 属于“旧协议或兼容性策略风险”。如果配置为风险值（SSLv3；TLSv1；TLSv1_2016；TLSv1.1_2016；TLSv1.2_2018；TLSv1.2_2019），可能允许 SSL/TLS 旧版本或兼容性策略继续生效，增加降级攻击、弱加密协商和明文链路暴露的可能性。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（TLSv1.3_2025；TLSv1.2_2025；TLSv1.2_2021）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-viewer-protocols-ciphers.html; https://docs.aws.amazon.com/cli/latest/reference/cloudfront/update-distribution.html",
     "risk_basis": "Risk rule 1: cipher name does not contain ECDHE or TLS_, so it lacks forward secrecy (FS).\nRisk rule 2: CBC mode, non-AEAD. AEAD examples are ChaCha20 and GCM. CBC has known attack history and is not recommended even when not fully broken in this context.\nRisk rule 3: SHA means SHA-1 style legacy hash naming, not SHA256/SHA384/SHA512, and is treated as risky."
   },
@@ -22,8 +22,8 @@
     "risky_values": "allow-all for authenticated/API/sensitive traffic",
     "risk_type": "legacy_protocol_or_policy",
     "risk_level": "high",
-    "risk_reason": "Allowing HTTP leaves the viewer-to-CloudFront segment unencrypted and exposes credentials, cookies, tokens, or request payloads to interception or modification.",
-    "security_value_reason": "Use https-only for sensitive workloads; redirect-to-https can be used for public static compatibility.",
+    "risk_reason": "ViewerProtocolPolicy 属于“旧协议或兼容性策略风险”。如果配置为风险值（allow-all for authenticated/API/sensitive traffic），可能允许 SSL/TLS 旧版本或兼容性策略继续生效，增加降级攻击、弱加密协商和明文链路暴露的可能性。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（https-only；redirect-to-https）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/using-https-viewers-to-cloudfront.html"
   },
   {
@@ -35,8 +35,8 @@
     "risky_values": "http-only\nmatch-viewer when viewer HTTP is allowed\nOriginSslProtocols: TLSv1\nOriginSslProtocols: TLSv1.1",
     "risk_type": "legacy_protocol_or_policy",
     "risk_level": "high",
-    "risk_reason": "CloudFront-to-origin traffic remains exposed if the origin policy allows HTTP or old TLS versions.",
-    "security_value_reason": "Use HTTPS-only to complete end-to-end encryption from viewer through CloudFront to origin.",
+    "risk_reason": "OriginProtocolPolicy / OriginSslProtocols 属于“旧协议或兼容性策略风险”。如果配置为风险值（http-only；match-viewer when viewer HTTP is allowed；OriginSslProtocols: TLSv1；OriginSslProtocols: TLSv1.1），可能允许 SSL/TLS 旧版本或兼容性策略继续生效，增加降级攻击、弱加密协商和明文链路暴露的可能性。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（https-only；OriginSslProtocols: TLSv1.2）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/DownloadDistValuesOrigin.html; https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/secure-connections-supported-ciphers-cloudfront-to-origin.html"
   },
   {
@@ -48,8 +48,8 @@
     "risky_values": "ELBSecurityPolicy-TLS13-1-2-2021-06\nELBSecurityPolicy-TLS13-1-2-PQ-2025-09\nELBSecurityPolicy-TLS13-1-2-Ext2-2021-06\nELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09\nELBSecurityPolicy-TLS13-1-2-Ext1-2021-06\nELBSecurityPolicy-TLS13-1-2-Ext1-PQ-2025-09\nELBSecurityPolicy-TLS13-1-1-2021-06\nELBSecurityPolicy-TLS13-1-0-2021-06\nELBSecurityPolicy-TLS13-1-0-PQ-2025-09\nELBSecurityPolicy-TLS-1-2-Ext-2018-06\nELBSecurityPolicy-TLS-1-2-2017-01\nELBSecurityPolicy-TLS-1-1-2017-01\nELBSecurityPolicy-2016-08",
     "risk_type": "weak_or_compatibility_cipher_profile",
     "risk_level": "high",
-    "risk_reason": "Policies in the risk column either support TLS 1.0/1.1 or include ciphers matching the weak-cipher rules: no ECDHE/TLS_ forward secrecy indicator, CBC mode, or legacy SHA naming.",
-    "security_value_reason": "Recommended TLS policies are TLS 1.3 only or Res policies with TLS 1.2/1.3 and AEAD/forward-secrecy-focused cipher profiles. AWS recommends the PQ-TLS policy ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09 for transition to post-quantum TLS.",
+    "risk_reason": "SslPolicy - TLS security policies 属于“弱密码套件或兼容性 cipher 风险”。如果配置为风险值（ELBSecurityPolicy-TLS13-1-2-2021-06；ELBSecurityPolicy-TLS13-1-2-PQ-2025-09；ELBSecurityPolicy-TLS13-1-2-Ext2-2021-06；ELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09；ELBSecurit…），可能保留 CBC、SHA1、缺少前向保密或其他兼容性 cipher，使 TLS 连接无法达到现代密码基线。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ELBSecurityPolicy-TLS13-1-3-2021-06；ELBSecurityPolicy-TLS13-1-3-PQ-2025-09；ELBSecurityPolicy-TLS13-1-2-Res-2021-06；ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/describe-ssl-policies.html",
     "risk_basis": "Risk rule 1: cipher name does not contain ECDHE or TLS_, so it lacks forward secrecy (FS).\nRisk rule 2: CBC mode, non-AEAD. AEAD examples are ChaCha20 and GCM. CBC has known attack history and is not recommended even when not fully broken in this context.\nRisk rule 3: SHA means SHA-1 style legacy hash naming, not SHA256/SHA384/SHA512, and is treated as risky."
   },
@@ -62,8 +62,8 @@
     "risky_values": "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09\nELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-PQ-2025-09\nELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-PQ-2025-09\nELBSecurityPolicy-TLS13-1-2-Ext0-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-2-Ext0-FIPS-PQ-2025-09\nELBSecurityPolicy-TLS13-1-1-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-0-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-0-FIPS-PQ-2025-09",
     "risk_type": "weak_or_compatibility_cipher_profile",
     "risk_level": "high",
-    "risk_reason": "FIPS means the policy uses the AWS-LC FIPS validated cryptographic module, but it does not automatically mean the TLS configuration is strong. Ext/Ext0/Ext1/Ext2 and TLS13-1-2-FIPS policies include CBC/SHA or RSA key exchange compatibility ciphers; TLS13-1-1/1-0 FIPS policies are documented by AWS as legacy compatibility only.",
-    "security_value_reason": "Use FIPS Res or TLS 1.3-only policies when FIPS is required and avoid FIPS policies that keep weak compatibility ciphers or TLS 1.0/1.1.",
+    "risk_reason": "SslPolicy - FIPS security policies 属于“弱密码套件或兼容性 cipher 风险”。如果配置为风险值（ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04；ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09；ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04；ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-P…），可能保留 CBC、SHA1、缺少前向保密或其他兼容性 cipher，使 TLS 连接无法达到现代密码基线。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04；ELBSecurityPolicy-TLS13-1-3-FIPS-PQ-2025-09；ELBSecurityPolicy-TLS13-1-2-Res-FIPS-2023-04；ELBSecurityPolicy-TLS13-1-2-Res-FIPS-PQ-…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/describe-ssl-policies.html",
     "risk_basis": "Risk rule 1: cipher name does not contain ECDHE or TLS_, so it lacks forward secrecy (FS).\nRisk rule 2: CBC mode, non-AEAD. AEAD examples are ChaCha20 and GCM. CBC has known attack history and is not recommended even when not fully broken in this context.\nRisk rule 3: SHA means SHA-1 style legacy hash naming, not SHA256/SHA384/SHA512, and is treated as risky.",
     "cipher_issue_examples": "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04 and ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-PQ-2025-09 include examples such as ECDHE-ECDSA-AES128-SHA256 (CBC), ECDHE-RSA-AES128-SHA256 (CBC), ECDHE-ECDSA-AES128-SHA (CBC,SHA), ECDHE-RSA-AES128-SHA (CBC,SHA), AES128-GCM-SHA256 (no ECDHE/TLS_, FS issue), AES128-SHA256 (CBC,FS issue), AES128-SHA (CBC,FS issue,SHA), AES256-GCM-SHA384 (FS issue), AES256-SHA256 (CBC,FS issue), AES256-SHA (CBC,FS issue,SHA)."
@@ -77,8 +77,8 @@
     "risky_values": "ELBSecurityPolicy-FS-1-2-Res-2019-08\nELBSecurityPolicy-FS-1-2-2019-08\nELBSecurityPolicy-FS-1-1-2019-08\nELBSecurityPolicy-FS-2018-06",
     "risk_type": "weak_or_compatibility_cipher_profile",
     "risk_level": "high",
-    "risk_reason": "Older FS policies may still include CBC/SHA compatibility ciphers or TLS 1.0/1.1. FS in the name does not remove all cipher-suite risk.",
-    "security_value_reason": "Use the Res 2020 policy if constrained to the FS policy family; otherwise prefer current TLS 1.3/Res/PQ families.",
+    "risk_reason": "SslPolicy - FS supported policies 属于“弱密码套件或兼容性 cipher 风险”。如果配置为风险值（ELBSecurityPolicy-FS-1-2-Res-2019-08；ELBSecurityPolicy-FS-1-2-2019-08；ELBSecurityPolicy-FS-1-1-2019-08；ELBSecurityPolicy-FS-2018-06），可能保留 CBC、SHA1、缺少前向保密或其他兼容性 cipher，使 TLS 连接无法达到现代密码基线。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ELBSecurityPolicy-FS-1-2-Res-2020-10）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/describe-ssl-policies.html",
     "risk_basis": "Risk rule 1: cipher name does not contain ECDHE or TLS_, so it lacks forward secrecy (FS).\nRisk rule 2: CBC mode, non-AEAD. AEAD examples are ChaCha20 and GCM. CBC has known attack history and is not recommended even when not fully broken in this context.\nRisk rule 3: SHA means SHA-1 style legacy hash naming, not SHA256/SHA384/SHA512, and is treated as risky."
   },
@@ -91,8 +91,8 @@
     "risky_values": "Expired certificate\nDomain mismatch\nIncomplete certificate chain\nmTLS verify without maintained trust store or CRL",
     "risk_type": "certificate_lifecycle_or_identity_mismatch",
     "risk_level": "medium",
-    "risk_reason": "TLS policy is not enough if certificate identity, validity, chain, or client-certificate trust is wrong.",
-    "security_value_reason": "Use ACM where possible and maintain certificate renewal, SNI list, trust store, and revocation data.",
+    "risk_reason": "Listener.Certificates / MutualAuthentication 属于“证书生命周期或身份匹配风险”。如果配置为风险值（Expired certificate；Domain mismatch；Incomplete certificate chain；mTLS verify without maintained trust store or CRL），可能导致证书过期、域名不匹配、证书链不完整或客户端信任失败，从而削弱 TLS 身份校验。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ACM managed certificate；Valid certificate chain and domain match；mTLS verify mode for client certificate authentication）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/https-listener-certificates.html; https://docs.aws.amazon.com/elasticloadbalancing/latest/application/configuring-mtls-with-elb.html"
   },
   {
@@ -104,8 +104,8 @@
     "risky_values": "ELBSecurityPolicy-TLS13-1-2-2021-06\nELBSecurityPolicy-TLS13-1-2-PQ-2025-09\nELBSecurityPolicy-TLS13-1-2-Ext2-2021-06\nELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09\nELBSecurityPolicy-TLS13-1-2-Ext1-2021-06\nELBSecurityPolicy-TLS13-1-2-Ext1-PQ-2025-09\nELBSecurityPolicy-TLS13-1-1-2021-06\nELBSecurityPolicy-TLS13-1-0-2021-06\nELBSecurityPolicy-TLS13-1-0-PQ-2025-09\nELBSecurityPolicy-TLS-1-2-Ext-2018-06\nELBSecurityPolicy-TLS-1-2-2017-01\nELBSecurityPolicy-TLS-1-1-2017-01\nELBSecurityPolicy-2016-08\nELBSecurityPolicy-2015-05",
     "risk_type": "weak_or_compatibility_cipher_profile",
     "risk_level": "high",
-    "risk_reason": "Policies in the risk column either support TLS 1.0/1.1 or include weak compatibility ciphers by the same cipher rules used for ALB. NLB also has the older ELBSecurityPolicy-2015-05 policy.",
-    "security_value_reason": "Use TLS 1.3-only or Res/PQ policies for TLS listeners. AWS recommends ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09 or FIPS-PQ for PQ transition.",
+    "risk_reason": "SslPolicy - TLS security policies 属于“弱密码套件或兼容性 cipher 风险”。如果配置为风险值（ELBSecurityPolicy-TLS13-1-2-2021-06；ELBSecurityPolicy-TLS13-1-2-PQ-2025-09；ELBSecurityPolicy-TLS13-1-2-Ext2-2021-06；ELBSecurityPolicy-TLS13-1-2-Ext2-PQ-2025-09；ELBSecurit…），可能保留 CBC、SHA1、缺少前向保密或其他兼容性 cipher，使 TLS 连接无法达到现代密码基线。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ELBSecurityPolicy-TLS13-1-3-2021-06；ELBSecurityPolicy-TLS13-1-3-PQ-2025-09；ELBSecurityPolicy-TLS13-1-2-Res-2021-06；ELBSecurityPolicy-TLS13-1-2-Res-PQ-2025-09）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/describe-ssl-policies.html",
     "risk_basis": "Risk rule 1: cipher name does not contain ECDHE or TLS_, so it lacks forward secrecy (FS).\nRisk rule 2: CBC mode, non-AEAD. AEAD examples are ChaCha20 and GCM. CBC has known attack history and is not recommended even when not fully broken in this context.\nRisk rule 3: SHA means SHA-1 style legacy hash naming, not SHA256/SHA384/SHA512, and is treated as risky."
   },
@@ -118,8 +118,8 @@
     "risky_values": "ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09\nELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-PQ-2025-09\nELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-2-Ext1-FIPS-PQ-2025-09\nELBSecurityPolicy-TLS13-1-2-Ext0-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-2-Ext0-FIPS-PQ-2025-09\nELBSecurityPolicy-TLS13-1-1-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-0-FIPS-2023-04\nELBSecurityPolicy-TLS13-1-0-FIPS-PQ-2025-09",
     "risk_type": "weak_or_compatibility_cipher_profile",
     "risk_level": "high",
-    "risk_reason": "FIPS policies use AWS-LC FIPS validated cryptographic module, but Ext/Ext0/Ext1/Ext2 and TLS13-1-2 FIPS families can still include CBC/SHA or RSA key exchange compatibility ciphers. TLS13-1-1/1-0 FIPS are legacy compatibility only.",
-    "security_value_reason": "Use FIPS Res or TLS 1.3-only policies when FIPS is required.",
+    "risk_reason": "SslPolicy - FIPS security policies 属于“弱密码套件或兼容性 cipher 风险”。如果配置为风险值（ELBSecurityPolicy-TLS13-1-2-FIPS-2023-04；ELBSecurityPolicy-TLS13-1-2-FIPS-PQ-2025-09；ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04；ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-P…），可能保留 CBC、SHA1、缺少前向保密或其他兼容性 cipher，使 TLS 连接无法达到现代密码基线。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ELBSecurityPolicy-TLS13-1-3-FIPS-2023-04；ELBSecurityPolicy-TLS13-1-3-FIPS-PQ-2025-09；ELBSecurityPolicy-TLS13-1-2-Res-FIPS-2023-04；ELBSecurityPolicy-TLS13-1-2-Res-FIPS-PQ-…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/describe-ssl-policies.html",
     "risk_basis": "Risk rule 1: cipher name does not contain ECDHE or TLS_, so it lacks forward secrecy (FS).\nRisk rule 2: CBC mode, non-AEAD. AEAD examples are ChaCha20 and GCM. CBC has known attack history and is not recommended even when not fully broken in this context.\nRisk rule 3: SHA means SHA-1 style legacy hash naming, not SHA256/SHA384/SHA512, and is treated as risky.",
     "cipher_issue_examples": "ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-2023-04 and ELBSecurityPolicy-TLS13-1-2-Ext2-FIPS-PQ-2025-09 include examples such as ECDHE-ECDSA-AES128-SHA256 (CBC), ECDHE-RSA-AES128-SHA256 (CBC), ECDHE-ECDSA-AES128-SHA (CBC,SHA), ECDHE-RSA-AES128-SHA (CBC,SHA), AES128-GCM-SHA256 (no ECDHE/TLS_, FS issue), AES128-SHA256 (CBC,FS issue), AES128-SHA (CBC,FS issue,SHA), AES256-GCM-SHA384 (FS issue), AES256-SHA256 (CBC,FS issue), AES256-SHA (CBC,FS issue,SHA)."
@@ -133,8 +133,8 @@
     "risky_values": "ELBSecurityPolicy-FS-1-2-Res-2019-08\nELBSecurityPolicy-FS-1-2-2019-08\nELBSecurityPolicy-FS-1-1-2019-08\nELBSecurityPolicy-FS-2018-06",
     "risk_type": "weak_or_compatibility_cipher_profile",
     "risk_level": "high",
-    "risk_reason": "Older FS policies may include CBC/SHA ciphers or TLS 1.0/1.1.",
-    "security_value_reason": "Use the Res 2020 policy if constrained to FS family; otherwise prefer current TLS 1.3/Res/PQ families.",
+    "risk_reason": "SslPolicy - FS supported policies 属于“弱密码套件或兼容性 cipher 风险”。如果配置为风险值（ELBSecurityPolicy-FS-1-2-Res-2019-08；ELBSecurityPolicy-FS-1-2-2019-08；ELBSecurityPolicy-FS-1-1-2019-08；ELBSecurityPolicy-FS-2018-06），可能保留 CBC、SHA1、缺少前向保密或其他兼容性 cipher，使 TLS 连接无法达到现代密码基线。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ELBSecurityPolicy-FS-1-2-Res-2020-10）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/describe-ssl-policies.html",
     "risk_basis": "Risk rule 1: cipher name does not contain ECDHE or TLS_, so it lacks forward secrecy (FS).\nRisk rule 2: CBC mode, non-AEAD. AEAD examples are ChaCha20 and GCM. CBC has known attack history and is not recommended even when not fully broken in this context.\nRisk rule 3: SHA means SHA-1 style legacy hash naming, not SHA256/SHA384/SHA512, and is treated as risky."
   },
@@ -147,8 +147,8 @@
     "risky_values": "IAM imported unsupported RSA key size such as RSA 4096\nTCP listener assumed to terminate TLS\nTLS offload when target-side end-to-end TLS is required\nALPN policy not aligned with client/backend protocol expectations",
     "risk_type": "certificate_lifecycle_or_identity_mismatch",
     "risk_level": "medium",
-    "risk_reason": "NLB TLS security depends on both the selected SslPolicy and certificate/protocol behavior. IAM-imported unsupported certificates can be rejected asynchronously and make a listener non-functional.",
-    "security_value_reason": "Prefer ACM certificate validation and choose TLS offload versus TCP pass-through intentionally.",
+    "risk_reason": "Listener.Certificates / AlpnPolicy / Protocol 属于“证书生命周期或身份匹配风险”。如果配置为风险值（IAM imported unsupported RSA key size such as RSA 4096；TCP listener assumed to terminate TLS；TLS offload when target-side end-to-end TLS is required；ALPN policy not align…），可能导致证书过期、域名不匹配、证书链不完整或客户端信任失败，从而削弱 TLS 身份校验。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ACM certificate；TLS listener for load balancer TLS offload；TCP 443 pass-through when targets must decrypt TLS；HTTP2Preferred when HTTP/2 is required）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/elasticloadbalancing/latest/network/tls-listener-certificates.html; https://docs.aws.amazon.com/elasticloadbalancing/latest/network/load-balancer-listeners.html"
   },
   {
@@ -160,8 +160,8 @@
     "risky_values": "Encryption Controls off\nOld Flow Logs without encryption-status\nEnforce mode without remediation\nBroad exclusions without compensating TLS/IPsec control",
     "risk_type": "in_transit_encryption_governance_gap",
     "risk_level": "medium",
-    "risk_reason": "VPC is not a TLS policy service. The risk is missing visibility/enforcement for cleartext flows and unmanaged exclusions.",
-    "security_value_reason": "Use monitor mode to discover cleartext paths, add encryption-status observability, remediate, and then enforce where appropriate.",
+    "risk_reason": "VPC Encryption Controls / Flow Logs encryption-status 属于“传输加密治理缺口”。如果配置为风险值（Encryption Controls off；Old Flow Logs without encryption-status；Enforce mode without remediation；Broad exclusions without compensating TLS/IPsec control），可能缺少对明文流量的发现、监控和强制能力，使传输加密要求难以落地。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（monitor mode for existing VPC first；enforce mode after remediation；Flow Logs with encryption-status, traffic-path, flow-direction；Transit Gateway encryption support where…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-encryption-controls.html"
   },
   {
@@ -173,8 +173,8 @@
     "risky_values": "DNSSEC disabled for critical public zone\nWrong KMS key spec, region, or key policy\nKSK ACTION_NEEDED\nMissing or wrong DS record\nMissing DNSSEC alarms",
     "risk_type": "dnssec_integrity_or_chain_of_trust_gap",
     "risk_level": "high",
-    "risk_reason": "DNSSEC failures are usually caused by chain-of-trust, KSK/KMS access, DS record, or monitoring gaps rather than cipher-suite selection.",
-    "security_value_reason": "Use Route 53 DNSSEC signing with correct KMS/KSK requirements and establish the DS chain of trust before relying on DNSSEC validation.",
+    "risk_reason": "DNSSEC signing / KSK / KMS / DS chain 属于“DNSSEC 完整性或信任链缺口”。如果配置为风险值（DNSSEC disabled for critical public zone；Wrong KMS key spec, region, or key policy；KSK ACTION_NEEDED；Missing or wrong DS record；Missing DNSSEC alarms），可能导致 DNS 响应完整性无法验证，或因 KSK/KMS/DS 链路配置错误破坏 DNSSEC 信任链。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（DNSSEC enabled for critical public hosted zones；KMS asymmetric customer managed key in us-east-1；KeySpec ECC_NIST_P256；DS record ECDSAP256SHA256 type 13 and SHA-256 diges…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec.html; https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec-cmk-requirements.html; https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/dns-configuring-dnssec-enable-signing.html"
   },
   {
@@ -186,8 +186,8 @@
     "risky_values": "ikev1 retained as long-term baseline\ndefault permits both ikev1 and ikev2 if not narrowed",
     "risk_type": "vpn_ipsec_weak_crypto",
     "risk_level": "high",
-    "risk_reason": "IKEv1 is a legacy compatibility option. AWS defaults include both ikev1 and ikev2 unless narrowed.",
-    "security_value_reason": "Prefer IKEv2 and remove unused legacy IKE versions from permitted tunnel options.",
+    "risk_reason": "IKEVersions 属于“VPN/IPsec 弱密码配置风险”。如果配置为风险值（ikev1 retained as long-term baseline；default permits both ikev1 and ikev2 if not narrowed），可能保留旧 IKE 版本、弱 DH group、SHA1 或非 AEAD 加密，降低 VPN 隧道的密码强度。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ikev2）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/vpn/latest/s2svpn/tunnel-configure.html; https://docs.aws.amazon.com/cli/latest/reference/ec2/modify-vpn-tunnel-options.html"
   },
   {
@@ -199,8 +199,8 @@
     "risky_values": "AES128 used as long-term compatibility instead of GCM\nAES256 used as long-term compatibility instead of GCM",
     "risk_type": "vpn_ipsec_weak_crypto",
     "risk_level": "medium",
-    "risk_reason": "AWS supports AES128/AES256 and AES-GCM options. GCM provides AEAD; non-GCM AES should be treated as compatibility when GCM is available.",
-    "security_value_reason": "Prefer AES-GCM for authenticated encryption in both IKE phase 1 and phase 2 where the customer gateway supports it.",
+    "risk_reason": "Phase 1/2 encryption algorithms 属于“VPN/IPsec 弱密码配置风险”。如果配置为风险值（AES128 used as long-term compatibility instead of GCM；AES256 used as long-term compatibility instead of GCM），可能保留旧 IKE 版本、弱 DH group、SHA1 或非 AEAD 加密，降低 VPN 隧道的密码强度。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（AES128-GCM-16；AES256-GCM-16）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/vpn/latest/s2svpn/tunnel-configure.html; https://docs.aws.amazon.com/cli/latest/reference/ec2/modify-vpn-tunnel-options.html"
   },
   {
@@ -212,8 +212,8 @@
     "risky_values": "SHA1",
     "risk_type": "vpn_ipsec_weak_crypto",
     "risk_level": "high",
-    "risk_reason": "AWS defaults include SHA1 together with SHA2 values. SHA1 should not remain a preferred or long-term integrity baseline.",
-    "security_value_reason": "Use SHA2 integrity algorithms and remove SHA1 unless a temporary customer gateway compatibility exception is documented.",
+    "risk_reason": "Phase 1/2 integrity algorithms 属于“VPN/IPsec 弱密码配置风险”。如果配置为风险值（SHA1），可能保留旧 IKE 版本、弱 DH group、SHA1 或非 AEAD 加密，降低 VPN 隧道的密码强度。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（SHA2-256；SHA2-384；SHA2-512）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/vpn/latest/s2svpn/tunnel-configure.html; https://docs.aws.amazon.com/cli/latest/reference/ec2/modify-vpn-tunnel-options.html"
   },
   {
@@ -225,8 +225,8 @@
     "risky_values": "Group 2\nGroup 5",
     "risk_type": "vpn_ipsec_weak_crypto",
     "risk_level": "high",
-    "risk_reason": "AWS defaults include group 2 for phase 1 and group 5 for phase 2. These are weaker legacy DH groups.",
-    "security_value_reason": "Use stronger DH groups and align both customer gateway and AWS tunnel options.",
+    "risk_reason": "Phase 1/2 Diffie-Hellman group numbers 属于“VPN/IPsec 弱密码配置风险”。如果配置为风险值（Group 2；Group 5），可能保留旧 IKE 版本、弱 DH group、SHA1 或非 AEAD 加密，降低 VPN 隧道的密码强度。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（Group 14 or higher；Prefer groups 19, 20, 21 where supported）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/vpn/latest/s2svpn/tunnel-configure.html; https://docs.aws.amazon.com/cli/latest/reference/ec2/modify-vpn-tunnel-options.html"
   },
   {
@@ -238,8 +238,8 @@
     "risky_values": "PSK stored directly in Site-to-Site VPN service without enhanced storage\nWeak or shared PSK lifecycle\nCertificate chain or X.509 extension validation problems",
     "risk_type": "vpn_authentication_secret_or_certificate_gap",
     "risk_level": "medium",
-    "risk_reason": "PSK is the default authentication option. AWS also supports Secrets Manager storage and private certificates from AWS Private CA.",
-    "security_value_reason": "Use Secrets Manager for PSK storage where possible, or private certificate authentication with valid certificate chain governance.",
+    "risk_reason": "Tunnel authentication / PSK storage 属于“VPN 认证密钥或证书治理缺口”。如果配置为风险值（PSK stored directly in Site-to-Site VPN service without enhanced storage；Weak or shared PSK lifecycle；Certificate chain or X.509 extension validation problems），可能导致 PSK、私有证书或证书链缺少安全存储、轮换和生命周期治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（PSK stored in AWS Secrets Manager；Private certificate from AWS Private CA where PSK is not desired；PSK rotation and customer gateway configuration governance）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/vpn/latest/s2svpn/tunnel-configure.html; https://docs.aws.amazon.com/vpn/latest/s2svpn/vpn-tunnel-authentication-options.html"
   },
   {
@@ -251,8 +251,8 @@
     "risky_values": "Assuming user-selectable TLS security policy exists\nOld or unpatched client software\nNonstandard client configuration that weakens verification",
     "risk_type": "vpn_tls_certificate_governance_gap",
     "risk_level": "medium",
-    "risk_reason": "Client VPN provides TLS 1.2 or later, but users do not manage an ELB-style security policy. Risk is mainly endpoint/client certificate and client configuration governance.",
-    "security_value_reason": "Keep clients current and avoid treating Client VPN as a cipher-policy service.",
+    "risk_reason": "TLS transport 属于“VPN TLS 证书治理缺口”。如果配置为风险值（Assuming user-selectable TLS security policy exists；Old or unpatched client software；Nonstandard client configuration that weakens verification），可能导致远程接入 VPN 的证书、CRL、客户端私钥或认证规则失控。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（TLS 1.2 or later；Current AWS provided client or patched OpenVPN-based client）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/data-protection.html; https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/client-authentication.html"
   },
   {
@@ -264,8 +264,8 @@
     "risky_values": "Expired server or client certificate\nRSA 1024-bit certificate as long-term baseline\nClient certificate without CN attribute\nClient private key distribution not controlled",
     "risk_type": "vpn_tls_certificate_governance_gap",
     "risk_level": "high",
-    "risk_reason": "AWS Client VPN requires a server certificate in ACM. Mutual authentication uses client certificates. Client VPN supports 1024-bit and 2048-bit RSA key sizes only, but 1024-bit should be treated as weak for long-term use.",
-    "security_value_reason": "Use ACM-managed server certificate lifecycle and controlled client certificate/private-key distribution.",
+    "risk_reason": "Server certificate / mutual authentication 属于“VPN TLS 证书治理缺口”。如果配置为风险值（Expired server or client certificate；RSA 1024-bit certificate as long-term baseline；Client certificate without CN attribute；Client private key distribution not controlled），可能导致远程接入 VPN 的证书、CRL、客户端私钥或认证规则失控。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ACM server certificate；RFC 5280-compliant certificates；RSA 2048-bit certificate baseline；Mutual authentication when certificate-based client identity is required）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/client-authentication.html; https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/mutual.html"
   },
   {
@@ -277,8 +277,8 @@
     "risky_values": "Expired CRL\nNo revocation process for issued client certificates\nShared client certificate/key across users",
     "risk_type": "vpn_tls_certificate_governance_gap",
     "risk_level": "high",
-    "risk_reason": "AWS troubleshooting docs identify expired CRL as a cause of TLS handshake failures. Shared or unmanaged client certificates also weaken certificate-based authentication.",
-    "security_value_reason": "Use per-client certificates where practical and keep CRL lifecycle monitored.",
+    "risk_reason": "Client certificate revocation list (CRL) 属于“VPN TLS 证书治理缺口”。如果配置为风险值（Expired CRL；No revocation process for issued client certificates；Shared client certificate/key across users），可能导致远程接入 VPN 的证书、CRL、客户端私钥或认证规则失控。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（Valid and monitored CRL when mutual authentication revocation is used；Process for revoking per-user client certificates）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/vpn/latest/clientvpn-admin/mutual.html; https://docs.aws.amazon.com/en_us/vpn/latest/clientvpn-admin/client-cannot-connect.html"
   },
   {
@@ -290,8 +290,8 @@
     "risky_values": "Treating Cloud Map namespace as TLS termination or encryption boundary\nPublic DNS namespace used for integrity-sensitive discovery without DNSSEC governance\nSensitive secrets placed in instance attributes, names, or tags\nDownstream service endpoint exposed without TLS",
     "risk_type": "service_discovery_encryption_boundary_gap",
     "risk_level": "medium",
-    "risk_reason": "Cloud Map maps names to resources and can create Route 53 hosted zones, but it does not provide user-selectable TLS/cipher/key configuration for the discovered service traffic.",
-    "security_value_reason": "Keep Cloud Map as discovery metadata; enforce encryption in the AWS API path, DNS integrity layer, and downstream service endpoint.",
+    "risk_reason": "Service discovery crypto boundary 属于“服务发现加密边界误判风险”。如果配置为风险值（Treating Cloud Map namespace as TLS termination or encryption boundary；Public DNS namespace used for integrity-sensitive discovery without DNSSEC governance；Sensitive sec…），可能把服务发现误认为加密边界，导致真正的数据传输链路没有落实 TLS 或 DNS 完整性控制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（Use HTTPS/TLS for AWS API access；Use private DNS namespace for internal-only discovery；Use Route 53 DNSSEC governance for public DNS integrity requirements；Enable TLS on…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/cloud-map/latest/dg/security.html; https://docs.aws.amazon.com/cloud-map/latest/dg/creating-namespaces.html; https://docs.aws.amazon.com/cloud-map/latest/api/API_Operations.html"
   },
   {
@@ -303,8 +303,8 @@
     "risky_values": "KeySpec and KeyUsage mismatch\nAsymmetric or HMAC KMS key used for AWS service encryption that requires symmetric KMS keys\nRSAES_OAEP_SHA_1 when SHA-256 OAEP is available\nHMAC_224 as a weak baseline\nOne KMS key reused across incompatible purposes",
     "risk_type": "kms_key_spec_usage_mismatch",
     "risk_level": "high",
-    "risk_reason": "AWS KMS key spec and key usage cannot be changed after creation. AWS integrated services use symmetric encryption KMS keys. Each KMS key has one key usage.",
-    "security_value_reason": "Choose key spec and key usage from the business purpose first; use SYMMETRIC_DEFAULT for most AWS service encryption and ML-DSA only for PQ signature requirements.",
+    "risk_reason": "CreateKey.KeySpec / KeyUsage 属于“KMS 密钥类型或用途不匹配风险”。如果配置为风险值（KeySpec and KeyUsage mismatch；Asymmetric or HMAC KMS key used for AWS service encryption that requires symmetric KMS keys；RSAES_OAEP_SHA_1 when SHA-256 OAEP is available；…），可能导致密钥类型、用途或算法与业务场景不匹配，造成密钥误用或 AWS 服务集成失败。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（SYMMETRIC_DEFAULT + ENCRYPT_DECRYPT for AWS integrated service encryption；RSA_3072/RSA_4096 or ECC_NIST_P256/P384/P521 for asymmetric sign/verify or encrypt/decrypt use c…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/kms/latest/APIReference/API_CreateKey.html; https://docs.aws.amazon.com/kms/latest/developerguide/symm-asymm-choose-key-spec.html; https://docs.aws.amazon.com/kms/latest/developerguide/symmetric-asymmetric.html"
   },
   {
@@ -316,8 +316,8 @@
     "risky_values": "EXTERNAL imported key material without expiration, availability, and rotation process\nCustom key store or external key store without availability/SLA governance\nMulti-Region key used where data residency or blast radius should remain regional",
     "risk_type": "kms_key_material_origin_or_residency_gap",
     "risk_level": "medium",
-    "risk_reason": "Origin and MultiRegion cannot be changed after key creation. Imported or custom key store material shifts operational responsibilities to the customer.",
-    "security_value_reason": "Use AWS_KMS origin by default and document operational controls when choosing imported material, custom key stores, external key stores, or multi-Region keys.",
+    "risk_reason": "CreateKey.Origin / MultiRegion / CustomKeyStoreId 属于“KMS 密钥材料来源或驻留治理缺口”。如果配置为风险值（EXTERNAL imported key material without expiration, availability, and rotation process；Custom key store or external key store without availability/SLA governance；Multi-Reg…），可能使密钥材料来源、外部密钥库、自定义密钥库或多区域策略与可用性、驻留和合规要求不一致。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（Origin AWS_KMS for standard managed key material；MultiRegion true only for cross-region cryptographic portability requirements；AWS_CLOUDHSM or EXTERNAL only with document…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/kms/latest/APIReference/API_CreateKey.html"
   },
   {
@@ -329,8 +329,8 @@
     "risky_values": "No rotation policy for customer managed keys\nAssuming automatic rotation works for asymmetric, HMAC, imported, or custom key store keys\nDeleting old key before all ciphertext/signature validation dependencies are migrated",
     "risk_type": "kms_rotation_policy_gap",
     "risk_level": "medium",
-    "risk_reason": "Automatic rotation applies only to eligible symmetric encryption KMS keys with AWS_KMS origin. Asymmetric, HMAC, imported, and custom key store keys require manual rotation patterns.",
-    "security_value_reason": "Enable automatic rotation where eligible and define manual rotation for non-eligible key types.",
+    "risk_reason": "Key rotation 属于“KMS 密钥轮换策略缺口”。如果配置为风险值（No rotation policy for customer managed keys；Assuming automatic rotation works for asymmetric, HMAC, imported, or custom key store keys；Deleting old key before all cipher…），可能让密钥长期不轮换，或误以为不支持自动轮换的密钥类型已经被自动治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（Automatic rotation for eligible symmetric AWS_KMS customer managed keys；Manual rotation plan for asymmetric, HMAC, imported, and custom key store keys；Rotation monitoring…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/kms/latest/developerguide/rotating-keys-enable.html; https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys-manually.html"
   },
   {
@@ -342,8 +342,8 @@
     "risky_values": "BypassPolicyLockoutSafetyCheck=true without explicit recovery path\nOverly broad key administrators or key users\nNo algorithm restrictions where only specific algorithms are approved",
     "risk_type": "kms_key_policy_governance_gap",
     "risk_level": "high",
-    "risk_reason": "AWS warns that bypassing the policy lockout safety check increases the risk that the KMS key becomes unmanageable.",
-    "security_value_reason": "Keep the safety check enabled and use key policy/IAM conditions to restrict key creation and cryptographic operations.",
+    "risk_reason": "Key policy / lockout safety 属于“KMS 密钥策略治理缺口”。如果配置为风险值（BypassPolicyLockoutSafetyCheck=true without explicit recovery path；Overly broad key administrators or key users；No algorithm restrictions where only specific algorithms a…），可能扩大密钥管理或使用权限，甚至造成策略锁定、越权使用或缺少算法约束。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（BypassPolicyLockoutSafetyCheck=false；Least-privilege key administrators and key users；Use kms:KeySpec, kms:KeyUsage, kms:EncryptionAlgorithm, kms:SigningAlgorithm, kms:Ma…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/kms/latest/APIReference/API_CreateKey.html; https://docs.aws.amazon.com/kms/latest/developerguide/conditions-kms.html"
   },
   {
@@ -355,8 +355,8 @@
     "risky_values": "non-FIPS mode selected for regulated workloads requiring FIPS validated algorithms\nassuming a cluster mode can be changed after creation\nbackup restore across incompatible FIPS/non-FIPS modes",
     "risk_type": "hsm_mode_or_mechanism_misconfiguration",
     "risk_level": "high",
-    "risk_reason": "CloudHSM cluster mode is selected at creation and cannot be changed later. Non-FIPS mode allows non-FIPS-approved algorithms.",
-    "security_value_reason": "Choose FIPS mode when compliance requires FIPS validated keys and algorithms; use non-FIPS only with documented algorithm need.",
+    "risk_reason": "Cluster mode / HSM type 属于“HSM 模式或密码机制配置风险”。如果配置为风险值（non-FIPS mode selected for regulated workloads requiring FIPS validated algorithms；assuming a cluster mode can be changed after creation；backup restore across incompatibl…），可能在 HSM 中长期使用 DES3、SHA1、RSA-PKCS、AES-ECB 等兼容性机制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（FIPS mode for FIPS 140 requirement；hsm2m.medium only when non-FIPS mode is explicitly needed；mode selected before production because it cannot be changed after creation）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html; https://docs.aws.amazon.com/cloudhsm/latest/userguide/cluster-hsm-types.html"
   },
   {
@@ -368,8 +368,8 @@
     "risky_values": "DES3-CBC / DES3-ECB as new baseline\nSHA1 digest/signature/KDF as new baseline\nRSA-PKCS / PKCS#1 v1.5 padding for new encryption/signature baseline\nAES-ECB",
     "risk_type": "hsm_mode_or_mechanism_misconfiguration",
     "risk_level": "high",
-    "risk_reason": "CloudHSM supports many mechanisms for compatibility. Supported does not mean recommended for new designs.",
-    "security_value_reason": "Use modern AEAD, SHA-2, and OAEP/ECDSA/HMAC mechanisms and keep legacy mechanisms as documented compatibility exceptions.",
+    "risk_reason": "PKCS#11/JCE/CNG mechanisms and algorithms 属于“HSM 模式或密码机制配置风险”。如果配置为风险值（DES3-CBC / DES3-ECB as new baseline；SHA1 digest/signature/KDF as new baseline；RSA-PKCS / PKCS#1 v1.5 padding for new encryption/signature baseline；AES-ECB），可能在 HSM 中长期使用 DES3、SHA1、RSA-PKCS、AES-ECB 等兼容性机制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（AES-GCM；AES Key Wrap；RSA-OAEP with SHA-2；ECDSA with SHA-2；HMAC with SHA-2；ECDH with SHA-2 KDF where applicable）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/cloudhsm/latest/userguide/pkcs11-mechanisms.html"
   },
   {
@@ -381,8 +381,8 @@
     "risky_values": "extractable sensitive keys without documented need\noverbroad encrypt/decrypt/sign/wrap/unwrap attributes\nshared CU credentials\nkey owner lifecycle not documented",
     "risk_type": "hsm_key_attribute_or_ownership_gap",
     "risk_level": "high",
-    "risk_reason": "CloudHSM key owners and attributes govern how keys can be used or exported. Overbroad attributes defeat HSM isolation goals.",
-    "security_value_reason": "Restrict key attributes to intended operations and govern CU ownership, wrapping, and deletion lifecycle.",
+    "risk_reason": "HSM key ownership and attributes 属于“HSM 密钥属性或所有权治理缺口”。如果配置为风险值（extractable sensitive keys without documented need；overbroad encrypt/decrypt/sign/wrap/unwrap attributes；shared CU credentials；key owner lifecycle not documented），可能让敏感密钥可导出、可被过度使用，或因 CU 所有权不清导致 HSM 隔离目标被削弱。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（least-privilege key attributes；non-extractable private keys by default；CU ownership and role separation；key wrapping only with trusted wrapping keys）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/cloudhsm/latest/userguide/manage-keys.html"
   },
   {
@@ -394,8 +394,8 @@
     "risky_values": "RSA_1024 as new baseline\nCertificateTransparencyLoggingPreference=DISABLED without privacy/legal justification\ncertificate domain/SAN mismatch\nprivate certificate algorithm family mismatch with CA key",
     "risk_type": "certificate_lifecycle_or_identity_mismatch",
     "risk_level": "medium",
-    "risk_reason": "ACM public certificate requests support RSA_2048, EC_prime256v1, and EC_secp384r1. CT logging helps detect mistaken or malicious public certificate issuance.",
-    "security_value_reason": "Use ACM-managed public certificates with DNS validation and CT logging enabled unless there is a documented exception.",
+    "risk_reason": "RequestCertificate.KeyAlgorithm / certificate transparency 属于“证书生命周期或身份匹配风险”。如果配置为风险值（RSA_1024 as new baseline；CertificateTransparencyLoggingPreference=DISABLED without privacy/legal justification；certificate domain/SAN mismatch；private certificate algorit…），可能导致证书过期、域名不匹配、证书链不完整或客户端信任失败，从而削弱 TLS 身份校验。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（RSA_2048；EC_prime256v1；EC_secp384r1；CertificateTransparencyLoggingPreference=ENABLED；DNS validation for public certificates）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/acm/latest/APIReference/API_RequestCertificate.html; https://docs.aws.amazon.com/acm/latest/userguide/managed-renewal.html"
   },
   {
@@ -407,8 +407,8 @@
     "risky_values": "imported certificate expected to renew automatically\nencrypted private key submitted for import\nprivate key mismatch\nincomplete chain\nexpired or not-yet-valid certificate",
     "risk_type": "certificate_lifecycle_or_identity_mismatch",
     "risk_level": "high",
-    "risk_reason": "ACM does not provide managed renewal for imported certificates. Import requires a matching unencrypted private key and valid PEM material.",
-    "security_value_reason": "Use imported certificates only when necessary and add renewal, chain, and private-key handling controls.",
+    "risk_reason": "ImportCertificate lifecycle 属于“证书生命周期或身份匹配风险”。如果配置为风险值（imported certificate expected to renew automatically；encrypted private key submitted for import；private key mismatch；incomplete chain；expired or not-yet-valid certificate），可能导致证书过期、域名不匹配、证书链不完整或客户端信任失败，从而削弱 TLS 身份校验。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（complete PEM certificate chain；private key matches certificate public key；expiration monitoring for imported certificates；prefer ACM-issued managed certificates when poss…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/acm/latest/APIReference/API_ImportCertificate.html; https://docs.aws.amazon.com/acm/latest/userguide/managed-renewal.html"
   },
   {
@@ -420,8 +420,8 @@
     "risky_values": "unnecessary export of private key material\nweak or inline passphrase\npassphrase committed to scripts/logs/shell history\nexported private key without inventory or revocation plan",
     "risk_type": "certificate_private_key_export_gap",
     "risk_level": "high",
-    "risk_reason": "ExportCertificate returns certificate, chain, and encrypted private key. Export expands the private-key trust boundary beyond ACM.",
-    "security_value_reason": "Use ACM-integrated deployment when possible; if export is required, protect passphrase and private key lifecycle.",
+    "risk_reason": "ExportCertificate / exportable public certificate private key handling 属于“证书私钥导出治理缺口”。如果配置为风险值（unnecessary export of private key material；weak or inline passphrase；passphrase committed to scripts/logs/shell history；exported private key without inventory or revocati…），可能扩大证书私钥离开 ACM 后的信任边界，增加私钥泄露、弱口令和吊销流程缺失风险。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（export only when certificate must be deployed outside integrated AWS services；passphrase supplied from a protected file or secret process；post-export private key storage…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/acm/latest/APIReference/API_ExportCertificate.html; https://docs.aws.amazon.com/en_us/acm/latest/userguide/acm-exportable-certificates.html"
   },
   {
@@ -433,8 +433,8 @@
     "risky_values": "AmazonFreeRTOS-TI-CC3220SF as new baseline because it is SHA1-RSA\nwrong platformId for artifact type\nIoT workflow certificate imported into ACM without lifecycle controls",
     "risk_type": "code_signing_algorithm_or_profile_gap",
     "risk_level": "high",
-    "risk_reason": "Signer platformId determines the signature algorithm and format. AWS documents AmazonFreeRTOS-TI-CC3220SF as SHA1-RSA, which should be treated as a legacy compatibility platform.",
-    "security_value_reason": "Use SHA256/ECDSA or SHA384/ECDSA platforms where supported and match platformId to artifact type.",
+    "risk_reason": "Signing profile platformId / signing algorithm 属于“代码签名算法或 profile 治理缺口”。如果配置为风险值（AmazonFreeRTOS-TI-CC3220SF as new baseline because it is SHA1-RSA；wrong platformId for artifact type；IoT workflow certificate imported into ACM without lifecycle controls），可能使用旧签名算法、过长有效期或过宽签名权限，扩大制品签名被滥用后的影响范围。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（AWSLambda-SHA384-ECDSA；Notation-OCI-SHA384-ECDSA；AWSIoTDeviceManagement-SHA256-ECDSA；AmazonFreeRTOS-Default）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/signer/latest/developerguide/signing-profiles.html; https://docs.aws.amazon.com/signer/latest/developerguide/Welcome.html"
   },
   {
@@ -446,8 +446,8 @@
     "risky_values": "maximum validity used by default without lifecycle rationale\noverbroad signing permissions\nuncontrolled profile reuse across environments\nno revocation or replacement process after signing material compromise",
     "risk_type": "code_signing_algorithm_or_profile_gap",
     "risk_level": "medium",
-    "risk_reason": "Long-lived signing validity and broad signing permissions increase blast radius if a profile, artifact pipeline, or signing material is compromised.",
-    "security_value_reason": "Treat signing profiles as sensitive cryptographic control points with scoped IAM and lifecycle governance.",
+    "risk_reason": "Signing profile validity and permissions 属于“代码签名算法或 profile 治理缺口”。如果配置为风险值（maximum validity used by default without lifecycle rationale；overbroad signing permissions；uncontrolled profile reuse across environments；no revocation or replacement pro…），可能使用旧签名算法、过长有效期或过宽签名权限，扩大制品签名被滥用后的影响范围。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（shortest practical signature validity period for Lambda/container workflows；least-privilege StartSigningJob and profile administration；profile version governance and revo…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/signer/latest/developerguide/signing-profiles.html"
   },
   {
@@ -459,8 +459,8 @@
     "risky_values": "ForbidEncryptAllowDecrypt used as steady-state new encryption baseline\ndiscovery keyring without discoveryFilter\nraw keyring without strong key storage controls\nmissing encryption context for data binding where needed",
     "risk_type": "client_side_encryption_sdk_misconfiguration",
     "risk_level": "high",
-    "risk_reason": "AWS recommends key commitment as a best practice. Discovery keyrings without filters can attempt keys across accounts/Regions and widen the decryption surface.",
-    "security_value_reason": "Use commitment policy explicitly, prefer AWS KMS keyrings, and restrict discovery mode.",
+    "risk_reason": "Commitment policy / AWS KMS keyring 属于“客户端加密 SDK 配置风险”。如果配置为风险值（ForbidEncryptAllowDecrypt used as steady-state new encryption baseline；discovery keyring without discoveryFilter；raw keyring without strong key storage controls；missing e…），可能削弱 key commitment、keyring 边界、字段级加密动作或可搜索加密泄露面控制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（RequireEncryptRequireDecrypt；AWS KMS keyring with explicit KMS key identifiers；discovery keyring only with discoveryFilter；encryption context with non-secret integrity me…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/en_us/encryption-sdk/latest/developer-guide/supported-algorithms.html; https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/migrate-commitment-policy.html; https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/use-kms-keyring.html; https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/configure.html"
   },
   {
@@ -472,8 +472,8 @@
     "risky_values": "DO_NOTHING for sensitive fields\nchanging cryptographic action on existing populated fields\nbeacon configured on DO_NOTHING field\nbeacon length/design that leaks too much plaintext structure",
     "risk_type": "client_side_encryption_sdk_misconfiguration",
     "risk_level": "high",
-    "risk_reason": "Cryptographic actions determine field protection. Beacons are HMAC-derived searchable tags and are not encrypted; they must be designed carefully before data is written.",
-    "security_value_reason": "Use encrypt/sign actions deliberately and plan searchable encryption with the hierarchical keyring and leakage analysis.",
+    "risk_reason": "Cryptographic actions / beacons / keyrings 属于“客户端加密 SDK 配置风险”。如果配置为风险值（DO_NOTHING for sensitive fields；changing cryptographic action on existing populated fields；beacon configured on DO_NOTHING field；beacon length/design that leaks too much…），可能削弱 key commitment、keyring 边界、字段级加密动作或可搜索加密泄露面控制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ENCRYPT_AND_SIGN for sensitive fields；SIGN_ONLY only for integrity-only fields；AWS KMS Hierarchical keyring for searchable encryption；beacon design before writing product…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/database-encryption-sdk/latest/devguide/concepts.html; https://docs.aws.amazon.com/database-encryption-sdk/latest/devguide/beacons.html; https://docs.aws.amazon.com/database-encryption-sdk/latest/devguide/plan-searchable-encryption.html"
   },
   {
@@ -485,8 +485,8 @@
     "risky_values": "legacy wrapping algorithms enabled for new encryption\nraw AES/RSA wrapping keys without HSM/KMS-grade protection\ncommitment policy allowing non-committed encryption as steady state\ninstruction file handling not governed",
     "risk_type": "client_side_encryption_sdk_misconfiguration",
     "risk_level": "high",
-    "risk_reason": "S3 Encryption Client depends on wrapping key protection and commitment policy. Legacy wrapping algorithms are for decrypting older data, not new encryption baselines.",
-    "security_value_reason": "Use current client versions, modern commitment policy, and KMS/HSM-protected wrapping keys.",
+    "risk_reason": "Keyring / wrapping algorithm / commitment policy 属于“客户端加密 SDK 配置风险”。如果配置为风险值（legacy wrapping algorithms enabled for new encryption；raw AES/RSA wrapping keys without HSM/KMS-grade protection；commitment policy allowing non-committed encryption as st…），可能削弱 key commitment、keyring 边界、字段级加密动作或可搜索加密泄露面控制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（AWS KMS wrapping key where possible；AES-GCM object encryption；RequireEncryptRequireDecrypt or migration-appropriate require policy；current fully supported wrapping algori…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/amazon-s3-encryption-client/latest/developerguide/concepts.html; https://docs.aws.amazon.com/amazon-s3-encryption-client/latest/developerguide/encryption-algorithms.html"
   },
   {
@@ -498,8 +498,8 @@
     "risky_values": "TDES_2KEY as new baseline\nNoRestrictions for production keys without strict justification\nKeyUsage reused across PIN, CVV, MAC, and data encryption purposes\nEncrypt/Decrypt/Wrap/Unwrap all enabled when only one operation is required\nTR31_K0 where TR31_K1 key block protection key is recommended",
     "risk_type": "payment_crypto_key_attribute_mismatch",
     "risk_level": "high",
-    "risk_reason": "AWS Payment Cryptography binds key algorithm, usage, and modes of use to keys. Valid does not always mean least privilege or suitable as a new baseline. TDES_2KEY and NoRestrictions should be treated as high-risk compatibility choices.",
-    "security_value_reason": "Scope each key to a single payment purpose, choose AES where supported, use TDES only for payment interoperability requirements, and minimize KeyModesOfUse.",
+    "risk_reason": "CreateKey.KeyAttributes: KeyAlgorithm / KeyUsage / KeyModesOfUse 属于“支付密码密钥属性不匹配风险”。如果配置为风险值（TDES_2KEY as new baseline；NoRestrictions for production keys without strict justification；KeyUsage reused across PIN, CVV, MAC, and data encryption purposes；Encrypt/Decry…），可能让支付密钥算法、用途或操作模式过宽，不满足支付场景的最小权限和密钥分离要求。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（AES_128 / AES_192 / AES_256 where supported by the payment key type；TDES_3KEY only when TDES interoperability is required；KeyUsage scoped to the payment purpose, such as…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_CreateKey.html; https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html"
   },
   {
@@ -511,8 +511,8 @@
     "risky_values": "paper key components as long-term operating model\nRSA wrap used when TR-34 is available and required integrity metadata is needed\nTR-31 Version A/C accepted from legacy sources without migration plan\nexportable working keys without business need\nwrapping key weaker than protected key",
     "risk_type": "payment_crypto_key_exchange_or_export_gap",
     "risk_level": "high",
-    "risk_reason": "AWS recommends standards-based electronic key exchange and notes TR-34 for KEK exchange, TR-31 for working key exchange, and RSA wrap as a fallback with limitations. Export expands the key transport boundary.",
-    "security_value_reason": "Use standards-based key blocks and ensure wrapping keys are at least as strong as protected keys; document KEK crypto periods and export need.",
+    "risk_reason": "Key import/export method and key block format 属于“支付密钥交换或导出治理缺口”。如果配置为风险值（paper key components as long-term operating model；RSA wrap used when TR-34 is available and required integrity metadata is needed；TR-31 Version A/C accepted from legacy s…），可能让支付密钥导入导出路径、key block 格式或 KEK 生命周期不符合安全与合规要求。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（TR-34 for initial KEK exchange where supported；ECDH for AES-256 key exchange needs where supported；TR-31 for working key exchange after KEK establishment；RSA wrap only as…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-importexport.html; https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-import.html; https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-export.html; https://docs.aws.amazon.com/payment-cryptography/latest/APIReference/API_ImportKey.html"
   },
   {
@@ -524,8 +524,8 @@
     "risky_values": "same key reused across PIN, CVV, MAC, and data encryption\nNoRestrictions used to bypass operation scoping\ntest keys or aliases used in production\noperation permissions granted broadly without purpose separation\nsensitive data in tags, aliases, or free-form fields",
     "risk_type": "payment_crypto_operation_scope_gap",
     "risk_level": "high",
-    "risk_reason": "Payment cryptography operations are strongly tied to key usage. Reusing one key across payment functions or environments weakens auditability and can violate payment key-separation expectations.",
-    "security_value_reason": "Separate keys, aliases, IAM permissions, and environments by payment operation and business role.",
+    "risk_reason": "Payment data operations: PIN / CVV / MAC / data encryption 属于“支付密码操作范围隔离缺口”。如果配置为风险值（same key reused across PIN, CVV, MAC, and data encryption；NoRestrictions used to bypass operation scoping；test keys or aliases used in production；operation permissions gr…），可能在 PIN、CVV、MAC、数据加密或测试/生产环境之间复用密钥和权限，削弱审计与隔离。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（Dedicated key usage for each operation family；CMAC/HMAC keys for MAC where supported by scheme；DUKPT BDK/IPEK with scoped derivation use；separate keys for test and produc…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/payment-cryptography/latest/userguide/data-protection.html; https://docs.aws.amazon.com/payment-cryptography/latest/userguide/keys-validattributes.html"
   },
   {
@@ -537,8 +537,8 @@
     "risky_values": "assuming exported key material can leave in cleartext\nAPI traffic without modern TLS client support\npublic endpoint used where private connectivity is mandated\ncredentials or secrets in URL, tags, aliases, or free-form fields",
     "risk_type": "payment_crypto_boundary_or_transport_gap",
     "risk_level": "medium",
-    "risk_reason": "AWS states key material never leaves the HSM boundary in plaintext and API calls require TLS. Customers still control API clients, IAM, endpoint choice, and sensitive metadata hygiene.",
-    "security_value_reason": "Use modern TLS clients, PrivateLink where required, and keep sensitive values out of metadata fields.",
+    "risk_reason": "HSM protection and TLS/PQ API transport 属于“支付密码边界或传输安全缺口”。如果配置为风险值（assuming exported key material can leave in cleartext；API traffic without modern TLS client support；public endpoint used where private connectivity is mandated；credential…），可能误解 HSM 边界或 API 传输边界，导致客户端 TLS、PrivateLink 或敏感元数据治理不足。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（PCI PTS HSM and FIPS 140-2 Level 3 service protection；TLS 1.2-1.3 with strong cryptography；hybrid post-quantum TLS support for API endpoints；PrivateLink VPC endpoint wher…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/payment-cryptography/latest/userguide/what-is.html; https://docs.aws.amazon.com/payment-cryptography/latest/userguide/data-protection.html"
   },
   {
@@ -550,8 +550,8 @@
     "risky_values": "DISABLED\nPERMISSIVE as a long-term baseline",
     "risk_type": "mesh_tls_or_mtls_governance_gap",
     "risk_level": "high",
-    "risk_reason": "DISABLED leaves service-to-service traffic without mesh-managed TLS. PERMISSIVE allows both encrypted and unencrypted connections and is suitable only as a migration bridge, not as a steady security baseline.",
-    "security_value_reason": "Use STRICT when the workload should require TLS on the listener and complete compatibility testing before enforcement.",
+    "risk_reason": "Listener TLS mode 属于“服务网格 TLS/mTLS 治理缺口”。如果配置为风险值（DISABLED；PERMISSIVE as a long-term baseline），可能导致服务网格内东西向流量缺少 TLS/mTLS、证书轮换或信任域治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（STRICT）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/app-mesh/latest/userguide/tls.html; https://docs.aws.amazon.com/app-mesh/latest/APIReference/API_ListenerTls.html"
   },
   {
@@ -563,8 +563,8 @@
     "risky_values": "enforce: false\nno validation trust\nmissing or overbroad subjectAlternativeNames",
     "risk_type": "mesh_tls_or_mtls_governance_gap",
     "risk_level": "high",
-    "risk_reason": "Without enforcement and trust validation, mesh clients can connect without consistently validating the backend TLS identity. Missing or overly broad SAN validation weakens service identity binding.",
-    "security_value_reason": "Enable client TLS enforcement and configure trust anchors and SAN matching for backends that require authenticated service identity.",
+    "risk_reason": "Backend client TLS policy 属于“服务网格 TLS/mTLS 治理缺口”。如果配置为风险值（enforce: false；no validation trust；missing or overbroad subjectAlternativeNames），可能导致服务网格内东西向流量缺少 TLS/mTLS、证书轮换或信任域治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（enforce: true；validation.trust configured；subjectAlternativeNames matched where identity binding is required）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/app-mesh/latest/APIReference/API_ClientPolicyTls.html; https://docs.aws.amazon.com/app-mesh/latest/APIReference/API_TlsValidationContext.html"
   },
   {
@@ -576,8 +576,8 @@
     "risky_values": "expired certificate\nunmanaged local private key file\nmissing trust anchor\ncertificate SAN not aligned with service identity",
     "risk_type": "certificate_lifecycle_or_identity_mismatch",
     "risk_level": "medium",
-    "risk_reason": "App Mesh TLS/mTLS security depends on certificate validity, private-key handling, trust anchors, and identity matching. Local file certificates require external lifecycle control and can drift from mesh policy.",
-    "security_value_reason": "Prefer managed or automated certificate sources and validate that trust roots and SANs match the intended service identity.",
+    "risk_reason": "TLS certificate and trust source 属于“证书生命周期或身份匹配风险”。如果配置为风险值（expired certificate；unmanaged local private key file；missing trust anchor；certificate SAN not aligned with service identity），可能导致证书过期、域名不匹配、证书链不完整或客户端信任失败，从而削弱 TLS 身份校验。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ACM Private CA for managed private certificates；SDS/SPIRE for short-lived workload identity；controlled file certificates only with rotation and reload process）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/app-mesh/latest/userguide/tls.html; https://docs.aws.amazon.com/app-mesh/latest/APIReference/API_ListenerTlsCertificate.html"
   },
   {
@@ -589,8 +589,8 @@
     "risky_values": "no_encrypt\nshould_encrypt as a long-term baseline",
     "risk_type": "direct_connect_macsec_gap",
     "risk_level": "high",
-    "risk_reason": "no_encrypt leaves the physical Direct Connect link without MACsec. should_encrypt can allow fallback behavior and should not become the permanent security baseline for sensitive connectivity.",
-    "security_value_reason": "Use must_encrypt after MACsec validation so the link does not silently continue without encryption.",
+    "risk_reason": "MACsec encryptionMode 属于“Direct Connect MACsec 治理缺口”。如果配置为风险值（no_encrypt；should_encrypt as a long-term baseline），可能让专线链路缺少 MACsec 加密、密钥轮换或连接状态监控。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（must_encrypt；should_encrypt only during migration or maintenance windows）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/MACsec.html; https://docs.aws.amazon.com/directconnect/latest/APIReference/API_UpdateConnection.html"
   },
   {
@@ -602,8 +602,8 @@
     "risky_values": "Manual key sharing without lifecycle control\nNo rotation plan\nMismatched CKN/CAK on customer router\nDeleting active key without replacement",
     "risk_type": "direct_connect_macsec_gap",
     "risk_level": "high",
-    "risk_reason": "MACsec depends on matching CKN/CAK material on both sides. Poor key storage, manual handling, or rotation mistakes can disable encryption or force operational fallback.",
-    "security_value_reason": "Use Secrets Manager-backed MACsec keys where supported and operate key rotation as a controlled change with status validation.",
+    "risk_reason": "MACsec CKN/CAK key association 属于“Direct Connect MACsec 治理缺口”。如果配置为风险值（Manual key sharing without lifecycle control；No rotation plan；Mismatched CKN/CAK on customer router；Deleting active key without replacement），可能让专线链路缺少 MACsec 加密、密钥轮换或连接状态监控。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（Use secretARN in AWS Secrets Manager；Use strong CKN/CAK values according to AWS MACsec requirements；Plan rotation with multiple associated MACsec keys）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/directconnect/latest/APIReference/API_AssociateMacSecKey.html; https://docs.aws.amazon.com/directconnect/latest/UserGuide/MACsec.html"
   },
   {
@@ -615,8 +615,8 @@
     "risky_values": "macSecCapable: false for workloads requiring link encryption\nportEncryptionStatus not monitored\nassuming hosted connections support the same MACsec model",
     "risk_type": "direct_connect_macsec_gap",
     "risk_level": "medium",
-    "risk_reason": "MACsec is not available on every Direct Connect connection type or capacity. Without status monitoring, a configuration drift or failed key exchange can be missed.",
-    "security_value_reason": "Select MACsec-capable connection types for link-encryption requirements and monitor MACsec status continuously.",
+    "risk_reason": "MACsec capability and encryption status 属于“Direct Connect MACsec 治理缺口”。如果配置为风险值（macSecCapable: false for workloads requiring link encryption；portEncryptionStatus not monitored；assuming hosted connections support the same MACsec model），可能让专线链路缺少 MACsec 加密、密钥轮换或连接状态监控。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（macSecCapable: true；portEncryptionStatus indicates active encryption；monitor alarms and change records for MACsec status）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/directconnect/latest/APIReference/API_Connection.html; https://docs.aws.amazon.com/directconnect/latest/UserGuide/MACsec.html"
   },
   {
@@ -628,8 +628,8 @@
     "risky_values": "Treating managed MACsec as end-to-end application encryption\nNo review of partner network encryption/isolation controls\nSensitive traffic without TLS/IPsec overlay",
     "risk_type": "managed_interconnect_encryption_boundary_gap",
     "risk_level": "medium",
-    "risk_reason": "AWS Interconnect provides managed private connectivity and AWS-side data-in-transit protection, but customer workloads should not assume this replaces end-to-end encryption or partner network due diligence.",
-    "security_value_reason": "Use Interconnect as a private connectivity layer, then document the encryption boundary and apply application-layer TLS or IPsec where data sensitivity requires it.",
+    "risk_reason": "Managed connection encryption boundary 属于“托管互联加密边界缺口”。如果配置为风险值（Treating managed MACsec as end-to-end application encryption；No review of partner network encryption/isolation controls；Sensitive traffic without TLS/IPsec overlay），可能把托管互联或私有连接误认为默认端到端加密边界，忽略上层 TLS/IPsec 控制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（Use AWS Interconnect for private managed connectivity；Confirm AWS-to-partner MACsec boundary and partner network controls；Overlay TLS/IPsec for sensitive application traf…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/interconnect/latest/userguide/what-is-interconnect.html; https://docs.aws.amazon.com/interconnect/latest/userguide/infrastructure-security.html"
   },
   {
@@ -641,8 +641,8 @@
     "risky_values": "protocol: HTTP for sensitive RTB traffic\nTLS not enabled for RTB application communications\nassuming private connectivity alone provides encryption",
     "risk_type": "rtb_fabric_tls_or_trust_boundary_gap",
     "risk_level": "high",
-    "risk_reason": "RTB Fabric supports TLS 1.2+ for RTB communications when TLS is configured. Using HTTP or relying only on private connectivity leaves bid requests and responses without application transport encryption.",
-    "security_value_reason": "Use HTTPS/TLS for RTB application communications and keep HTTP only for explicitly accepted, non-sensitive compatibility cases with compensating controls.",
+    "risk_reason": "Gateway protocol and TLS for RTB traffic 属于“应用网络 TLS 或信任边界缺口”。如果配置为风险值（protocol: HTTP for sensitive RTB traffic；TLS not enabled for RTB application communications；assuming private connectivity alone provides encryption），可能导致应用网络、服务网络或后端目标之间的 TLS 与信任边界不清晰。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（protocol: HTTPS；port: 443 where applicable；TLS 1.2+ between requester and responder applications）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/rtb-fabric/latest/userguide/data-protection.html; https://docs.aws.amazon.com/rtb-fabric/latest/api/API_CreateResponderGateway.html"
   },
   {
@@ -654,8 +654,8 @@
     "risky_values": "missing trustStoreConfiguration where peer authentication is required\nover-broad CA trust\nexpired or stale CA certificates\npartner certificate chain not validated operationally",
     "risk_type": "rtb_fabric_tls_or_trust_boundary_gap",
     "risk_level": "high",
-    "risk_reason": "A trust store defines which CA certificates are trusted for RTB communications. Missing, stale, or overly broad CA trust can weaken peer authentication even when TLS is enabled.",
-    "security_value_reason": "Keep CA trust narrow, partner-specific where possible, and governed by certificate lifecycle and rotation procedures.",
+    "risk_reason": "Responder gateway trust store 属于“应用网络 TLS 或信任边界缺口”。如果配置为风险值（missing trustStoreConfiguration where peer authentication is required；over-broad CA trust；expired or stale CA certificates；partner certificate chain not validated operati…），可能导致应用网络、服务网络或后端目标之间的 TLS 与信任边界不清晰。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（Scoped CA certificates for trusted RTB peers；Certificate lifecycle and rotation process；CA list aligned with partner trust model）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/rtb-fabric/latest/api/API_CreateResponderGateway.html"
   },
   {
@@ -667,8 +667,8 @@
     "risky_values": "true as a long-term baseline\nHTTP responder allowed without partner and data-sensitivity review",
     "risk_type": "rtb_fabric_tls_or_trust_boundary_gap",
     "risk_level": "medium",
-    "risk_reason": "Allowing HTTP responders creates an explicit path for unencrypted responder communications and can undermine the intended TLS baseline for RTB traffic.",
-    "security_value_reason": "Disable HTTP responder allowance by default and require documented exceptions when a partner cannot support HTTPS.",
+    "risk_reason": "HTTP responder allowance on links 属于“应用网络 TLS 或信任边界缺口”。如果配置为风险值（true as a long-term baseline；HTTP responder allowed without partner and data-sensitivity review），可能导致应用网络、服务网络或后端目标之间的 TLS 与信任边界不清晰。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（false；true only for documented migration or compatibility exception）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/rtb-fabric/latest/api/API_CreateLink.html"
   },
   {
@@ -680,8 +680,8 @@
     "risky_values": "credentials embedded in external server URL\ncustomer email or identifiers in tags/name/description\nsecrets in customerProvidedId or metadata fields",
     "risk_type": "rtb_fabric_tls_or_trust_boundary_gap",
     "risk_level": "medium",
-    "risk_reason": "AWS documentation warns against placing confidential information in tags, free-form text fields, or URLs. These fields can appear in billing, diagnostic logs, or operational metadata and are not a substitute for encrypted payload handling.",
-    "security_value_reason": "Keep credentials and sensitive identifiers out of RTB Fabric metadata and use dedicated secret-management and application payload controls instead.",
+    "risk_reason": "Sensitive data in URLs, tags, and free-form fields 属于“应用网络 TLS 或信任边界缺口”。如果配置为风险值（credentials embedded in external server URL；customer email or identifiers in tags/name/description；secrets in customerProvidedId or metadata fields），可能导致应用网络、服务网络或后端目标之间的 TLS 与信任边界不清晰。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（no credentials in URL；no sensitive customer data in tags or free-form names；CloudTrail and log review for metadata hygiene）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/rtb-fabric/latest/userguide/data-protection.html"
   },
   {
@@ -693,8 +693,8 @@
     "risky_values": "expired certificate\nCN/SAN mismatch with ApplicationDomain\nmissing DomainCertificateArn for public application domain\nmanual certificate lifecycle without renewal monitoring",
     "risk_type": "verified_access_tls_or_backend_boundary_gap",
     "risk_level": "high",
-    "risk_reason": "Verified Access endpoint access for application domains depends on a public TLS/SSL certificate in ACM whose CN matches the DNS name users reach. Mismatch or expiry breaks trust and availability.",
-    "security_value_reason": "Use ACM-managed public certificates aligned to the application domain and monitor renewal or replacement before expiry.",
+    "risk_reason": "Endpoint domain certificate 属于“Verified Access TLS 或后端边界缺口”。如果配置为风险值（expired certificate；CN/SAN mismatch with ApplicationDomain；missing DomainCertificateArn for public application domain；manual certificate lifecycle without renewal monitor…），可能只保护入口访问而忽略后端 TLS、设备信任、身份上下文或目标组边界。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ACM public TLS certificate；CN/SAN matches ApplicationDomain；certificate lifecycle monitored through ACM）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/verified-access/latest/ug/create-load-balancer-endpoint.html; https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVerifiedAccessEndpoint.html"
   },
   {
@@ -706,8 +706,8 @@
     "risky_values": "HTTP backend path for sensitive applications\nassuming user-to-Verified-Access TLS covers all backend hops\nno documented encryption boundary for load balancer, network-interface, CIDR, or RDS endpoints",
     "risk_type": "verified_access_tls_or_backend_boundary_gap",
     "risk_level": "medium",
-    "risk_reason": "Verified Access encrypts end-user traffic to the Verified Access endpoint using TLS 1.2 or later, but downstream application connectivity and endpoint protocol choices still need separate encryption-boundary review.",
-    "security_value_reason": "Treat Verified Access as the access control and user-edge TLS boundary, then require HTTPS/TLS/IPsec on backend paths when data sensitivity requires end-to-end confidentiality.",
+    "risk_reason": "Endpoint protocol and backend encryption boundary 属于“Verified Access TLS 或后端边界缺口”。如果配置为风险值（HTTP backend path for sensitive applications；assuming user-to-Verified-Access TLS covers all backend hops；no documented encryption boundary for load balancer, network-int…），可能只保护入口访问而忽略后端 TLS、设备信任、身份上下文或目标组边界。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（HTTPS for web applications where supported；TCP with application-layer TLS for long-lived HTTPS/WebSocket or non-HTTP protocols；backend TLS/IPsec where confidentiality is…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/verified-access/latest/ug/data-protection.html; https://docs.aws.amazon.com/verified-access/latest/ug/verified-access-endpoints.html; https://docs.aws.amazon.com/verified-access/latest/ug/getting-started.html"
   },
   {
@@ -719,8 +719,8 @@
     "risky_values": "weak or missing endpoint/group policy\ntrust provider detached or not aligned with intended user/device assurance\nover-broad allow policy on an encrypted endpoint",
     "risk_type": "verified_access_tls_or_backend_boundary_gap",
     "risk_level": "medium",
-    "risk_reason": "Encryption protects the channel, but Verified Access security also depends on trust providers and policies deciding who can use that channel. A broad policy can expose applications even when TLS is strong.",
-    "security_value_reason": "Pair TLS/certificate governance with least-privilege Verified Access policies and trust provider validation for identity and device posture.",
+    "risk_reason": "Trust provider and policy boundary for encrypted access 属于“Verified Access TLS 或后端边界缺口”。如果配置为风险值（weak or missing endpoint/group policy；trust provider detached or not aligned with intended user/device assurance；over-broad allow policy on an encrypted endpoint），可能只保护入口访问而忽略后端 TLS、设备信任、身份上下文或目标组边界。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（at least one required trust provider attached；default deny until policy is defined；identity/device trust claims aligned with application sensitivity）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/verified-access/latest/ug/how-it-works.html; https://docs.aws.amazon.com/verified-access/latest/ug/trust-providers.html"
   },
   {
@@ -732,8 +732,8 @@
     "risky_values": "default aws/secretsmanager where separate key control is required\nKMS key policy allowing broad decrypt or administration\nreplica Region without region-appropriate KMS key governance\nchanging KMS key without validating access to existing and new versions",
     "risk_type": "secrets_manager_encryption_or_rotation_gap",
     "risk_level": "high",
-    "risk_reason": "Secrets Manager uses envelope encryption with KMS-generated 256-bit AES data keys. The selected KMS key controls who can create, update, decrypt, and replicate secret values. Weak KMS policy or the wrong key choice can undermine secret isolation.",
-    "security_value_reason": "Use customer managed KMS keys when you need independent access control, key policy conditions, audit separation, or Region-specific governance.",
+    "risk_reason": "Secret encryption KMS key 属于“Secrets Manager 加密或轮换治理缺口”。如果配置为风险值（default aws/secretsmanager where separate key control is required；KMS key policy allowing broad decrypt or administration；replica Region without region-appropriate KMS ke…），可能导致 secret 缺少合适 KMS 加密、自动轮换、访问边界或敏感字段治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（customer managed KMS key when independent policy/audit control is required；aws/secretsmanager only when default service-managed control is acceptable；kms:ViaService and e…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/security-encryption.html; https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_CreateSecret.html; https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_UpdateSecret.html"
   },
   {
@@ -745,8 +745,8 @@
     "risky_values": "rotation disabled for long-lived credentials\nrotation Lambda without least-privilege access\nrotation schedule configured but failing silently\nAWSPENDING/AWSCURRENT stage drift",
     "risk_type": "secrets_manager_encryption_or_rotation_gap",
     "risk_level": "high",
-    "risk_reason": "Secrets that are not rotated remain valid after exposure. Misconfigured rotation can leave current and pending versions inconsistent or update the secret without updating the target system.",
-    "security_value_reason": "Enable managed or Lambda rotation where supported and monitor rotation success, version staging labels, and target credential validity.",
+    "risk_reason": "Secret rotation 属于“Secrets Manager 加密或轮换治理缺口”。如果配置为风险值（rotation disabled for long-lived credentials；rotation Lambda without least-privilege access；rotation schedule configured but failing silently；AWSPENDING/AWSCURRENT stage…），可能导致 secret 缺少合适 KMS 加密、自动轮换、访问边界或敏感字段治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（managed rotation for supported managed secrets；Lambda rotation for custom secrets with tested four-step rotation；rotation schedule aligned to credential sensitivity；post-…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html; https://docs.aws.amazon.com/secretsmanager/latest/apireference/API_RotateSecret.html"
   },
   {
@@ -758,8 +758,8 @@
     "risky_values": "passwords, tokens, customer identifiers, or private keys in name/description/tags\noverly broad resource policy\nsecret value logged by rotation Lambda or client application",
     "risk_type": "secrets_manager_encryption_or_rotation_gap",
     "risk_level": "medium",
-    "risk_reason": "Secrets Manager encrypts the secret value, but names, descriptions, tags, rotation settings, and the KMS key ARN are not encrypted as secret values. Sensitive metadata can leak through inventory, billing, logs, or IAM-visible fields.",
-    "security_value_reason": "Keep confidential content only in encrypted secret values and review both resource policies and KMS key policies for least privilege.",
+    "risk_reason": "Secret value versus metadata boundary 属于“Secrets Manager 加密或轮换治理缺口”。如果配置为风险值（passwords, tokens, customer identifiers, or private keys in name/description/tags；overly broad resource policy；secret value logged by rotation Lambda or client applicatio…），可能导致 secret 缺少合适 KMS 加密、自动轮换、访问边界或敏感字段治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（put sensitive material only in SecretString or SecretBinary；use neutral names, descriptions, and tags；separate resource policy and KMS policy review）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/security-encryption.html; https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access.html"
   },
   {
@@ -771,8 +771,8 @@
     "risky_values": "root access key present\nlong-term IAM user access keys for human users\nunused or old access keys remaining active\nsecret access key stored in code, configuration, or shared files",
     "risk_type": "iam_long_term_credential_or_certificate_gap",
     "risk_level": "high",
-    "risk_reason": "Access keys are long-term signing credentials for AWS API requests. They are not automatically scoped by session duration like role credentials and can remain usable after exposure if not reviewed, rotated, or deleted.",
-    "security_value_reason": "Prefer temporary credentials and use access key last-used information to remove or rotate unavoidable long-term keys.",
+    "risk_reason": "IAM user access key lifecycle 属于“IAM 长期凭证或证书治理缺口”。如果配置为风险值（root access key present；long-term IAM user access keys for human users；unused or old access keys remaining active；secret access key stored in code, configuration, or shar…），可能让长期访问密钥、签名证书或服务凭证缺少轮换、吊销和最小权限治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（temporary credentials through IAM roles or federation；no root access keys；regular review of last-used data；disable and delete unused long-term access keys）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html; https://docs.aws.amazon.com/IAM/latest/UserGuide/securing_access-keys.html"
   },
   {
@@ -784,8 +784,8 @@
     "risky_values": "using IAM server certificate when ACM is supported\nexpired certificate\nmissing certificate chain\nprivate key mishandling before upload\nCloudFront certificate path not using required /cloudfront/ path",
     "risk_type": "iam_long_term_credential_or_certificate_gap",
     "risk_level": "medium",
-    "risk_reason": "IAM can store SSL/TLS server certificates and encrypt uploaded private keys, but AWS recommends ACM where supported. IAM certificate lifecycle is more manual and can lead to expiry, chain, or private-key handling risk.",
-    "security_value_reason": "Use ACM for certificate provisioning, deployment, and renewal where possible; reserve IAM server certificates for explicit compatibility cases.",
+    "risk_reason": "IAM server certificates 属于“IAM 长期凭证或证书治理缺口”。如果配置为风险值（using IAM server certificate when ACM is supported；expired certificate；missing certificate chain；private key mishandling before upload；CloudFront certificate path not usi…），可能让长期访问密钥、签名证书或服务凭证缺少轮换、吊销和最小权限治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（ACM-managed certificates in Regions and services that support ACM；IAM server certificates only where ACM is unavailable or required；valid PEM certificate, unencrypted pri…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_server-certs.html; https://docs.aws.amazon.com/IAM/latest/APIReference/API_UploadServerCertificate.html"
   },
   {
@@ -797,8 +797,8 @@
     "risky_values": "expired SAML X.509 certificate not monitored\nIdP signing certificate rotated without updating IAM provider\nprivate decryption key uploaded without governance\nassuming IAM Identity Center supports the same encrypted assertion model as IAM SAML federation",
     "risk_type": "iam_long_term_credential_or_certificate_gap",
     "risk_level": "high",
-    "risk_reason": "IAM SAML federation relies on X.509 certificates and, for encrypted assertions, private decryption key material. AWS notes IAM does not evaluate X.509 certificate expiration in SAML metadata, so organizations must monitor and rotate certificates themselves.",
-    "security_value_reason": "Treat SAML certificate and private key material as cryptographic trust anchors with explicit expiry monitoring, rotation windows, and IdP/AWS synchronization checks.",
+    "risk_reason": "IAM SAML provider certificates and encrypted assertions 属于“IAM 长期凭证或证书治理缺口”。如果配置为风险值（expired SAML X.509 certificate not monitored；IdP signing certificate rotated without updating IAM provider；private decryption key uploaded without governance；assuming IAM…），可能让长期访问密钥、签名证书或服务凭证缺少轮换、吊销和最小权限治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（monitor SAML X.509 certificate expiration；rotate IdP signing certificates before expiry；use encrypted SAML assertions only where IAM federation requires and supports them…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_saml.html; https://docs.aws.amazon.com/IAM/latest/APIReference/API_CreateSAMLProvider.html"
   },
   {
@@ -810,8 +810,8 @@
     "risky_values": "weak or default password policy for active IAM users\nno MFA for privileged users\nlong-lived IAM users used instead of federation\nMFA devices not reviewed after personnel changes",
     "risk_type": "iam_long_term_credential_or_certificate_gap",
     "risk_level": "medium",
-    "risk_reason": "Passwords and MFA devices are authentication secrets rather than cipher configuration, but weak credential controls increase the likelihood that cryptographic signing credentials or administrative sessions are misused.",
-    "security_value_reason": "Use federation and temporary credentials for workforce access; where IAM users remain, combine strong password policy with MFA and credential review.",
+    "risk_reason": "Password policy and MFA credential controls 属于“IAM 长期凭证或证书治理缺口”。如果配置为风险值（weak or default password policy for active IAM users；no MFA for privileged users；long-lived IAM users used instead of federation；MFA devices not reviewed after personnel…），可能让长期访问密钥、签名证书或服务凭证缺少轮换、吊销和最小权限治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（strong account password policy；MFA required for root and IAM users that remain in use；prefer federation for workforce users；conditions requiring MFA for sensitive actions…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html; https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html; https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
   },
   {
@@ -823,8 +823,8 @@
     "risky_values": "certificate near expiry without rotation plan\nold certificate removed before all applications trust the new certificate\nexternal IdP metadata missing X.509 certificate\nassuming encrypted SAML assertions are supported in IAM Identity Center external IdP flow",
     "risk_type": "iam_identity_center_federation_certificate_or_token_gap",
     "risk_level": "high",
-    "risk_reason": "IAM Identity Center uses X.509 certificates to establish SAML trust. Certificate rotation mistakes can break sign-in or leave stale trust material active. AWS documentation also calls out limits around SAML encryption support for external IdP flows.",
-    "security_value_reason": "Operate SAML certificate rotation as a planned cryptographic trust change with overlap, validation, and expiry monitoring.",
+    "risk_reason": "SAML 2.0 X.509 certificate rotation 属于“IAM Identity Center 联邦证书或令牌治理缺口”。如果配置为风险值（certificate near expiry without rotation plan；old certificate removed before all applications trust the new certificate；external IdP metadata missing X.509 certificate；as…），可能导致联邦证书、SAML/OIDC 令牌、会话时长或身份提供方信任链治理不足。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（rotate certificates before expiration；use overlap period where old and new certificates are trusted；verify IdP and service provider metadata after rotation；monitor certif…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/singlesignon/latest/userguide/managesamlcerts.html; https://docs.aws.amazon.com/singlesignon/latest/userguide/rotatecert.html; https://docs.aws.amazon.com/singlesignon/latest/userguide/other-idps.html"
   },
   {
@@ -836,8 +836,8 @@
     "risky_values": "expired SCIM token\nlong-lived token stored in IdP configuration without ownership\nmaximum token count reached because old tokens were not deleted\ntoken exposed in logs or tickets",
     "risk_type": "iam_identity_center_federation_certificate_or_token_gap",
     "risk_level": "high",
-    "risk_reason": "SCIM provisioning uses a bearer access token. If the token expires, leaks, or is not rotated cleanly, identity synchronization can fail or be abused.",
-    "security_value_reason": "Treat SCIM tokens as secrets: store them securely, rotate before expiration, and remove unused tokens after cutover.",
+    "risk_reason": "SCIM access token lifecycle 属于“IAM Identity Center 联邦证书或令牌治理缺口”。如果配置为风险值（expired SCIM token；long-lived token stored in IdP configuration without ownership；maximum token count reached because old tokens were not deleted；token exposed in logs or…），可能导致联邦证书、SAML/OIDC 令牌、会话时长或身份提供方信任链治理不足。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（rotate SCIM access token before expiration；store token in a managed secret store；delete unused or superseded SCIM tokens；monitor provisioning failures after rotation）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/singlesignon/latest/userguide/rotate-token.html; https://docs.aws.amazon.com/singlesignon/latest/developerguide/what-is-scim.html"
   },
   {
@@ -849,8 +849,8 @@
     "risky_values": "MFA disabled for workforce access\nexternal IdP manages MFA but enforcement is not verified\nweak authenticator types allowed without compensating controls\nunclear MFA responsibility during IdP migration",
     "risk_type": "iam_identity_center_federation_certificate_or_token_gap",
     "risk_level": "medium",
-    "risk_reason": "MFA is not a cipher setting, but it is a cryptographic authentication control. IAM Identity Center MFA responsibility differs depending on whether the identity source is internal, directory-based, or external IdP.",
-    "security_value_reason": "Define where MFA is enforced, prefer phishing-resistant options where feasible, and verify that external IdP MFA claims match the intended access assurance.",
+    "risk_reason": "MFA enforcement and external IdP boundary 属于“IAM Identity Center 联邦证书或令牌治理缺口”。如果配置为风险值（MFA disabled for workforce access；external IdP manages MFA but enforcement is not verified；weak authenticator types allowed without compensating controls；unclear MFA resp…），可能导致联邦证书、SAML/OIDC 令牌、会话时长或身份提供方信任链治理不足。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（MFA enabled or explicitly enforced by external IdP；FIDO2 passkeys or strong authenticator options where available；clear ownership of MFA policy between IAM Identity Cente…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/singlesignon/latest/userguide/mfa-configure.html; https://docs.aws.amazon.com/singlesignon/latest/userguide/mfa-getting-started.html; https://docs.aws.amazon.com/singlesignon/latest/userguide/manage-your-identity-source-idp.html"
   },
   {
@@ -862,8 +862,8 @@
     "risky_values": "treating Cloud Directory as customer configurable KMS/TLS policy service\nlegacy client TLS stack\nno FIPS endpoint for FIPS-required workload\nlong-term access keys for API signing\nsecrets stored in directory attributes, schema, paths, names, or tags",
     "risk_type": "managed_directory_crypto_boundary_gap",
     "risk_level": "medium",
-    "risk_reason": "Cloud Directory API access is protected by AWS managed HTTPS endpoints and signed requests. Customers do not configure service-side KMS keys or TLS policies, so risk comes from client crypto posture, credential signing, and sensitive data modeling in directory attributes.",
-    "security_value_reason": "Use modern TLS clients, FIPS endpoints where required, temporary AWS credentials, and keep secret values out of directory metadata unless protected by application-layer controls.",
+    "risk_reason": "Managed API crypto boundary 属于“托管目录密码边界治理缺口”。如果配置为风险值（treating Cloud Directory as customer configurable KMS/TLS policy service；legacy client TLS stack；no FIPS endpoint for FIPS-required workload；long-term access keys for API…），可能误判托管目录服务的密码边界，忽略 LDAP/TLS、Kerberos、证书或同步链路安全。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（TLS 1.2 or later client support；PFS-capable cipher support such as DHE/ECDHE；FIPS endpoint when FIPS validated module access is required；SigV4 signed requests with tempor…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/clouddirectory/latest/developerguide/infrastructure-security.html; https://docs.aws.amazon.com/clouddirectory/latest/developerguide/iam_auth_access.html; https://docs.aws.amazon.com/general/latest/gr/clouddirectory.html"
   },
   {
@@ -875,8 +875,8 @@
     "risky_values": "no classification export repository for audit retention\nKMS key in wrong Region or disabled\nbroad kms:Decrypt or s3:GetObject access to discovery results\nresults bucket without public access block or lifecycle governance\nassuming Macie findings alone retain full discovery details",
     "risk_type": "macie_results_encryption_or_sample_access_gap",
     "risk_level": "high",
-    "risk_reason": "Sensitive data discovery results can contain detailed locations and metadata for sensitive data. Macie lets you store these records in S3 and encrypt them with a KMS key; misconfigured S3/KMS access exposes sensitive investigation data or breaks retention.",
-    "security_value_reason": "Configure a dedicated S3 repository with same-Region KMS encryption, least-privilege bucket/KMS policies, and retention controls aligned to audit needs.",
+    "risk_reason": "Sensitive data discovery results repository 属于“Macie 结果加密或样本访问治理缺口”。如果配置为风险值（no classification export repository for audit retention；KMS key in wrong Region or disabled；broad kms:Decrypt or s3:GetObject access to discovery results；results bucket w…），可能导致敏感数据发现结果、样本或导出内容缺少加密和访问控制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（configure S3 repository for long-term discovery result retention；use an enabled same-Region symmetric KMS key；restrict bucket policy and KMS key policy to Macie and autho…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/macie/latest/APIReference/classification-export-configuration.html; https://docs.aws.amazon.com/macie/latest/user/discovery-results-repository-s3.html"
   },
   {
@@ -888,8 +888,8 @@
     "risky_values": "reveal samples enabled without scoped KMS key policy\ninvestigator can reveal samples without need-to-know\nmissing corresponding discovery result\nHMAC KMS signing requirement ignored for assumed-role object access\nrevealed samples copied into tickets or logs",
     "risk_type": "macie_results_encryption_or_sample_access_gap",
     "risk_level": "high",
-    "risk_reason": "When sensitive data samples are revealed, Macie encrypts extracted samples with a specified KMS key and temporarily caches them. The feature intentionally exposes excerpts of sensitive data, so KMS, IAM, and operational handling must be tightly controlled.",
-    "security_value_reason": "Use a customer managed KMS key with narrow permissions, restrict reveal access to investigators, and treat revealed samples as sensitive data outside Macie's temporary cache.",
+    "risk_reason": "Reveal sensitive data samples KMS key 属于“Macie 结果加密或样本访问治理缺口”。如果配置为风险值（reveal samples enabled without scoped KMS key policy；investigator can reveal samples without need-to-know；missing corresponding discovery result；HMAC KMS signing requirem…），可能导致敏感数据发现结果、样本或导出内容缺少加密和访问控制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（customer managed KMS key for sample encryption；least-privilege access to findings, discovery results, affected S3 object, and KMS key；short-lived operational access for i…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/macie/latest/user/findings-retrieve-sd-configure.html; https://docs.aws.amazon.com/macie/latest/APIReference/reveal-configuration.html; https://docs.aws.amazon.com/macie/latest/APIReference/findings-findingid-reveal.html"
   },
   {
@@ -901,8 +901,8 @@
     "risky_values": "treating Macie discovery as automatic S3 encryption remediation\nunencrypted or publicly accessible S3 buckets remain unresolved\nno workflow from Macie findings to S3/KMS changes\nclassification jobs scan data but results are not protected",
     "risk_type": "macie_results_encryption_or_sample_access_gap",
     "risk_level": "medium",
-    "risk_reason": "Macie identifies S3 data security risks including encryption status, but it does not itself enforce S3 encryption. Remediation must occur through S3, KMS, IAM, and governance workflows.",
-    "security_value_reason": "Use Macie findings as detection input and close the loop with S3 default encryption, KMS key policy, bucket policy, and ownership controls.",
+    "risk_reason": "S3 encryption findings and remediation boundary 属于“Macie 结果加密或样本访问治理缺口”。如果配置为风险值（treating Macie discovery as automatic S3 encryption remediation；unencrypted or publicly accessible S3 buckets remain unresolved；no workflow from Macie findings to S3/KMS…），可能导致敏感数据发现结果、样本或导出内容缺少加密和访问控制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（review Macie encryption-related S3 findings；remediate unencrypted buckets or weak bucket controls in S3；use customer managed KMS keys where data classification requires d…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://aws.amazon.com/documentation-overview/macie/; https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html"
   },
   {
@@ -914,8 +914,8 @@
     "risky_values": "S3_MANAGED_KEY where customer managed key is required\ncustomer managed KMS key without required grants\nKMS key disabled, scheduled for deletion, or wrong Region\nUpdateDataLake accidentally resets kmsKeyId to S3_MANAGED_KEY",
     "risk_type": "security_lake_encryption_or_access_boundary_gap",
     "risk_level": "high",
-    "risk_reason": "Security Lake stores security logs in S3 and encrypts them with SSE-S3 by default, but supports SSE-KMS for customer-managed key control. Incorrect KMS key policy or unintended fallback to S3-managed encryption can break ingestion or violate key-control requirements.",
-    "security_value_reason": "Select SSE-KMS when direct key governance is required and validate KMS grants before enabling sources, replication, and subscribers.",
+    "risk_reason": "Data lake encryptionConfiguration 属于“Security Lake 加密或访问边界缺口”。如果配置为风险值（S3_MANAGED_KEY where customer managed key is required；customer managed KMS key without required grants；KMS key disabled, scheduled for deletion, or wrong Region；UpdateDat…），可能让安全日志湖数据的 KMS 加密、跨账户访问或订阅边界不清晰。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（SSE-KMS with customer managed KMS key when direct key control is required；S3_MANAGED_KEY only when SSE-S3 is acceptable；KMS key policy grants Security Lake and required S…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/security-lake/latest/userguide/data-protection.html; https://docs.aws.amazon.com/security-lake/latest/APIReference/API_CreateDataLake.html; https://docs.aws.amazon.com/security-lake/latest/APIReference/API_UpdateDataLake.html"
   },
   {
@@ -927,8 +927,8 @@
     "risky_values": "rollup replication configured without KMS permissions\nsubscriber or replication role missing kms:Decrypt/Encrypt/GenerateDataKey as required\nRegion key mismatch\nreplication failures not monitored",
     "risk_type": "security_lake_encryption_or_access_boundary_gap",
     "risk_level": "medium",
-    "risk_reason": "When Security Lake data is replicated to rollup Regions and encrypted with customer managed KMS keys, replication roles and S3 service principals need corresponding KMS permissions. Missing grants can silently interrupt cross-Region log availability.",
-    "security_value_reason": "Treat rollup Regions as separate encryption domains and explicitly validate replication roles, KMS policies, and failure monitoring.",
+    "risk_reason": "Rollup Region replication and KMS permissions 属于“Security Lake 加密或访问边界缺口”。如果配置为风险值（rollup replication configured without KMS permissions；subscriber or replication role missing kms:Decrypt/Encrypt/GenerateDataKey as required；Region key mismatch；replicati…），可能让安全日志湖数据的 KMS 加密、跨账户访问或订阅边界不清晰。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（replication role has required S3 and KMS permissions；source and rollup Region KMS policies reviewed；replication tested after KMS key or Region changes；CloudTrail/monitori…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/security-lake/latest/userguide/add-rollup-region.html; https://docs.aws.amazon.com/security-lake/latest/userguide/data-protection.html"
   },
   {
@@ -940,8 +940,8 @@
     "risky_values": "subscriber can read more sources or Regions than needed\nsubscriber lacks required KMS permissions and fails open operationally\nSQS/EventBridge notification path not governed\nassuming S3 encryption replaces data access segmentation",
     "risk_type": "security_lake_encryption_or_access_boundary_gap",
     "risk_level": "medium",
-    "risk_reason": "Security Lake subscribers consume centralized security data from S3. Encryption protects stored objects, but confidentiality also depends on Lake Formation, IAM, KMS grants, and notification queue governance.",
-    "security_value_reason": "Scope subscriber access by data need, align KMS grants with subscriber identities, and treat notification queues as part of the encrypted data delivery boundary.",
+    "risk_reason": "Subscriber data access and encryption boundary 属于“Security Lake 加密或访问边界缺口”。如果配置为风险值（subscriber can read more sources or Regions than needed；subscriber lacks required KMS permissions and fails open operationally；SQS/EventBridge notification path not gover…），可能让安全日志湖数据的 KMS 加密、跨账户访问或订阅边界不清晰。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（least-privilege subscriber permissions；Lake Formation/IAM scope aligned to required sources；KMS permissions granted only to authorized subscribers；subscriber queues encry…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/security-lake/latest/userguide/subscriber-data-access.html; https://docs.aws.amazon.com/security-lake/latest/userguide/data-protection.html; https://docs.aws.amazon.com/security-lake/latest/APIReference/API_CreateSubscriber.html"
   },
   {
@@ -953,8 +953,8 @@
     "risky_values": "customer managed key policy missing Verified Permissions permissions\nasymmetric KMS key used for policy store encryption\nKMS key disabled, deleted, or inaccessible to callers\nassuming encryption key can be changed or removed after policy store creation\nbroad kms:Decrypt without source constraints",
     "risk_type": "verified_permissions_kms_or_token_validation_gap",
     "risk_level": "high",
-    "risk_reason": "Verified Permissions encrypts policy stores by default and can use a customer managed symmetric KMS key. Once a customer managed key is used for a policy store, AWS documents that it cannot be changed or removed; unavailable KMS access can make authorization decisions stale or inaccurate and block resource operations.",
-    "security_value_reason": "Choose customer managed KMS only when key control is required, validate key policy and caller permissions before creation, and treat the KMS choice as a durable policy-store boundary.",
+    "risk_reason": "Policy store encryption settings 属于“Verified Permissions KMS 或令牌校验缺口”。如果配置为风险值（customer managed key policy missing Verified Permissions permissions；asymmetric KMS key used for policy store encryption；KMS key disabled, deleted, or inaccessible to cal…），可能导致策略存储加密、授权令牌校验或身份上下文验证不足。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（AWS owned key for default managed encryption；customer managed symmetric KMS key when independent key control/audit is required；source context or encryption context condit…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/verifiedpermissions/latest/userguide/security-data-protection-cmk.html; https://docs.aws.amazon.com/verifiedpermissions/latest/apireference/API_CreatePolicyStore.html"
   },
   {
@@ -966,8 +966,8 @@
     "risky_values": "OIDC client or audience validation omitted\naccepting tokens from unintended application clients\nusing token claims in policies without validating issuer/audience semantics\nassuming Verified Permissions authenticates the user outside configured identity sources",
     "risk_type": "verified_permissions_kms_or_token_validation_gap",
     "risk_level": "high",
-    "risk_reason": "Verified Permissions can authorize with tokens from Cognito or OIDC identity sources. If client ID or audience validation is omitted or identity-source boundaries are unclear, a validly signed token from an unintended client can drive authorization decisions.",
-    "security_value_reason": "Configure identity sources with issuer, client, and audience expectations that match the application, and review token claims before using them in Cedar policies.",
+    "risk_reason": "OIDC/Cognito identity source token validation 属于“Verified Permissions KMS 或令牌校验缺口”。如果配置为风险值（OIDC client or audience validation omitted；accepting tokens from unintended application clients；using token claims in policies without validating issuer/audience semantic…），可能导致策略存储加密、授权令牌校验或身份上下文验证不足。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（Cognito or OIDC identity source explicitly configured；client ID and audience validation configured for OIDC providers；ID token use for principal identity where required；i…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/verifiedpermissions/latest/userguide/identity-sources.html; https://docs.aws.amazon.com/verifiedpermissions/latest/userguide/identity-sources-oidc.html; https://docs.aws.amazon.com/verifiedpermissions/latest/apireference/API_CreateIdentitySource.html"
   },
   {
@@ -979,8 +979,8 @@
     "risky_values": "ValidationSettings.Mode: OFF as production baseline\nSTRICT enabled before schema exists causing policy deployment failures\npolicy templates created without schema validation\nconfusing encryption-at-rest with authorization-policy correctness",
     "risk_type": "verified_permissions_kms_or_token_validation_gap",
     "risk_level": "medium",
-    "risk_reason": "Policy validation is not encryption, but it protects authorization policy integrity. AWS recommends STRICT after a schema is defined; using OFF long term can allow malformed or unintended authorization logic even when the policy store is encrypted.",
-    "security_value_reason": "Use schema-backed STRICT validation once the authorization model is defined, and treat validation failures separately from KMS encryption issues.",
+    "risk_reason": "Policy validation mode and schema boundary 属于“Verified Permissions KMS 或令牌校验缺口”。如果配置为风险值（ValidationSettings.Mode: OFF as production baseline；STRICT enabled before schema exists causing policy deployment failures；policy templates created without schema validat…），可能导致策略存储加密、授权令牌校验或身份上下文验证不足。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（STRICT after schema is defined；OFF only during controlled bootstrap or migration；schema reviewed before enabling broad production policies）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/verifiedpermissions/latest/apireference/API_ValidationSettings.html; https://docs.aws.amazon.com/verifiedpermissions/latest/apireference/API_CreatePolicyStore.html"
   },
   {
@@ -992,8 +992,8 @@
     "risky_values": "no S3 export for long-term history beyond 90-day finding retention\nmissing or wrong kmsKeyArn\nS3 bucket and KMS key Region mismatch\nopt-in Region export path not supported\narchived/suppressed findings assumed to export automatically",
     "risk_type": "guardduty_findings_export_encryption_gap",
     "risk_level": "high",
-    "risk_reason": "GuardDuty findings are retained for 90 days in the service. Optional export to S3 uses AWS KMS to encrypt findings data and requires the destination bucket and KMS key to satisfy regional and permission constraints.",
-    "security_value_reason": "Configure S3/KMS export per Region for audit history, with explicit KMS key ARN, compatible Region selection, and frequency aligned with investigation requirements.",
+    "risk_reason": "Findings export S3/KMS destination 属于“GuardDuty 发现结果导出加密缺口”。如果配置为风险值（no S3 export for long-term history beyond 90-day finding retention；missing or wrong kmsKeyArn；S3 bucket and KMS key Region mismatch；opt-in Region export path not supporte…），可能让威胁发现结果导出到 S3 或跨账户时缺少加密和访问治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（destinationType: S3；kmsKeyArn specified for exported findings；S3 bucket and KMS key in compatible Region；export configured in each active GuardDuty Region；frequency selec…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_exportfindings.html; https://docs.aws.amazon.com/guardduty/latest/APIReference/API_CreatePublishingDestination.html"
   },
   {
@@ -1005,8 +1005,8 @@
     "risky_values": "overbroad KMS key policy without SourceAccount/SourceArn\nmissing GuardDuty service principal\nwrong detector ARN or Region in condition\nbucket policy path changed after export configuration\ncross-account key policy not updated in key-owning account",
     "risk_type": "guardduty_findings_export_encryption_gap",
     "risk_level": "high",
-    "risk_reason": "GuardDuty needs permissions on both the S3 bucket and the KMS key to export encrypted findings. Missing permissions break export, while overbroad permissions weaken the encryption boundary around security findings.",
-    "security_value_reason": "Use the AWS documented GuardDuty KMS and S3 policy pattern, including source-account/source-ARN conditions and regional service principal adjustments where required.",
+    "risk_reason": "KMS key policy and S3 bucket policy for finding export 属于“GuardDuty 发现结果导出加密缺口”。如果配置为风险值（overbroad KMS key policy without SourceAccount/SourceArn；missing GuardDuty service principal；wrong detector ARN or Region in condition；bucket policy path changed after ex…），可能让威胁发现结果导出到 S3 或跨账户时缺少加密和访问治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（KMS key policy allows GuardDuty kms:GenerateDataKey；conditions include aws:SourceAccount and aws:SourceArn；S3 bucket policy allows GuardDuty PutObject with expected prefi…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_exportfindings.html"
   },
   {
@@ -1018,8 +1018,8 @@
     "risky_values": "assuming encrypted EBS volumes are always scanned without KMS permission review\ncustomer managed KMS policy blocks replica volume creation or scan access\nGuardDutyExcluded tag applied accidentally\nscan failures not monitored\nmalware scan treated as data encryption remediation",
     "risk_type": "guardduty_findings_export_encryption_gap",
     "risk_level": "medium",
-    "risk_reason": "GuardDuty Malware Protection creates snapshots and encrypted replica volumes as part of scanning EBS volumes. Customer managed KMS key permissions and exclusion tags can affect whether encrypted volumes are scanned successfully.",
-    "security_value_reason": "Treat encrypted EBS malware scanning as a KMS-permission-dependent workflow and monitor scan eligibility, failures, and exclusion tags.",
+    "risk_reason": "Malware Protection encrypted EBS scan boundary 属于“GuardDuty 发现结果导出加密缺口”。如果配置为风险值（assuming encrypted EBS volumes are always scanned without KMS permission review；customer managed KMS policy blocks replica volume creation or scan access；GuardDutyExclude…），可能让威胁发现结果导出到 S3 或跨账户时缺少加密和访问治理。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（encrypted and unencrypted supported EBS volumes eligible where feature is supported；customer managed KMS permissions validated for scan workflow；GuardDutyExcluded tag use…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/guardduty/latest/ug/gdu-malpro-supported-volumes.html; https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_malware_protection-ebs-volume-data.html; https://docs.aws.amazon.com/guardduty/latest/ug/malware-protection-backup-iam-permissions.html"
   },
   {
@@ -1031,8 +1031,8 @@
     "risky_values": "default key where customer managed key is required\ncustomer managed key in wrong Region\nKMS key disabled, scheduled for deletion, or inaccessible\nassuming new KMS setting re-encrypts existing assessments\nold KMS key permissions removed before old reports/exports are no longer needed",
     "risk_type": "audit_manager_evidence_encryption_gap",
     "risk_level": "high",
-    "risk_reason": "Audit Manager can use customer managed KMS keys for assessments, evidence, frameworks, controls, and reports. Changing settings applies to new assessments; old assessments and their reports continue to use the old KMS key, and disabling or deleting a key can make data unrecoverable.",
-    "security_value_reason": "Choose KMS settings before production assessments, retain permissions for historical keys, and avoid disabling or deleting keys that protect active or retained audit evidence.",
+    "risk_reason": "Audit Manager data encryption KMS setting 属于“Audit Manager 证据加密治理缺口”。如果配置为风险值（default key where customer managed key is required；customer managed key in wrong Region；KMS key disabled, scheduled for deletion, or inaccessible；assuming new KMS setting…），可能导致审计证据、评估导出或跨服务访问缺少加密和权限边界。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（customer managed symmetric KMS key when audit evidence key control is required；DEFAULT or AWS owned key only when service-managed encryption is acceptable；KMS key in same…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/audit-manager/latest/userguide/data-protection.html; https://docs.aws.amazon.com/audit-manager/latest/userguide/settings-KMS.html; https://docs.aws.amazon.com/audit-manager/latest/APIReference/API_RegisterAccount.html"
   },
   {
@@ -1044,8 +1044,8 @@
     "risky_values": "cross-Region report bucket with customer managed KMS mismatch\nS3 bucket policy requires SSE-KMS with a different key than Audit Manager setting\ncross-account bucket without ownership and bucket policy controls\nassuming AWS owned key report output uses SSE-KMS instead of SSE-S3",
     "risk_type": "audit_manager_evidence_encryption_gap",
     "risk_level": "medium",
-    "risk_reason": "Audit Manager publishes assessment reports to a chosen S3 bucket. AWS documents that customer managed KMS key Region must match the assessment and report destination bucket, and SSE-KMS bucket policies must align with the configured Audit Manager KMS key.",
-    "security_value_reason": "Keep report destinations in the same account and Region where possible, and align S3 bucket encryption requirements with Audit Manager KMS settings.",
+    "risk_reason": "Assessment report S3 destination and encryption match 属于“Audit Manager 证据加密治理缺口”。如果配置为风险值（cross-Region report bucket with customer managed KMS mismatch；S3 bucket policy requires SSE-KMS with a different key than Audit Manager setting；cross-account bucket witho…），可能导致审计证据、评估导出或跨服务访问缺少加密和权限边界。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（same-Region assessment, S3 bucket, and customer managed KMS key；S3 bucket policy SSE requirement aligned with Audit Manager KMS setting；same-account same-Region bucket pr…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/audit-manager/latest/userguide/settings-destination.html; https://docs.aws.amazon.com/audit-manager/latest/userguide/data-protection.html"
   },
   {
@@ -1057,8 +1057,8 @@
     "risky_values": "legacy client TLS posture\nKMS key deletion before evidence retention period ends\nassuming disabling Audit Manager preserves recoverable encrypted data\nassessment reports retained in S3 without lifecycle or access review",
     "risk_type": "audit_manager_evidence_encryption_gap",
     "risk_level": "medium",
-    "risk_reason": "Audit Manager uses TLS for in-transit protection and encrypted storage for evidence and reports, but evidence retention and key lifecycle must be aligned. Deleting Audit Manager data or disabling/deleting KMS keys can make audit artifacts unavailable.",
-    "security_value_reason": "Align TLS client requirements, CloudTrail auditability, evidence retention, S3 lifecycle, and KMS lifecycle before deleting data or keys.",
+    "risk_reason": "TLS access and audit evidence retention boundary 属于“Audit Manager 证据加密治理缺口”。如果配置为风险值（legacy client TLS posture；KMS key deletion before evidence retention period ends；assuming disabling Audit Manager preserves recoverable encrypted data；assessment reports…），可能导致审计证据、评估导出或跨服务访问缺少加密和权限边界。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（TLS 1.2 required and TLS 1.3 recommended for AWS API access；CloudTrail logging for API/user activity；retention and deletion plan for evidence and reports；KMS key lifecycl…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/audit-manager/latest/userguide/data-protection.html"
   },
   {
@@ -1070,8 +1070,8 @@
     "risky_values": "assuming Detective supports customer managed KMS keys\ncompliance requirement demands customer-controlled keys but Detective is used as the retention/export system\nbehavior graph administrator/member data boundary not reviewed\nconfusing Detective managed encryption with Security Lake KMS-governed data lake storage",
     "risk_type": "detective_managed_encryption_or_export_boundary_gap",
     "risk_level": "medium",
-    "risk_reason": "Detective encrypts data at rest and in transit, but its key-management page states that it uses AWS managed/owned keys that rotate automatically. Customers do not select KMS keys for Detective behavior graph data.",
-    "security_value_reason": "Document Detective as a managed investigation service, not a customer-managed-key data lake. Use complementary S3/KMS or Security Lake controls when direct key governance is required.",
+    "risk_reason": "Managed data encryption and key-management boundary 属于“Detective 托管加密或导出边界缺口”。如果配置为风险值（assuming Detective supports customer managed KMS keys；compliance requirement demands customer-controlled keys but Detective is used as the retention/export system；behavio…），可能误判 Detective 托管加密边界，或在导出分析数据时缺少额外加密和访问控制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（treat Detective encryption as AWS managed service encryption；use IAM least privilege for access to behavior graphs, investigations, and reports；use Security Lake or S3/KM…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/detective/latest/userguide/data-protection.html; https://docs.aws.amazon.com/detective/latest/userguide/key-management.html; https://docs.aws.amazon.com/detective/latest/userguide/what-is-detective.html"
   },
   {
@@ -1083,8 +1083,8 @@
     "risky_values": "legacy client TLS stack\nnon-PFS client cipher support\nno FIPS endpoint for FIPS-required workload\nlong-term access keys for programmatic investigation access\nCloudTrail logging not enabled for API/user activity",
     "risk_type": "detective_managed_encryption_or_export_boundary_gap",
     "risk_level": "medium",
-    "risk_reason": "Detective API access is through AWS managed endpoints. AWS requires TLS 1.2 and recommends TLS 1.3, with clients supporting PFS cipher suites. Customers control client posture, endpoint choice, credentials, and logging rather than service-side cipher policy.",
-    "security_value_reason": "Use modern TLS clients, FIPS endpoints where required, SigV4 temporary credentials, and CloudTrail logging for Detective API and console activity.",
+    "risk_reason": "API TLS/FIPS access boundary 属于“Detective 托管加密或导出边界缺口”。如果配置为风险值（legacy client TLS stack；non-PFS client cipher support；no FIPS endpoint for FIPS-required workload；long-term access keys for programmatic investigation access；CloudTrail l…），可能误判 Detective 托管加密边界，或在导出分析数据时缺少额外加密和访问控制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（TLS 1.2 or later required；TLS 1.3 recommended；PFS-capable cipher suites such as DHE/ECDHE on clients；FIPS endpoint when FIPS 140-3 validated module access is required；Sig…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/detective/latest/userguide/infrastructure-security.html; https://docs.aws.amazon.com/detective/latest/userguide/data-protection.html; https://docs.aws.amazon.com/detective/latest/userguide/security-iam.html"
   },
   {
@@ -1096,8 +1096,8 @@
     "risky_values": "downloaded report stored on unmanaged local device\nCSV/JSON copied to unencrypted shared drive, ticket, or chat\nsearch export treated as nonsensitive metadata\ncredentials or customer identifiers in tags/free-form fields\nno retention policy for exported investigation evidence",
     "risk_type": "detective_managed_encryption_or_export_boundary_gap",
     "risk_level": "high",
-    "risk_reason": "Detective lets users download investigation reports in JSON and export search results as CSV. After export, the data leaves Detective managed encryption and must be protected by the customer's storage, KMS, access, and retention controls.",
-    "security_value_reason": "Treat Detective exports as sensitive security evidence and immediately place them under encrypted, access-controlled, auditable storage.",
+    "risk_reason": "Investigation report and search-result export handling 属于“Detective 托管加密或导出边界缺口”。如果配置为风险值（downloaded report stored on unmanaged local device；CSV/JSON copied to unencrypted shared drive, ticket, or chat；search export treated as nonsensitive metadata；credentials…），可能误判 Detective 托管加密边界，或在导出分析数据时缺少额外加密和访问控制。因此需要将这些值视为需要整改、替换或明确例外审批的配置。",
+    "security_value_reason": "建议采用推荐值（store downloaded JSON/CSV in encrypted S3 or approved evidence repository；use SSE-KMS where customer key control is required after export；limit report access to investiga…）。这些配置更符合现代密码学基线、最小权限和托管生命周期治理要求，有助于降低弱协议、弱算法、密钥误用、证书失效或加密边界不清带来的风险；实际落地时仍应结合业务兼容性和合规要求验证。",
     "references": "https://docs.aws.amazon.com/detective/latest/userguide/download-investigation.html; https://docs.aws.amazon.com/detective/latest/userguide/detective-search.html; https://docs.aws.amazon.com/detective/latest/userguide/data-protection.html"
   }
 ]

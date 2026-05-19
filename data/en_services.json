@@ -448,5 +448,138 @@
       "monitor external IdP trust metadata"
     ],
     "api_endpoint_focus": "IAM Identity Center SAML certificate management / SCIM access token rotation / MFA settings"
+  },
+  {
+    "service_id": "cloud-directory",
+    "service": "Amazon Cloud Directory",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Identity & Credential Security",
+    "crypto_category": "Managed API TLS; IAM SigV4; FIPS endpoint",
+    "configurable_status": "not_configurable",
+    "main_focus": "Managed HTTPS API access; TLS 1.2+ client support; SigV4 signed requests; FIPS endpoint selection; directory attribute sensitivity boundary",
+    "typical_risks": "Mistaking Cloud Directory for a customer-configurable KMS/TLS-policy service; legacy client TLS or non-PFS cipher support; not using FIPS endpoints for FIPS-required access; storing sensitive credentials or secrets in directory object attributes, schema, tags, or metadata without application-layer protection.",
+    "service_intro": "Amazon Cloud Directory is a managed directory data store. Customers do not select KMS keys, TLS policies, or cipher suites for the service, so cryptography analysis should focus on API TLS/SigV4 boundaries, FIPS endpoint selection, and sensitive-data modeling in directory attributes.",
+    "detail_path": "#/services/cloud-directory",
+    "recommended_values": [
+      "Use AWS HTTPS endpoints with TLS 1.2 or later",
+      "Use PFS-capable clients",
+      "Use FIPS endpoint where required",
+      "Do not store secrets in directory metadata"
+    ],
+    "api_endpoint_focus": "Cloud Directory HTTPS API endpoints / FIPS endpoints / IAM SigV4 signed requests"
+  },
+  {
+    "service_id": "macie",
+    "service": "Amazon Macie",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Data Protection",
+    "crypto_category": "S3; KMS; Sensitive data discovery results; Sample reveal encryption",
+    "configurable_status": "configurable",
+    "main_focus": "Sensitive data discovery results repository; S3 bucket and KMS encryption; reveal samples KMS key; HMAC KMS requirement for assumed-role access",
+    "typical_risks": "No long-term sensitive data discovery results repository; wrong Region, permissions, or policy for the results S3 bucket or KMS key; reveal samples without a protected customer managed KMS key; ignoring HMAC KMS signing requirements when using assumed-role access; treating Macie findings as automatic remediation for S3 encryption risks.",
+    "service_intro": "Amazon Macie is a sensitive data discovery and S3 data security service. Cryptography-relevant controls focus on S3/KMS-protected discovery result storage, KMS encryption for reveal samples, and the workflow from S3 encryption findings to remediation.",
+    "detail_path": "#/services/macie",
+    "recommended_values": [
+      "Configure classification export repository",
+      "Use same-Region symmetric KMS key for discovery results",
+      "Use customer managed KMS key for reveal samples",
+      "Remediate S3 encryption findings separately"
+    ],
+    "api_endpoint_focus": "PutClassificationExportConfiguration.s3Destination.kmsKeyArn / UpdateRevealConfiguration.kmsKeyId / Reveal sensitive data occurrences"
+  },
+  {
+    "service_id": "security-lake",
+    "service": "Amazon Security Lake",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Data Protection",
+    "crypto_category": "S3; SSE-S3/SSE-KMS; KMS; Log data lake; Subscriber access",
+    "configurable_status": "configurable",
+    "main_focus": "Data lake encryptionConfiguration; SSE-S3 versus SSE-KMS; customer managed KMS key policy; rollup Region replication; subscriber data access boundary",
+    "typical_risks": "Using default SSE-S3 where customer managed KMS key control is required; KMS key policy missing permissions for Security Lake, S3 replication, subscribers, or related queues; missing KMS grants for rollup Region replication; overbroad subscriber data access; mistaking log-lake at-rest encryption for source transport encryption and data access segmentation.",
+    "service_intro": "Amazon Security Lake centralizes security logs and events in an S3 data lake. Cryptography-relevant configuration centers on data lake encryptionConfiguration, SSE-S3 versus SSE-KMS, customer managed KMS permissions, rollup Region replication, and subscriber access boundaries.",
+    "detail_path": "#/services/security-lake",
+    "recommended_values": [
+      "Use SSE-KMS with customer managed key where direct key control is required",
+      "Grant KMS permissions for Security Lake, S3 replication, and subscribers",
+      "Scope subscriber access through Lake Formation/IAM",
+      "Document source-to-lake encryption boundary"
+    ],
+    "api_endpoint_focus": "CreateDataLake.encryptionConfiguration.kmsKeyId / UpdateDataLake.encryptionConfiguration / CreateSubscriber"
+  },
+  {
+    "service_id": "verified-permissions",
+    "service": "Amazon Verified Permissions",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Identity & Credential Security",
+    "crypto_category": "KMS; Authorization policy store; OIDC/JWT token validation",
+    "configurable_status": "configurable",
+    "main_focus": "Policy store encryptionSettings; customer managed KMS key policy; OIDC/Cognito identity source token validation; policy validation mode",
+    "typical_risks": "No customer managed KMS key where independent key control is required; KMS key policy does not authorize Verified Permissions or callers; assuming a customer managed key can be freely changed or removed after creation; OIDC identity source missing client ID or audience validation; confusing encryption-at-rest with correct authorization logic.",
+    "service_intro": "Amazon Verified Permissions cryptography-relevant configuration is mainly policy store KMS encryption and token validation boundaries for OIDC/Cognito identity sources, rather than TLS cipher selection.",
+    "detail_path": "#/services/verified-permissions",
+    "recommended_values": [
+      "Customer managed symmetric KMS key when key control is required",
+      "KMS policy grants verifiedpermissions.amazonaws.com and callers",
+      "OIDC client ID/audience validation configured",
+      "ValidationSettings.Mode: STRICT after schema is defined"
+    ],
+    "api_endpoint_focus": "CreatePolicyStore.encryptionSettings / CreateIdentitySource.configuration / ValidationSettings.Mode"
+  },
+  {
+    "service_id": "guardduty",
+    "service": "Amazon GuardDuty",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Security Monitoring & Compliance",
+    "crypto_category": "S3; KMS; Findings export; EBS malware scan encryption boundary",
+    "configurable_status": "configurable",
+    "main_focus": "Publishing destination S3/KMS encryption; KMS and bucket policy for exports; regional export constraints; Malware Protection encrypted EBS scan boundary",
+    "typical_risks": "No findings export for long-term history beyond 90 days; wrong or missing KMS key ARN or S3 bucket policy; S3 bucket and KMS key Region mismatch; administrator account exporting member findings without cross-account boundary review; Malware Protection blocked by customer managed KMS permissions for encrypted EBS volumes.",
+    "service_intro": "Amazon GuardDuty is a threat detection service. Cryptography-relevant controls focus on KMS-encrypted findings export to S3, S3/KMS policy alignment, regional constraints, and Malware Protection workflows for encrypted EBS volumes.",
+    "detail_path": "#/services/guardduty",
+    "recommended_values": [
+      "CreatePublishingDestination.destinationProperties.kmsKeyArn",
+      "same-Region S3 bucket and KMS key",
+      "KMS policy allows GuardDuty GenerateDataKey",
+      "monitor Malware Protection scan support for encrypted EBS volumes"
+    ],
+    "api_endpoint_focus": "CreatePublishingDestination.destinationProperties.kmsKeyArn / UpdatePublishingDestination / Malware Protection for EC2 encrypted volume scan"
+  },
+  {
+    "service_id": "audit-manager",
+    "service": "AWS Audit Manager",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Security Monitoring & Compliance",
+    "crypto_category": "KMS; S3 assessment reports; Evidence encryption; TLS",
+    "configurable_status": "configurable",
+    "main_focus": "Audit Manager kmsKey setting; customer managed KMS key; assessment report destination S3 encryption; old/new assessment KMS boundary; TLS 1.2+ API access",
+    "typical_risks": "Default AWS owned/managed key where independent key control is required; assuming UpdateSettings re-encrypts old assessments and reports; disabled or deleted KMS key makes encrypted audit resources unrecoverable; S3 report bucket, KMS key, and assessment Region mismatch; SSE-KMS bucket policy conflicts with the Audit Manager configured KMS key.",
+    "service_intro": "AWS Audit Manager cryptography-relevant controls center on KMS key settings, evidence and assessment report encryption, S3 report destination alignment, and TLS-protected API access.",
+    "detail_path": "#/services/audit-manager",
+    "recommended_values": [
+      "customer managed symmetric KMS key where audit key control is required",
+      "same-Region KMS key, assessment, and report destination bucket",
+      "do not disable/delete active Audit Manager KMS key",
+      "TLS 1.2+ for API access"
+    ],
+    "api_endpoint_focus": "RegisterAccount.kmsKey / UpdateSettings.kmsKey / UpdateSettings.defaultAssessmentReportsDestination"
+  },
+  {
+    "service_id": "detective",
+    "service": "Amazon Detective",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "Security Monitoring & Compliance",
+    "crypto_category": "Managed KMS; TLS; FIPS endpoint; Investigation export boundary",
+    "configurable_status": "not_configurable",
+    "main_focus": "AWS managed key boundary; TLS 1.2+/PFS API access; FIPS endpoint selection; behavior graph member-data boundary; downloaded report/search export protection",
+    "typical_risks": "Mistaking Detective for a customer-managed-KMS security data lake; assuming service-side TLS policies or cipher suites are customer selectable; legacy clients that do not meet TLS 1.2+/PFS or FIPS endpoint requirements; downloaded investigation reports or CSV exports stored without encryption or tight access control; sensitive data in tags or free-form fields; unmanaged member-account contribution boundary for behavior graphs.",
+    "service_intro": "Amazon Detective is a managed security investigation and behavior graph analytics service. It does not expose customer-selectable KMS keys, TLS policies, or cipher suites, so cryptography analysis should focus on managed encryption boundaries, TLS/FIPS API access, multi-account behavior graph data boundaries, and protection of downloaded/exported investigation data.",
+    "detail_path": "#/services/detective",
+    "recommended_values": [
+      "Use TLS 1.2+ clients and prefer TLS 1.3",
+      "Use PFS-capable cipher suites on clients",
+      "Use FIPS endpoint where required",
+      "Store downloaded reports/CSV in encrypted controlled locations"
+    ],
+    "api_endpoint_focus": "Detective HTTPS API endpoints / FIPS endpoints / Download investigation report / Search CSV export"
   }
 ]

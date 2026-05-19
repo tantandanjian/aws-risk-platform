@@ -440,5 +440,138 @@
       "monitor external IdP trust metadata"
     ],
     "api_endpoint_focus": "IAM Identity Center SAML certificate management / SCIM access token rotation / MFA settings"
+  },
+  {
+    "service_id": "cloud-directory",
+    "service": "Amazon Cloud Directory",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "\u8eab\u4efd\u4e0e\u51ed\u636e\u5b89\u5168",
+    "crypto_category": "Managed API TLS; IAM SigV4; FIPS endpoint",
+    "configurable_status": "\u4e0d\u53ef\u914d\u7f6e",
+    "main_focus": "Managed HTTPS API access; TLS 1.2+ client support; SigV4 signed requests; FIPS endpoint selection; directory attribute sensitivity boundary",
+    "typical_risks": "\u5c06 Cloud Directory \u8bef\u8ba4\u4e3a\u53ef\u914d\u7f6e KMS/TLS policy \u7684\u5bc6\u7801\u670d\u52a1\uff1b\u5ba2\u6237\u7aef\u4f7f\u7528\u8fc7\u65e7 TLS \u6216\u4e0d\u652f\u6301 PFS cipher\uff1b\u672a\u5728\u9700\u8981 FIPS \u65f6\u4f7f\u7528 FIPS endpoint\uff1b\u5728 directory object attribute\u3001schema\u3001tag \u7b49\u5143\u6570\u636e\u4e2d\u653e\u5165\u672a\u7ecf\u5e94\u7528\u5c42\u4fdd\u62a4\u7684\u654f\u611f\u51ed\u636e\u6216\u79d8\u5bc6",
+    "service_intro": "Amazon Cloud Directory \u662f\u6258\u7ba1\u76ee\u5f55\u6570\u636e\u5b58\u50a8\u670d\u52a1\uff0c\u5ba2\u6237\u4e0d\u80fd\u9009\u62e9 KMS key\u3001TLS policy \u6216 cipher suite\u3002\u5bc6\u7801\u76f8\u5173\u5206\u6790\u5e94\u805a\u7126\u5728 AWS API \u7684 TLS/SigV4 \u8fb9\u754c\u3001FIPS endpoint \u9009\u62e9\u548c\u76ee\u5f55\u5c5e\u6027\u4e2d\u7684\u654f\u611f\u6570\u636e\u5efa\u6a21\u98ce\u9669\u3002",
+    "detail_path": "#/services/cloud-directory",
+    "recommended_values": [
+      "Use AWS HTTPS endpoints with TLS 1.2 or later",
+      "Use PFS-capable clients",
+      "Use FIPS endpoint where required",
+      "Do not store secrets in directory metadata"
+    ],
+    "api_endpoint_focus": "Cloud Directory HTTPS API endpoints / FIPS endpoints / IAM SigV4 signed requests"
+  },
+  {
+    "service_id": "macie",
+    "service": "Amazon Macie",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "\u6570\u636e\u4fdd\u62a4",
+    "crypto_category": "S3; KMS; Sensitive data discovery results; Sample reveal encryption",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "Sensitive data discovery results repository; S3 bucket and KMS encryption; reveal samples KMS key; HMAC KMS requirement for assumed-role access",
+    "typical_risks": "\u672a\u914d\u7f6e sensitive data discovery results \u957f\u671f\u4fdd\u7559\u5e93\uff1b\u7ed3\u679c\u5e93 S3 bucket \u6216 KMS key \u533a\u57df\u3001\u6743\u9650\u3001\u7b56\u7565\u914d\u7f6e\u9519\u8bef\uff1b\u672a\u4e3a reveal samples \u6307\u5b9a\u6216\u4fdd\u62a4 customer managed KMS key\uff1b\u4f7f\u7528 assumed role \u8bbf\u95ee\u6837\u672c\u65f6\u5ffd\u7565 HMAC KMS key \u7b7e\u540d\u8981\u6c42\uff1b\u5c06 Macie \u68c0\u6d4b\u7ed3\u679c\u89c6\u4e3a\u5df2\u81ea\u52a8\u4fee\u590d S3 \u52a0\u5bc6\u98ce\u9669",
+    "service_intro": "Amazon Macie \u672c\u8eab\u662f\u654f\u611f\u6570\u636e\u53d1\u73b0\u4e0e S3 \u6570\u636e\u5b89\u5168\u670d\u52a1\uff0c\u5bc6\u7801\u76f8\u5173\u53ef\u63a7\u70b9\u96c6\u4e2d\u5728\u654f\u611f\u6570\u636e\u53d1\u73b0\u7ed3\u679c\u7684 S3/KMS \u4fdd\u7559\u5e93\u3001reveal samples \u529f\u80fd\u7684 KMS key\uff0c\u4ee5\u53ca\u5bf9 S3 bucket \u52a0\u5bc6\u72b6\u6001\u7684\u53d1\u73b0\u4e0e\u6cbb\u7406\u95ed\u73af\u3002",
+    "detail_path": "#/services/macie",
+    "recommended_values": [
+      "Configure classification export repository",
+      "Use same-Region symmetric KMS key for discovery results",
+      "Use customer managed KMS key for reveal samples",
+      "Remediate S3 encryption findings separately"
+    ],
+    "api_endpoint_focus": "PutClassificationExportConfiguration.s3Destination.kmsKeyArn / UpdateRevealConfiguration.kmsKeyId / Reveal sensitive data occurrences"
+  },
+  {
+    "service_id": "security-lake",
+    "service": "Amazon Security Lake",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "\u6570\u636e\u4fdd\u62a4",
+    "crypto_category": "S3; SSE-S3/SSE-KMS; KMS; Log data lake; Subscriber access",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "Data lake encryptionConfiguration; SSE-S3 versus SSE-KMS; customer managed KMS key policy; rollup Region replication; subscriber data access boundary",
+    "typical_risks": "\u4f7f\u7528\u9ed8\u8ba4 SSE-S3 \u4f46\u4e1a\u52a1\u8981\u6c42\u9700\u8981\u5ba2\u6237\u7ba1\u7406 KMS key\uff1bSSE-KMS key policy \u672a\u6388\u6743 Security Lake\u3001S3 replication\u3001subscriber \u6216\u76f8\u5173\u961f\u5217\u5fc5\u8981\u6743\u9650\uff1b\u8de8\u533a\u57df rollup \u548c\u590d\u5236\u65f6 KMS \u6743\u9650\u7f3a\u5931\uff1b\u8ba2\u9605\u8005\u6570\u636e\u8bbf\u95ee\u8303\u56f4\u8fc7\u5bbd\uff1b\u5c06\u65e5\u5fd7\u6e56\u9759\u6001\u52a0\u5bc6\u8bef\u8ba4\u4e3a\u66ff\u4ee3\u4e86\u6e90\u7aef\u4f20\u8f93\u52a0\u5bc6\u548c\u8bbf\u95ee\u5206\u7ea7",
+    "service_intro": "Amazon Security Lake \u5c06\u5b89\u5168\u65e5\u5fd7\u548c\u4e8b\u4ef6\u6570\u636e\u96c6\u4e2d\u5230 S3 \u6570\u636e\u6e56\u3002\u5bc6\u7801\u76f8\u5173\u914d\u7f6e\u4e3b\u8981\u662f data lake encryptionConfiguration \u4e2d\u7684 SSE-S3/SSE-KMS \u9009\u62e9\u3001\u5ba2\u6237\u7ba1\u7406 KMS key \u6388\u6743\u3001rollup Region \u590d\u5236\u548c subscriber \u8bbf\u95ee\u8fb9\u754c\u3002",
+    "detail_path": "#/services/security-lake",
+    "recommended_values": [
+      "Use SSE-KMS with customer managed key where direct key control is required",
+      "Grant KMS permissions for Security Lake, S3 replication, and subscribers",
+      "Scope subscriber access through Lake Formation/IAM",
+      "Document source-to-lake encryption boundary"
+    ],
+    "api_endpoint_focus": "CreateDataLake.encryptionConfiguration.kmsKeyId / UpdateDataLake.encryptionConfiguration / CreateSubscriber"
+  },
+  {
+    "service_id": "verified-permissions",
+    "service": "Amazon Verified Permissions",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "\u8eab\u4efd\u4e0e\u51ed\u636e\u5b89\u5168",
+    "crypto_category": "KMS; Authorization policy store; OIDC/JWT token validation",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "Policy store encryptionSettings; customer managed KMS key policy; OIDC/Cognito identity source token validation; policy validation mode",
+    "typical_risks": "\u672a\u5728\u9700\u8981\u72ec\u7acb\u5bc6\u94a5\u63a7\u5236\u65f6\u4e3a policy store \u9009\u62e9 customer managed KMS key\uff1bKMS key policy \u672a\u6388\u6743 Verified Permissions \u6216\u8c03\u7528\u65b9\uff1b\u542f\u7528 customer managed key \u540e\u8bef\u4ee5\u4e3a\u53ef\u4ee5\u968f\u610f\u66f4\u6362\u6216\u79fb\u9664\uff1bOIDC identity source \u7f3a\u5c11 client ID/audience \u9a8c\u8bc1\uff1b\u5c06\u8fc7\u5bbd Cedar policy \u89c6\u4e3a\u5bc6\u7801\u52a0\u5bc6\u95ee\u9898\u800c\u5ffd\u7565\u6388\u6743\u903b\u8f91\u672c\u8eab",
+    "service_intro": "Amazon Verified Permissions \u7684\u5bc6\u7801\u76f8\u5173\u914d\u7f6e\u4e3b\u8981\u4e0d\u662f TLS cipher\uff0c\u800c\u662f policy store \u7684 KMS \u9759\u6001\u52a0\u5bc6\u548c OIDC/Cognito identity source \u7684 token \u9a8c\u8bc1\u8fb9\u754c\u3002\u98ce\u9669\u5173\u6ce8\u53ef\u6982\u62ec\u4e3a KMS \u5bc6\u94a5\u9009\u578b\u4e0e\u6388\u6743\u4e0d\u5f53\u3001\u52a0\u5bc6\u5bc6\u94a5\u4e0d\u53ef\u53d8\u66f4\u8fb9\u754c\u8bef\u89e3\u3001JWT \u53d7\u4f17/\u5ba2\u6237\u7aef\u6821\u9a8c\u4e0d\u8db3\u548c policy validation \u5173\u95ed\u5bfc\u81f4\u6388\u6743\u903b\u8f91\u5931\u914d\u3002",
+    "detail_path": "#/services/verified-permissions",
+    "recommended_values": [
+      "Customer managed symmetric KMS key when key control is required",
+      "KMS policy grants verifiedpermissions.amazonaws.com and callers",
+      "OIDC client ID/audience validation configured",
+      "ValidationSettings.Mode: STRICT after schema is defined"
+    ],
+    "api_endpoint_focus": "CreatePolicyStore.encryptionSettings / CreateIdentitySource.configuration / ValidationSettings.Mode"
+  },
+  {
+    "service_id": "guardduty",
+    "service": "Amazon GuardDuty",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "\u5b89\u5168\u76d1\u6d4b\u4e0e\u5408\u89c4",
+    "crypto_category": "S3; KMS; Findings export; EBS malware scan encryption boundary",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "Publishing destination S3/KMS encryption; KMS and bucket policy for exports; regional export constraints; Malware Protection encrypted EBS scan boundary",
+    "typical_risks": "\u672a\u914d\u7f6e findings export \u5bfc\u81f4 90 \u5929\u540e\u5386\u53f2\u7ed3\u679c\u7f3a\u5931\uff1bCreatePublishingDestination \u7684 kmsKeyArn \u6216 S3 bucket policy \u672a\u6b63\u786e\u6388\u6743 GuardDuty\uff1bKMS key \u4e0e S3 bucket \u533a\u57df\u4e0d\u5339\u914d\uff1b\u7ba1\u7406\u5458\u8d26\u53f7\u5bfc\u51fa\u6210\u5458\u8d26\u53f7 findings \u65f6\u672a\u8003\u8651\u8de8\u8d26\u53f7\u8bbf\u95ee\u8fb9\u754c\uff1bMalware Protection \u626b\u63cf customer managed KMS \u52a0\u5bc6 EBS \u5377\u65f6\u7f3a\u5c11\u5fc5\u8981\u6388\u6743\u6216\u76d1\u63a7",
+    "service_intro": "Amazon GuardDuty \u672c\u8eab\u662f\u5a01\u80c1\u68c0\u6d4b\u670d\u52a1\uff0c\u5bc6\u7801\u76f8\u5173\u53ef\u63a7\u70b9\u4e3b\u8981\u662f\u5c06 findings \u5bfc\u51fa\u5230 S3 \u65f6\u7684 KMS \u52a0\u5bc6\u3001S3/KMS \u7b56\u7565\u3001\u533a\u57df\u5339\u914d\uff0c\u4ee5\u53ca Malware Protection \u5904\u7406\u52a0\u5bc6 EBS \u5377\u548c\u526f\u672c\u7684\u8fb9\u754c\u3002",
+    "detail_path": "#/services/guardduty",
+    "recommended_values": [
+      "CreatePublishingDestination.destinationProperties.kmsKeyArn",
+      "same-Region S3 bucket and KMS key",
+      "KMS policy allows GuardDuty GenerateDataKey",
+      "monitor Malware Protection scan support for encrypted EBS volumes"
+    ],
+    "api_endpoint_focus": "CreatePublishingDestination.destinationProperties.kmsKeyArn / UpdatePublishingDestination / Malware Protection for EC2 encrypted volume scan"
+  },
+  {
+    "service_id": "audit-manager",
+    "service": "AWS Audit Manager",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "\u5b89\u5168\u76d1\u6d4b\u4e0e\u5408\u89c4",
+    "crypto_category": "KMS; S3 assessment reports; Evidence encryption; TLS",
+    "configurable_status": "\u53ef\u914d\u7f6e",
+    "main_focus": "Audit Manager kmsKey setting; customer managed KMS key; assessment report destination S3 encryption; old/new assessment KMS boundary; TLS 1.2+ API access",
+    "typical_risks": "\u9ed8\u8ba4 AWS owned/AWS managed key \u4e0d\u6ee1\u8db3\u72ec\u7acb\u5bc6\u94a5\u63a7\u5236\u8981\u6c42\uff1bUpdateSettings \u5207\u6362 KMS key \u540e\u8bef\u4ee5\u4e3a\u65e7 assessment \u548c report \u4e5f\u4f1a\u81ea\u52a8\u91cd\u52a0\u5bc6\uff1b\u7981\u7528\u6216\u5220\u9664 KMS key \u5bfc\u81f4\u5df2\u52a0\u5bc6\u5ba1\u8ba1\u8d44\u6e90\u4e0d\u53ef\u6062\u590d\uff1bassessment report S3 bucket \u4e0e KMS key/assessment \u533a\u57df\u4e0d\u5339\u914d\uff1bS3 bucket policy \u8981\u6c42 SSE-KMS \u4f46\u4e0e Audit Manager \u8bbe\u7f6e KMS key \u4e0d\u4e00\u81f4",
+    "service_intro": "AWS Audit Manager \u7684\u5bc6\u7801\u76f8\u5173\u53ef\u63a7\u70b9\u4e3b\u8981\u662f\u542f\u7528\u548c\u8bbe\u7f6e\u4e2d\u7684 KMS key\u3001\u8bc1\u636e\u4e0e assessment report \u7684\u9759\u6001\u52a0\u5bc6\u3001\u62a5\u544a\u76ee\u7684\u5730 S3 \u4e0e KMS \u5339\u914d\u3002\u98ce\u9669\u5173\u6ce8\u53ef\u6982\u62ec\u4e3a KMS \u5bc6\u94a5\u9009\u578b\u4e0d\u7b26\u5408\u5ba1\u8ba1\u8981\u6c42\u3001\u65b0\u65e7 assessment \u52a0\u5bc6\u8fb9\u754c\u8bef\u89e3\u3001KMS key \u7981\u7528/\u5220\u9664\u9020\u6210\u6570\u636e\u4e0d\u53ef\u8bfb\u548c S3 report \u76ee\u7684\u5730\u52a0\u5bc6\u914d\u7f6e\u5931\u914d\u3002",
+    "detail_path": "#/services/audit-manager",
+    "recommended_values": [
+      "customer managed symmetric KMS key where audit key control is required",
+      "same-Region KMS key, assessment, and report destination bucket",
+      "do not disable/delete active Audit Manager KMS key",
+      "TLS 1.2+ for API access"
+    ],
+    "api_endpoint_focus": "RegisterAccount.kmsKey / UpdateSettings.kmsKey / UpdateSettings.defaultAssessmentReportsDestination"
+  },
+  {
+    "service_id": "detective",
+    "service": "Amazon Detective",
+    "aws_category": "Security, Identity, & Compliance",
+    "service_group": "\u5b89\u5168\u76d1\u6d4b\u4e0e\u5408\u89c4",
+    "crypto_category": "Managed KMS; TLS; FIPS endpoint; Investigation export boundary",
+    "configurable_status": "\u4e0d\u53ef\u914d\u7f6e",
+    "main_focus": "AWS managed key boundary; TLS 1.2+/PFS API access; FIPS endpoint selection; behavior graph member-data boundary; downloaded report/search export protection",
+    "typical_risks": "\u5c06 Detective \u8bef\u8ba4\u4e3a\u53ef\u914d\u7f6e customer managed KMS key \u7684\u5b89\u5168\u6570\u636e\u6e56\uff1b\u8bef\u4ee5\u4e3a\u53ef\u4ee5\u9009\u62e9 TLS policy \u6216 cipher suite\uff1b\u5ba2\u6237\u7aef\u672a\u6ee1\u8db3 TLS 1.2+/PFS \u6216 FIPS endpoint \u8981\u6c42\uff1b\u5c06 investigation report JSON \u6216 search CSV \u4e0b\u8f7d\u540e\u5b58\u5230\u672a\u52a0\u5bc6\u6216\u8bbf\u95ee\u8fc7\u5bbd\u7684\u4f4d\u7f6e\uff1b\u5728 tags/free-form fields \u4e2d\u5199\u5165\u654f\u611f\u4fe1\u606f\uff1b\u884c\u4e3a\u56fe member account \u8d21\u732e\u6570\u636e\u8fb9\u754c\u672a\u7ecf\u6cbb\u7406",
+    "service_intro": "Amazon Detective \u662f\u6258\u7ba1\u5b89\u5168\u8c03\u67e5\u4e0e\u884c\u4e3a\u56fe\u5206\u6790\u670d\u52a1\uff0c\u4e0d\u63d0\u4f9b\u5ba2\u6237\u53ef\u9009 KMS key\u3001TLS policy \u6216 cipher suite\u3002\u5bc6\u7801\u76f8\u5173\u5206\u6790\u5e94\u805a\u7126\u5728 AWS \u6258\u7ba1\u52a0\u5bc6\u8fb9\u754c\u3001TLS/FIPS API \u8bbf\u95ee\u8981\u6c42\u3001behavior graph \u591a\u8d26\u53f7\u6570\u636e\u8fb9\u754c\uff0c\u4ee5\u53ca\u4e0b\u8f7d\u6216\u5bfc\u51fa\u8c03\u67e5\u6570\u636e\u540e\u7684\u5b58\u50a8\u4e0e\u5206\u53d1\u4fdd\u62a4\u3002",
+    "detail_path": "#/services/detective",
+    "recommended_values": [
+      "Use TLS 1.2+ clients and prefer TLS 1.3",
+      "Use PFS-capable cipher suites on clients",
+      "Use FIPS endpoint where required",
+      "Store downloaded reports/CSV in encrypted controlled locations"
+    ],
+    "api_endpoint_focus": "Detective HTTPS API endpoints / FIPS endpoints / Download investigation report / Search CSV export"
   }
 ]

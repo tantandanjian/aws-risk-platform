@@ -208,5 +208,54 @@
     "related_services": "AWS IAM Identity Center",
     "typical_risky_values": "SAML certificate near expiry; stale application certificate; expired SCIM token; token stored outside secret management; MFA disabled or delegated but unverified; unsupported encrypted SAML assertion assumption",
     "recommended_direction": "Rotate SAML certificates and SCIM tokens before expiration, store tokens securely, define MFA enforcement ownership, and validate external IdP trust metadata."
+  },
+  {
+    "risk_type": "managed_directory_crypto_boundary_gap",
+    "risk_description": "A managed directory service is mistaken for a customer-configurable encryption service, or client TLS, SigV4 credential use, FIPS endpoint selection, and sensitive directory attributes are not governed.",
+    "related_services": "Amazon Cloud Directory",
+    "typical_risky_values": "legacy TLS client; no FIPS endpoint for FIPS-required access; long-term access keys for API signing; secrets in object attributes/schema/tags; assuming customer-managed KMS is available",
+    "recommended_direction": "Use modern TLS clients, SigV4 temporary credentials, FIPS endpoints where required, IAM least privilege, and application-layer protection or avoidance for secret directory attributes."
+  },
+  {
+    "risk_type": "macie_results_encryption_or_sample_access_gap",
+    "risk_description": "Macie sensitive data discovery results, reveal samples, KMS keys, or S3 remediation workflow are missing, over-permissive, or misunderstood as automatic encryption remediation.",
+    "related_services": "Amazon Macie",
+    "typical_risky_values": "no classification export repository; wrong-Region or disabled KMS key; broad access to discovery results; reveal samples without narrow KMS policy; ignored HMAC KMS requirement; unremediated S3 encryption findings",
+    "recommended_direction": "Configure S3/KMS-protected discovery result storage, restrict reveal sample access with customer managed KMS keys, satisfy role/HMAC requirements, and remediate S3 encryption findings outside Macie."
+  },
+  {
+    "risk_type": "security_lake_encryption_or_access_boundary_gap",
+    "risk_description": "Security Lake data lake encryption, customer managed KMS key policy, rollup replication, or subscriber access boundary is weak or misconfigured.",
+    "related_services": "Amazon Security Lake",
+    "typical_risky_values": "S3_MANAGED_KEY where SSE-KMS is required; missing KMS grants; UpdateDataLake reset to S3-managed encryption; rollup replication without KMS permissions; overbroad subscriber access; ungoverned notification queues",
+    "recommended_direction": "Use SSE-KMS where direct key control is required, validate KMS permissions for Security Lake/S3/replication/subscribers, and scope subscriber access through IAM, Lake Formation, and KMS grants."
+  },
+  {
+    "risk_type": "verified_permissions_kms_or_token_validation_gap",
+    "risk_description": "Verified Permissions policy store encryption, KMS key policy, identity-source token validation, or policy validation mode is missing, overbroad, or misunderstood as a substitute for correct authorization logic.",
+    "related_services": "Amazon Verified Permissions",
+    "typical_risky_values": "AWS owned key where customer managed KMS is required; asymmetric KMS key; missing verifiedpermissions.amazonaws.com key policy; KMS key disabled/deleted; OIDC client/audience validation omitted; ValidationSettings OFF in production",
+    "recommended_direction": "Use customer managed symmetric KMS keys only when key control is required, validate key policy and caller access, configure OIDC/Cognito token validation, and use schema-backed STRICT policy validation after model definition."
+  },
+  {
+    "risk_type": "guardduty_findings_export_encryption_gap",
+    "risk_description": "GuardDuty findings export, S3/KMS policies, regional export settings, or malware-scan encrypted volume permissions are missing or misconfigured.",
+    "related_services": "Amazon GuardDuty",
+    "typical_risky_values": "no findings S3 export; missing kmsKeyArn; S3 bucket and KMS key Region mismatch; broad or missing KMS key policy; bucket policy path mismatch; encrypted EBS scan blocked by KMS permissions; accidental GuardDutyExcluded tag",
+    "recommended_direction": "Configure encrypted S3 findings export per Region, use AWS documented GuardDuty S3/KMS policy conditions, monitor export and scan failures, and validate KMS permissions for encrypted EBS malware scans."
+  },
+  {
+    "risk_type": "audit_manager_evidence_encryption_gap",
+    "risk_description": "Audit Manager evidence, assessments, reports, KMS settings, report S3 destination, TLS access, or evidence-retention key lifecycle is weak or misaligned.",
+    "related_services": "AWS Audit Manager",
+    "typical_risky_values": "default key where customer managed key is required; wrong-Region KMS key; disabled/deleted key; old assessments still using old key after UpdateSettings; S3 bucket SSE-KMS policy mismatches Audit Manager key; report bucket cross-account/Region mismatch",
+    "recommended_direction": "Use a customer managed symmetric KMS key where audit control requires it, keep KMS key Region aligned with assessments and report buckets, retain historical key access, and align evidence retention with S3/KMS lifecycle."
+  },
+  {
+    "risk_type": "detective_managed_encryption_or_export_boundary_gap",
+    "risk_description": "Detective managed encryption, API TLS/FIPS access, behavior graph data sharing, or downloaded investigation exports are misunderstood or not protected after data leaves the service boundary.",
+    "related_services": "Amazon Detective",
+    "typical_risky_values": "assuming customer managed KMS is available; legacy TLS clients; no FIPS endpoint where required; downloaded JSON/CSV reports stored unencrypted; sensitive data in tags/free-form fields; unmanaged behavior graph member-data boundary",
+    "recommended_direction": "Treat Detective as an AWS-managed encryption service, use TLS 1.2+/PFS and FIPS endpoints where required, govern behavior graph access, and store exports in encrypted, access-controlled repositories."
   }
 ]

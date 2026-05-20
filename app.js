@@ -1,4 +1,5 @@
 const pageSize = 9;
+const riskTypePageSize = 8;
 const collapsedFilterLimit = 6;
 const config = window.APP_CONFIG;
 
@@ -9,8 +10,10 @@ const state = {
   activeAwsCategory: "all",
   activeGroup: "all",
   activeStatus: "all",
+  activeSort: "name",
   query: "",
   page: 1,
+  riskTypePage: 1,
   expandedFilters: {},
 };
 
@@ -80,6 +83,67 @@ function riskLevelClass(level) {
   return "info";
 }
 
+function riskCountsForService(serviceId) {
+  return state.items
+    .filter((item) => item.service_id === serviceId)
+    .reduce(
+      (counts, item) => {
+        const level = compact(item.risk_level, "").toLowerCase();
+        counts.total += 1;
+        if (level === "high") counts.high += 1;
+        if (level === "medium") counts.medium += 1;
+        if (level === "low") counts.low += 1;
+        return counts;
+      },
+      { total: 0, high: 0, medium: 0, low: 0 },
+    );
+}
+
+function compareServices(left, right) {
+  if (state.activeSort === "name") {
+    return compact(left.service, "").localeCompare(compact(right.service, ""), config.lang);
+  }
+  const leftCounts = riskCountsForService(left.service_id);
+  const rightCounts = riskCountsForService(right.service_id);
+  return (
+    rightCounts.high - leftCounts.high ||
+    rightCounts.medium - leftCounts.medium ||
+    rightCounts.total - leftCounts.total ||
+    compact(left.service, "").localeCompare(compact(right.service, ""), config.lang)
+  );
+}
+
+function countMatches(services, predicate) {
+  return services.filter(predicate).length;
+}
+
+function serviceMatchesFilters(service, overrides = {}) {
+  const query = state.query.toLowerCase();
+  const awsCategory = displayAwsCategory(service);
+  const activeAwsCategory = overrides.awsCategory ?? state.activeAwsCategory;
+  const activeGroup = overrides.group ?? state.activeGroup;
+  const activeStatus = overrides.status ?? state.activeStatus;
+  const awsCategoryMatches = activeAwsCategory === "all" || awsCategory === activeAwsCategory;
+  const groupMatches = activeGroup === "all" || service.service_group === activeGroup;
+  const statusMatches = activeStatus === "all" || service.configurable_status === activeStatus;
+  const haystack = [
+    service.service_id,
+    service.service,
+    awsCategory,
+    service.aws_category,
+    service.service_group,
+    serviceGroupLabel(service.service_group),
+    service.crypto_category,
+    service.configurable_status,
+    serviceStatusLabel(service.configurable_status),
+    service.main_focus,
+    service.typical_risks,
+  ]
+    .join(" ")
+    .toLowerCase();
+  return awsCategoryMatches && groupMatches && statusMatches && (!query || haystack.includes(query));
+}
+
 function updateChrome() {
   document.documentElement.lang = config.lang;
   document.title = config.title;
@@ -115,7 +179,14 @@ function renderFilterOptions(container, options, settings) {
   const hiddenCount = options.length - visibleOptions.length;
   container.innerHTML = `
     ${visibleOptions
-      .map((option) => `<button class="chip" type="button" ${settings.attribute}="${escapeHtml(option.value)}">${escapeHtml(option.label)}</button>`)
+      .map((option) => {
+        const count = settings.countFor ? settings.countFor(option.value) : null;
+        const content =
+          count === null
+            ? escapeHtml(option.label)
+            : `<span class="chip-label">${escapeHtml(option.label)}</span><span class="chip-count">${escapeHtml(count)}</span>`;
+        return `<button class="chip" type="button" ${settings.attribute}="${escapeHtml(option.value)}">${content}</button>`;
+      })
       .join("")}
     ${shouldCollapse ? `<button class="chip chip-toggle" type="button" data-filter-toggle="${settings.key}" aria-expanded="${expanded}">${expanded ? escapeHtml(label("showLess")) : escapeHtml(label("showMore", hiddenCount))}</button>` : ""}
   `;
@@ -184,32 +255,49 @@ function renderHome() {
         ${renderStat(new Set(state.services.map(displayAwsCategory)).size, label("officialCategories"))}
       </div>
     </section>
-    <section class="filters" aria-label="${escapeHtml(label("serviceFiltersLabel"))}">
-      <label class="search-box">
-        <span>${escapeHtml(label("searchLabel"))}</span>
-        <input id="search-input" type="search" placeholder="${escapeHtml(label("searchPlaceholder"))}" autocomplete="off" />
-      </label>
-      <div class="filter-block">
-        <span class="filter-label">${escapeHtml(label("awsServiceCategory"))}</span>
-        <div id="group-filters" class="chips" role="list"></div>
-      </div>
-      <div class="filter-block">
-        <span class="filter-label">${escapeHtml(label("cryptoDimension"))}</span>
-        <div id="crypto-filters" class="chips" role="list"></div>
-      </div>
-      <div class="filter-block">
-        <span class="filter-label">${escapeHtml(label("controllability"))}</span>
-        <div id="status-filters" class="chips" role="list"></div>
+    <section class="dashboard-layout">
+      <aside class="filters" aria-label="${escapeHtml(label("serviceFiltersLabel"))}">
+        <div class="filter-toolbar">
+          <label class="sort-box">
+            <span>${escapeHtml(label("sortLabel"))}</span>
+            <select id="sort-select">
+              <option value="name">${escapeHtml(label("sortName"))}</option>
+              <option value="risk">${escapeHtml(label("sortRiskFirst"))}</option>
+            </select>
+          </label>
+          <button id="clear-filters" class="secondary-button" type="button">${escapeHtml(label("clearFilters"))}</button>
+        </div>
+        <div class="filter-block">
+          <span class="filter-label">${escapeHtml(label("awsServiceCategory"))}</span>
+          <div id="group-filters" class="chips" role="list"></div>
+        </div>
+        <div class="filter-block">
+          <span class="filter-label">${escapeHtml(label("cryptoDimension"))}</span>
+          <div id="crypto-filters" class="chips" role="list"></div>
+        </div>
+        <div class="filter-block">
+          <span class="filter-label">${escapeHtml(label("controllability"))}</span>
+          <div id="status-filters" class="chips" role="list"></div>
+        </div>
+      </aside>
+      <div class="results-panel">
+        <div class="results-toolbar">
+          <label class="search-box result-search">
+            <span>${escapeHtml(label("searchLabel"))}</span>
+            <input id="search-input" type="search" placeholder="${escapeHtml(label("searchPlaceholder"))}" autocomplete="off" />
+          </label>
+          <div id="pagination-slot" class="pagination-slot"></div>
+        </div>
+        <section class="section-head">
+          <div>
+            <h2>${escapeHtml(label("serviceOverview"))}</h2>
+            <p id="result-summary"></p>
+          </div>
+          <a class="secondary-link" href="#/risk-types">${escapeHtml(label("viewRiskTypes"))}</a>
+        </section>
+        <section id="service-grid" class="service-grid" aria-label="${escapeHtml(label("serviceCardsLabel"))}"></section>
       </div>
     </section>
-    <section class="section-head">
-      <div>
-        <h2>${escapeHtml(label("serviceOverview"))}</h2>
-        <p id="result-summary"></p>
-      </div>
-      <a class="secondary-link" href="#/risk-types">${escapeHtml(label("viewRiskTypes"))}</a>
-    </section>
-    <section id="service-grid" class="service-grid" aria-label="${escapeHtml(label("serviceCardsLabel"))}"></section>
   `;
 
   wireHomeFilters();
@@ -218,33 +306,18 @@ function renderHome() {
 
 function wireHomeFilters() {
   const categoryWrap = $("#group-filters");
-  renderFilterOptions(categoryWrap, config.filters.awsCategories, {
-    key: "awsCategory",
-    attribute: "data-aws-category",
-    activeValue: () => state.activeAwsCategory,
-  });
   categoryWrap.addEventListener("click", (event) => {
-    handleFilterClick(event, categoryWrap, config.filters.awsCategories, "awsCategory", "data-aws-category", "activeAwsCategory");
+    handleFilterClick(event, "data-aws-category", "activeAwsCategory");
   });
 
   const cryptoWrap = $("#crypto-filters");
-  renderFilterOptions(cryptoWrap, config.filters.cryptoGroups, {
-    key: "cryptoGroup",
-    attribute: "data-group",
-    activeValue: () => state.activeGroup,
-  });
   cryptoWrap.addEventListener("click", (event) => {
-    handleFilterClick(event, cryptoWrap, config.filters.cryptoGroups, "cryptoGroup", "data-group", "activeGroup");
+    handleFilterClick(event, "data-group", "activeGroup");
   });
 
   const statusWrap = $("#status-filters");
-  renderFilterOptions(statusWrap, config.filters.statuses, {
-    key: "status",
-    attribute: "data-status",
-    activeValue: () => state.activeStatus,
-  });
   statusWrap.addEventListener("click", (event) => {
-    handleFilterClick(event, statusWrap, config.filters.statuses, "status", "data-status", "activeStatus");
+    handleFilterClick(event, "data-status", "activeStatus");
   });
 
   const input = $("#search-input");
@@ -254,13 +327,53 @@ function wireHomeFilters() {
     state.page = 1;
     updateHomeResults();
   });
+
+  const sortSelect = $("#sort-select");
+  sortSelect.value = state.activeSort;
+  sortSelect.addEventListener("change", (event) => {
+    state.activeSort = event.target.value;
+    state.page = 1;
+    updateHomeResults();
+  });
+
+  $("#clear-filters").addEventListener("click", () => {
+    state.activeAwsCategory = "all";
+    state.activeGroup = "all";
+    state.activeStatus = "all";
+    state.query = "";
+    state.activeSort = "name";
+    state.page = 1;
+    $("#search-input").value = "";
+    $("#sort-select").value = state.activeSort;
+    updateHomeResults();
+  });
 }
 
-function handleFilterClick(event, container, options, key, attribute, stateKey) {
+function renderHomeFilterOptions() {
+  renderFilterOptions($("#group-filters"), config.filters.awsCategories, {
+    key: "awsCategory",
+    attribute: "data-aws-category",
+    activeValue: () => state.activeAwsCategory,
+    countFor: (value) => countMatches(state.services, (service) => serviceMatchesFilters(service, { awsCategory: value })),
+  });
+  renderFilterOptions($("#crypto-filters"), config.filters.cryptoGroups, {
+    key: "cryptoGroup",
+    attribute: "data-group",
+    activeValue: () => state.activeGroup,
+    countFor: (value) => countMatches(state.services, (service) => serviceMatchesFilters(service, { group: value })),
+  });
+  renderFilterOptions($("#status-filters"), config.filters.statuses, {
+    key: "status",
+    attribute: "data-status",
+    activeValue: () => state.activeStatus,
+    countFor: (value) => countMatches(state.services, (service) => serviceMatchesFilters(service, { status: value })),
+  });
+}
+
+function handleFilterClick(event, attribute, stateKey) {
   const toggle = event.target.closest("[data-filter-toggle]");
   if (toggle) {
     state.expandedFilters[toggle.dataset.filterToggle] = !state.expandedFilters[toggle.dataset.filterToggle];
-    renderFilterOptions(container, options, { key, attribute, activeValue: () => state[stateKey] });
     updateHomeResults();
     return;
   }
@@ -272,6 +385,7 @@ function handleFilterClick(event, container, options, key, attribute, stateKey) 
 }
 
 function updateHomeResults() {
+  renderHomeFilterOptions();
   document.querySelectorAll("[data-aws-category]").forEach((button) => {
     button.classList.toggle("active", button.dataset.awsCategory === state.activeAwsCategory);
   });
@@ -281,30 +395,9 @@ function updateHomeResults() {
   document.querySelectorAll("[data-status]").forEach((button) => {
     button.classList.toggle("active", button.dataset.status === state.activeStatus);
   });
+  $("#clear-filters").disabled = !hasActiveFilters();
 
-  const query = state.query.toLowerCase();
-  const filtered = state.services.filter((service) => {
-    const awsCategory = displayAwsCategory(service);
-    const awsCategoryMatches = state.activeAwsCategory === "all" || awsCategory === state.activeAwsCategory;
-    const groupMatches = state.activeGroup === "all" || service.service_group === state.activeGroup;
-    const statusMatches = state.activeStatus === "all" || service.configurable_status === state.activeStatus;
-    const haystack = [
-      service.service_id,
-      service.service,
-      awsCategory,
-      service.aws_category,
-      service.service_group,
-      serviceGroupLabel(service.service_group),
-      service.crypto_category,
-      service.configurable_status,
-      serviceStatusLabel(service.configurable_status),
-      service.main_focus,
-      service.typical_risks,
-    ]
-      .join(" ")
-      .toLowerCase();
-    return awsCategoryMatches && groupMatches && statusMatches && (!query || haystack.includes(query));
-  });
+  const filtered = state.services.filter((service) => serviceMatchesFilters(service)).sort(compareServices);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
   state.page = Math.min(Math.max(1, state.page), totalPages);
@@ -322,6 +415,10 @@ function updateHomeResults() {
   renderPagination(filtered.length, totalPages);
 }
 
+function hasActiveFilters() {
+  return Boolean(state.query) || state.activeAwsCategory !== "all" || state.activeGroup !== "all" || state.activeStatus !== "all" || state.activeSort !== "name";
+}
+
 function renderPagination(totalItems, totalPages) {
   let pagination = $("#pagination");
   if (!pagination) {
@@ -329,13 +426,12 @@ function renderPagination(totalItems, totalPages) {
     pagination.id = "pagination";
     pagination.className = "pagination";
     pagination.setAttribute("aria-label", label("paginationLabel"));
-    $("#service-grid").insertAdjacentElement("afterend", pagination);
+    $("#pagination-slot").appendChild(pagination);
     pagination.addEventListener("click", (event) => {
       const button = event.target.closest("[data-page]");
       if (!button || button.disabled) return;
       state.page = Number(button.dataset.page);
       updateHomeResults();
-      $(".section-head")?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
 
@@ -359,6 +455,7 @@ function renderPagination(totalItems, totalPages) {
 function renderServiceCard(service) {
   const status = compact(service.configurable_status);
   const awsCategory = displayAwsCategory(service);
+  const counts = riskCountsForService(service.service_id);
   return `
     <article class="service-card">
       <div class="tag-row">
@@ -367,6 +464,11 @@ function renderServiceCard(service) {
         <span class="tag">${escapeHtml(serviceGroupLabel(service.service_group))}</span>
       </div>
       <h3>${escapeHtml(service.service)}</h3>
+      <div class="risk-counts" aria-label="${escapeHtml(label("riskCounts"))}">
+        ${renderRiskCount("high", label("riskLevel_high"), counts.high)}
+        ${renderRiskCount("medium", label("riskLevel_medium"), counts.medium)}
+        ${renderRiskCount("info", label("configItems"), counts.total)}
+      </div>
       <dl class="meta-list">
         <div><dt>${escapeHtml(label("cryptoDimension"))}</dt><dd>${escapeHtml(serviceGroupLabel(service.service_group))}</dd></div>
         <div><dt>${escapeHtml(label("cryptoCategory"))}</dt><dd>${escapeHtml(service.crypto_category)}</dd></div>
@@ -376,6 +478,15 @@ function renderServiceCard(service) {
         <a class="primary-button" href="${escapeHtml(service.detail_path)}">${escapeHtml(label("viewDetails"))}</a>
       </div>
     </article>
+  `;
+}
+
+function renderRiskCount(level, title, value) {
+  return `
+    <span class="risk-count ${level}">
+      <strong>${escapeHtml(value)}</strong>
+      <span>${escapeHtml(title)}</span>
+    </span>
   `;
 }
 
@@ -423,6 +534,7 @@ function renderDetail(serviceId) {
     const expanded = row.hidden;
     row.hidden = !expanded;
     button.textContent = expanded ? label("collapse") : label("expand");
+    button.setAttribute("aria-expanded", String(expanded));
   });
 }
 
@@ -445,13 +557,13 @@ function renderItemsTable(items) {
       const detailId = `detail-row-${index}`;
       return `
         <tr>
-          <td>${escapeHtml(item.configuration_item)}</td>
-          <td>${escapeHtml(item.api_endpoint)}</td>
-          <td>${escapeHtml(item.recommended_values)}</td>
-          <td>${escapeHtml(item.risky_values)}</td>
-          <td><span class="tag ${riskLevelClass(item.risk_level)}">${escapeHtml(label(`riskLevel_${item.risk_level}`) || item.risk_level)}</span></td>
-          <td>${renderReference(item.references)}</td>
-          <td><button class="expand-button" type="button" data-expand="${detailId}">${escapeHtml(label("expand"))}</button></td>
+          <td data-label="${escapeHtml(label("configurationItem"))}">${escapeHtml(item.configuration_item)}</td>
+          <td data-label="${escapeHtml(label("apiEndpoint"))}">${escapeHtml(item.api_endpoint)}</td>
+          <td data-label="${escapeHtml(label("recommendedValues"))}">${escapeHtml(item.recommended_values)}</td>
+          <td data-label="${escapeHtml(label("riskyValues"))}">${escapeHtml(item.risky_values)}</td>
+          <td data-label="${escapeHtml(label("riskLevel"))}"><span class="tag ${riskLevelClass(item.risk_level)}">${escapeHtml(label(`riskLevel_${item.risk_level}`) || item.risk_level)}</span></td>
+          <td data-label="${escapeHtml(label("references"))}">${renderReference(item.references)}</td>
+          <td data-label="${escapeHtml(label("action"))}"><button class="expand-button" type="button" data-expand="${detailId}" aria-controls="${detailId}" aria-expanded="false">${escapeHtml(label("expand"))}</button></td>
         </tr>
         <tr id="${detailId}" class="detail-row" hidden>
           <td colspan="7">
@@ -518,7 +630,13 @@ function renderRiskTypes() {
       <p>${escapeHtml(label("naCopy"))}</p>
     </section>
     <section class="accordion-section">
-      <h2>${escapeHtml(label("riskTypeList"))}</h2>
+      <div class="risk-list-head">
+        <div>
+          <h2>${escapeHtml(label("riskTypeList"))}</h2>
+          <p id="risk-type-summary"></p>
+        </div>
+        <nav id="risk-pagination" class="pagination compact-pagination" aria-label="${escapeHtml(label("riskTypePaginationLabel"))}"></nav>
+      </div>
       <div id="risk-list" class="accordion-list"></div>
     </section>
     <section class="two-column">
@@ -537,7 +655,7 @@ function renderRiskTypes() {
     </section>
   `;
 
-  $("#risk-list").innerHTML = state.riskTypes.map(renderRiskType).join("");
+  renderRiskTypePage();
   $("#group-guide").innerHTML = renderGuideTable(config.guides.groupHeaders, config.guides.groupRows);
   $("#field-guide").innerHTML = renderGuideTable(config.guides.fieldHeaders, config.guides.fieldRows);
   $("#standard-list").innerHTML = config.guides.standardRows
@@ -548,6 +666,40 @@ function renderRiskTypes() {
       </details>
     `)
     .join("");
+}
+
+function renderRiskTypePage() {
+  const totalPages = Math.max(1, Math.ceil(state.riskTypes.length / riskTypePageSize));
+  state.riskTypePage = Math.min(Math.max(1, state.riskTypePage), totalPages);
+  const startIndex = (state.riskTypePage - 1) * riskTypePageSize;
+  const pageItems = state.riskTypes.slice(startIndex, startIndex + riskTypePageSize);
+  $("#risk-type-summary").textContent = label("riskTypeSummary", state.riskTypes.length, state.riskTypePage, totalPages);
+  $("#risk-list").innerHTML = pageItems.map(renderRiskType).join("");
+  renderRiskTypePagination(totalPages);
+}
+
+function renderRiskTypePagination(totalPages) {
+  const pagination = $("#risk-pagination");
+  if (totalPages <= 1) {
+    pagination.hidden = true;
+    pagination.innerHTML = "";
+    return;
+  }
+  pagination.hidden = false;
+  const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
+  pagination.innerHTML = `
+    <button type="button" data-risk-page="${state.riskTypePage - 1}" ${state.riskTypePage === 1 ? "disabled" : ""}>${escapeHtml(label("previous"))}</button>
+    <div class="pagination-pages">
+      ${pages.map((page) => `<button type="button" data-risk-page="${page}" class="${page === state.riskTypePage ? "active" : ""}" aria-current="${page === state.riskTypePage ? "page" : "false"}">${page}</button>`).join("")}
+    </div>
+    <button type="button" data-risk-page="${state.riskTypePage + 1}" ${state.riskTypePage === totalPages ? "disabled" : ""}>${escapeHtml(label("next"))}</button>
+  `;
+  pagination.onclick = (event) => {
+    const button = event.target.closest("[data-risk-page]");
+    if (!button || button.disabled) return;
+    state.riskTypePage = Number(button.dataset.riskPage);
+    renderRiskTypePage();
+  };
 }
 
 function renderRiskType(risk) {

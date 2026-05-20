@@ -35,7 +35,8 @@ a {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -104,6 +105,7 @@ input {
 
 .nav a,
 .secondary-link,
+.secondary-button,
 .back-link,
 .detail-link {
   display: inline-flex;
@@ -118,10 +120,22 @@ input {
 .nav a.active,
 .nav a:hover,
 .secondary-link:hover,
+.secondary-button:hover:not(:disabled),
 .back-link:hover,
 .detail-link:hover {
   background: var(--surface-strong);
   color: var(--text);
+}
+
+.secondary-button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.secondary-button:disabled {
+  opacity: 0.46;
+  cursor: not-allowed;
 }
 
 .app {
@@ -133,6 +147,10 @@ input {
 .app:has(.cover-page) {
   padding-top: 8px;
   padding-bottom: 24px;
+}
+
+.app:has(.dashboard-layout) {
+  width: min(1440px, calc(100% - 32px));
 }
 
 .cover-page {
@@ -352,10 +370,51 @@ h3 {
   font-size: 13px;
 }
 
-.filters {
+.dashboard-layout {
   display: grid;
-  gap: 18px;
-  padding: 28px 0;
+  grid-template-columns: 268px minmax(0, 1fr);
+  gap: 30px;
+  align-items: start;
+  padding: 28px 0 0;
+}
+
+.filters {
+  position: sticky;
+  top: 88px;
+  display: grid;
+  gap: 16px;
+  max-height: calc(100vh - 112px);
+  padding: 0 20px 0 0;
+  overflow: auto;
+  border-right: 1px solid var(--line);
+}
+
+.results-panel {
+  min-width: 0;
+}
+
+.results-toolbar {
+  position: sticky;
+  top: 78px;
+  z-index: 8;
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) auto;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 18px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(219, 226, 223, 0.92);
+  background: rgba(246, 247, 249, 0.94);
+  backdrop-filter: blur(12px);
+}
+
+.result-search {
+  min-width: 0;
+}
+
+.pagination-slot {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .filter-block {
@@ -365,26 +424,30 @@ h3 {
 
 .filter-label {
   color: var(--muted);
-  font-size: 14px;
-  font-weight: 650;
+  font-size: 12px;
+  font-weight: 760;
+  text-transform: uppercase;
 }
 
 .search-box {
   display: grid;
   gap: 8px;
   color: var(--muted);
-  font-size: 14px;
-  font-weight: 650;
+  font-size: 12px;
+  font-weight: 760;
+  text-transform: uppercase;
 }
 
 .search-box input {
   width: 100%;
-  min-height: 48px;
-  padding: 0 16px;
+  min-height: 40px;
+  padding: 0 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
   color: var(--text);
+  font-size: 13px;
+  text-transform: none;
   outline: none;
 }
 
@@ -393,33 +456,94 @@ h3 {
   box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
 }
 
+.filter-toolbar {
+  display: grid;
+  gap: 12px;
+}
+
+.sort-box {
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 760;
+  text-transform: uppercase;
+}
+
+.sort-box select {
+  min-height: 40px;
+  padding: 0 36px 0 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 13px;
+  text-transform: none;
+  outline: none;
+}
+
+.sort-box select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+}
+
 .chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  gap: 3px;
 }
 
 .chip {
-  min-height: 34px;
-  padding: 7px 12px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--surface);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  min-height: 30px;
+  padding: 6px 8px 6px 10px;
+  border: 0;
+  border-left: 3px solid transparent;
+  border-radius: 6px;
+  background: transparent;
   color: var(--muted);
   cursor: pointer;
+  font-size: 13px;
+  line-height: 1.25;
+  text-align: left;
 }
 
 .chip.active,
 .chip:hover {
-  border-color: rgba(15, 118, 110, 0.34);
-  background: var(--surface-strong);
+  border-left-color: var(--accent);
+  background: #eef3f1;
   color: var(--accent);
 }
 
 .chip-toggle {
-  border-style: dashed;
+  justify-content: flex-start;
   color: var(--accent);
   font-weight: 750;
+}
+
+.chip-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.chip-count {
+  flex: 0 0 auto;
+  min-width: 26px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: var(--accent-3);
+  font-size: 12px;
+  text-align: center;
+}
+
+.chip.active .chip-count,
+.chip:hover .chip-count {
+  background: #d9ebe6;
+  color: var(--accent);
 }
 
 .section-head {
@@ -446,7 +570,7 @@ h3 {
   justify-content: center;
   align-items: center;
   gap: 10px;
-  margin-top: 22px;
+  margin: 0;
 }
 
 .pagination-pages {
@@ -481,6 +605,11 @@ h3 {
 .pagination button:disabled {
   opacity: 0.48;
   cursor: not-allowed;
+}
+
+.compact-pagination {
+  justify-content: flex-end;
+  margin: 0;
 }
 
 .service-card {
@@ -523,6 +652,51 @@ h3 {
   min-width: 0;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.risk-counts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.risk-count {
+  min-height: 58px;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f8faf9;
+}
+
+.risk-count strong,
+.risk-count span {
+  display: block;
+}
+
+.risk-count strong {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.risk-count span {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.risk-count.high {
+  background: #fef2f2;
+  color: var(--danger);
+}
+
+.risk-count.medium {
+  background: #fff7ed;
+  color: var(--warn);
+}
+
+.risk-count.info {
+  background: #eff6ff;
+  color: var(--info);
 }
 
 .tag-row {
@@ -681,7 +855,7 @@ h3 {
 }
 
 .analysis-table-wrap {
-  overflow-x: hidden;
+  overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
@@ -807,6 +981,18 @@ tr.detail-row td {
   margin-top: 14px;
 }
 
+.risk-list-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.risk-list-head p {
+  margin: 8px 0 0;
+  color: var(--muted);
+}
+
 details {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -849,12 +1035,36 @@ details .panel {
 @media (max-width: 980px) {
   .hero,
   .cover-page,
+  .dashboard-layout,
   .two-column {
     grid-template-columns: 1fr;
   }
 
   .cover-page {
     min-height: auto;
+  }
+
+  .dashboard-layout {
+    gap: 20px;
+  }
+
+  .filters {
+    position: static;
+    max-height: none;
+    padding: 0 0 20px;
+    overflow: visible;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .results-toolbar {
+    top: 76px;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .pagination-slot {
+    justify-content: flex-start;
   }
 
   .service-grid,
@@ -907,9 +1117,83 @@ details .panel {
     grid-template-columns: 1fr;
   }
 
+  .sort-box select,
+  .secondary-button {
+    width: 100%;
+  }
+
   .pagination {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .risk-list-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .compact-pagination {
+    justify-content: flex-start;
+  }
+
+  .analysis-table-wrap {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+  }
+
+  .analysis-table,
+  .analysis-table tbody,
+  .analysis-table tr,
+  .analysis-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .analysis-table thead,
+  .analysis-table colgroup {
+    display: none;
+  }
+
+  .analysis-table tr {
+    margin-bottom: 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+
+  .analysis-table tr[hidden] {
+    display: none;
+  }
+
+  .analysis-table td {
+    display: grid;
+    grid-template-columns: minmax(104px, 34%) minmax(0, 1fr);
+    gap: 12px;
+    min-width: 0;
+    padding: 12px 14px;
+  }
+
+  .analysis-table td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 760;
+  }
+
+  .analysis-table td[colspan] {
+    display: block;
+  }
+
+  .analysis-table td[colspan]::before {
+    content: "";
+    display: none;
+  }
+
+  .detail-row {
+    margin-top: -12px;
+    border-top: 0;
   }
 
   .cover-page {
